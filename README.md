@@ -16,12 +16,13 @@ Everything is in `index.html` except the sprites in `assets/`.
 
 ## What's in this version
 
-ChatGPT's third version, built on the merged file from this repo. Includes:
+ChatGPT's fourth version, built on the merged file from this repo. Includes:
 
 - **Heroes:** Crypt Mage, Stormcaller (defeat a boss) and Emberweaver (reach wave 10 or earn 300 lifetime embers).
 - **Embers and upgrade shrine** with 6 permanent upgrades; the death screen shows embers earned and the next unlock.
 - **Evolutions:** Inferno, Storm Crown, Plague Heart, Ember Barrage, Absolute Zero, Arcane Tempest.
 - **Wave surprises:** runner rings, elite hunts (swift / splitting / armored) and a fleeing treasure imp.
+- **Achievements:** Deep Delver, Boss Slayer, Spell Weaver, Imp Catcher (one-time ember rewards).
 - **New level-up cards:** Phase Bolts, Soul Harvest, Voltaic Crits.
 - **Boss telegraphs** fill up over the wind-up and play a warning sound; slams deal damage (the original never did, due to a bug).
 - Lighter glow rendering for phones, 1×/1.25×/1.5× speed toggle, versioned saves.

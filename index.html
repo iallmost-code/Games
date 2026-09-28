@@ -286,6 +286,35 @@
         color: #ffe1a0;
         font-weight: 750;
       }
+      .achievements {
+        margin: 10px 0 13px;
+        text-align: left;
+        font-size: 11px;
+      }
+      .achievements-title {
+        color: #ffd995;
+        font-weight: 900;
+        letter-spacing: 0.14em;
+        margin-bottom: 6px;
+      }
+      .achievement {
+        display: flex;
+        justify-content: space-between;
+        gap: 8px;
+        padding: 4px 7px;
+        border-bottom: 1px solid #ffffff18;
+        color: #c4d6d5;
+      }
+      .achievement strong {
+        color: #ffe2a5;
+        white-space: nowrap;
+      }
+      .achievement.complete {
+        color: #9bdea9;
+      }
+      .panel {
+        overflow-y: auto;
+      }
       .panel {
         position: absolute;
         inset: 0;
@@ -479,6 +508,7 @@
             and follow the glowing markers to wells, forges, and vaults.
           </p>
           <div class="meta-bar" id="metaBar"></div>
+          <div class="achievements" id="achievements" hidden></div>
           <div id="choices"></div>
           <button class="menu-secondary" id="shrineBtn">UPGRADE SHRINE</button
           ><button class="menu-secondary" id="heroBtn">HERO: CRYPT MAGE</button
@@ -520,6 +550,7 @@
           kickerEl = $("kicker"),
           choicesEl = $("choices"),
           metaEl = $("metaBar"),
+          achievementsEl = $("achievements"),
           shrineBtn = $("shrineBtn"),
           heroBtn = $("heroBtn"),
           menuBack = $("menuBack"),
@@ -631,7 +662,19 @@
           best = +(localStorage.getItem("ember-crypt-best") || 0);
         } catch {}
         const profileKey = "ember-crypt-profile-v1";
-        let profile = { embers: 0, total: 0, upgrades: {}, storm: false, ember: false, migrated: false },
+        let profile = {
+            embers: 0,
+            total: 0,
+            upgrades: {},
+            storm: false,
+            ember: false,
+            migrated: false,
+            bestWave: 1,
+            bosses: 0,
+            bestEvolutions: 0,
+            imps: 0,
+            achievements: {},
+          },
           selectedHero = "mage",
           runEmbers = 0,
           pickupBonus = 0;
@@ -643,6 +686,10 @@
             profile.storm = !!prior.storm;
             profile.ember = !!prior.ember || profile.total >= 300;
             profile.migrated = !!prior.migrated;
+            for (const k of ["bestWave", "bosses", "bestEvolutions", "imps"])
+              profile[k] = Math.max(k === "bestWave" ? 1 : 0, Math.floor(Number(prior[k]) || 0));
+            for (const k of ["wave10", "boss3", "evolve2", "imp5"])
+              profile.achievements[k] = !!prior.achievements?.[k];
             for (const k of ["power", "vigor", "fleet", "magnet", "armor", "reroll"])
               profile.upgrades[k] = Math.min(5, Math.max(0, Math.floor(Number(prior.upgrades?.[k]) || 0)));
             selectedHero = ["storm", "ember"].includes(prior.selectedHero) ? prior.selectedHero : "mage";
@@ -666,6 +713,71 @@
           saveProfile();
         }
         const heroNames = { mage: "CRYPT MAGE", storm: "STORMCALLER", ember: "EMBERWEAVER" };
+        const heroTraits = {
+          mage: "Piercing staff · bolts pass through one foe",
+          storm: "Storm staff · bolts chain once · sturdier armor",
+          ember: "Cinder staff · defeated foes leave brief fire patches",
+        };
+        const achievementGoals = [
+          {
+            key: "wave10",
+            name: "Deep Delver",
+            goal: 10,
+            value: () => profile.bestWave,
+            reward: 25,
+            unit: "wave",
+          },
+          {
+            key: "boss3",
+            name: "Boss Slayer",
+            goal: 3,
+            value: () => profile.bosses,
+            reward: 35,
+            unit: "bosses",
+          },
+          {
+            key: "evolve2",
+            name: "Spell Weaver",
+            goal: 2,
+            value: () => profile.bestEvolutions,
+            reward: 40,
+            unit: "evolutions",
+          },
+          { key: "imp5", name: "Imp Catcher", goal: 5, value: () => profile.imps, reward: 35, unit: "imps" },
+        ];
+        function checkAchievements() {
+          for (const goal of achievementGoals) {
+            if (profile.achievements[goal.key] || goal.value() < goal.goal) continue;
+            profile.achievements[goal.key] = true;
+            awardEmbers(goal.reward);
+            showToast(goal.name.toUpperCase() + " · +" + goal.reward + " EMBERS");
+          }
+          saveProfile();
+        }
+        function showAchievements() {
+          achievementsEl.hidden = false;
+          achievementsEl.innerHTML =
+            '<div class="achievements-title">ACHIEVEMENTS · ONE-TIME REWARDS</div>' +
+            achievementGoals
+              .map(
+                (goal) =>
+                  '<div class="achievement' +
+                  (profile.achievements[goal.key] ? " complete" : "") +
+                  '"><span>' +
+                  (profile.achievements[goal.key] ? "✓ " : "") +
+                  goal.name +
+                  " · " +
+                  Math.min(goal.goal, goal.value()) +
+                  "/" +
+                  goal.goal +
+                  " " +
+                  goal.unit +
+                  "</span><strong>" +
+                  (profile.achievements[goal.key] ? "CLAIMED" : "✦ +" + goal.reward) +
+                  "</strong></div>",
+              )
+              .join("");
+        }
         function nextUnlock() {
           if (!profile.storm) return "Stormcaller: defeat a boss";
           if (!profile.ember)
@@ -700,8 +812,7 @@
           mode = "menu";
           kickerEl.textContent = "ONE-THUMB DUNGEON SURVIVAL";
           titleEl.innerHTML = "EMBER<br>CRYPT";
-          descEl.textContent =
-            "Survive the crypt. Collect embers, unlock permanent upgrades, and grow stronger between runs.";
+          descEl.textContent = heroTraits[selectedHero] + ". Collect embers and grow stronger between runs.";
           choicesEl.replaceChildren();
           updateMeta();
           metaEl.hidden = false;
@@ -710,6 +821,13 @@
           menuBack.hidden = true;
           start.hidden = false;
           let saved = readRun();
+          if (saved) {
+            profile.bestWave = Math.max(profile.bestWave, saved.wave);
+            profile.bosses = Math.max(profile.bosses, saved.runStats?.bosses || 0);
+            profile.bestEvolutions = Math.max(profile.bestEvolutions, saved.hero.evolutions?.length || 0);
+          }
+          checkAchievements();
+          showAchievements();
           resumeBtn.hidden = !saved;
           start.textContent = saved ? "NEW RUN" : "ENTER THE CRYPT";
           panel.classList.remove("hidden");
@@ -720,6 +838,7 @@
           kickerEl.textContent = "POWER THAT LASTS";
           titleEl.innerHTML = "UPGRADE<br>SHRINE";
           descEl.textContent = "Spend embers on upgrades for future runs.";
+          achievementsEl.hidden = true;
           updateMeta();
           shrineBtn.hidden = true;
           heroBtn.hidden = true;
@@ -765,6 +884,9 @@
           selectedHero = available[(available.indexOf(selectedHero) + 1) % available.length];
           saveProfile();
           updateMeta();
+          if (mode === "menu")
+            descEl.textContent =
+              heroTraits[selectedHero] + ". Collect embers and grow stronger between runs.";
         });
         let deathReactionBudget = 0,
           frameErrors = 0,
@@ -1084,32 +1206,32 @@
             y: 0,
             r: 14,
             hp:
-              (selectedHero === "storm" ? 85 : selectedHero === "ember" ? 92 : 100) +
+              (selectedHero === "storm" ? 100 : selectedHero === "ember" ? 92 : 100) +
               10 * (profile.upgrades.vigor || 0),
             maxHp:
-              (selectedHero === "storm" ? 85 : selectedHero === "ember" ? 92 : 100) +
+              (selectedHero === "storm" ? 100 : selectedHero === "ember" ? 92 : 100) +
               10 * (profile.upgrades.vigor || 0),
             speed: Math.round(
               (selectedHero === "storm" ? 245 : selectedHero === "ember" ? 238 : 230) *
                 (1 + (profile.upgrades.fleet || 0) * 0.05),
             ),
             damage: Math.round(
-              (selectedHero === "storm" ? 21 : selectedHero === "ember" ? 22 : 24) *
+              (selectedHero === "storm" ? 23 : selectedHero === "ember" ? 25 : 24) *
                 (1 + (profile.upgrades.power || 0) * 0.05),
             ),
             armor:
-              (selectedHero === "storm" ? 22 : selectedHero === "ember" ? 26 : 30) +
+              (selectedHero === "storm" ? 35 : selectedHero === "ember" ? 26 : 30) +
               10 * (profile.upgrades.armor || 0),
             maxArmor:
-              (selectedHero === "storm" ? 22 : selectedHero === "ember" ? 26 : 30) +
+              (selectedHero === "storm" ? 35 : selectedHero === "ember" ? 26 : 30) +
               10 * (profile.upgrades.armor || 0),
             armorBonus: 0,
             armorStyle: "cloth",
             lastHit: -99,
             range: 265,
-            baseRate: selectedHero === "storm" ? 0.31 : 0.28,
+            baseRate: selectedHero === "storm" ? 0.29 : selectedHero === "ember" ? 0.27 : 0.28,
             attackHaste: 0,
-            rate: selectedHero === "storm" ? 0.31 : 0.28,
+            rate: selectedHero === "storm" ? 0.29 : selectedHero === "ember" ? 0.27 : 0.28,
             critChance: 0.05,
             critMultiplier: 1.5,
             cast: 0,
@@ -1123,7 +1245,7 @@
             faceY: 1,
             stepPhase: 0,
             projectiles: 1,
-            pierceBonus: 0,
+            pierceBonus: selectedHero === "mage" ? 1 : 0,
             xpBurst: 0,
             critSpark: 0,
             chain: 0,
@@ -1131,9 +1253,9 @@
             weaponRank: 0,
             leech: 0,
             poison: false,
-            fire: selectedHero === "ember",
+            fire: false,
             evolutions: [],
-            fairies: selectedHero === "storm" ? ["lightning"] : selectedHero === "ember" ? ["flame"] : [],
+            fairies: [],
             class: selectedHero,
             rerolls: profile.upgrades.reroll || 0,
             pickupBonus: 18 * (profile.upgrades.magnet || 0),
@@ -1192,6 +1314,7 @@
           joy.dx = joy.dy = 0;
           stick.style.transform = "";
           panel.classList.add("hidden");
+          achievementsEl.hidden = true;
           start.hidden = false;
           resumeBtn.hidden = true;
           updateHud();
@@ -1246,6 +1369,7 @@
         function levelUp() {
           sfx("upgrade");
           mode = "upgrade";
+          achievementsEl.hidden = true;
           resetJoy();
           metaEl.hidden = true;
           shrineBtn.hidden = true;
@@ -1502,6 +1626,8 @@
                 text: o.text,
                 apply: () => {
                   hero.evolutions.push(o.key);
+                  profile.bestEvolutions = Math.max(profile.bestEvolutions, hero.evolutions.length);
+                  checkAchievements();
                   sfx("upgrade");
                   flash = 0.7;
                 },
@@ -1848,6 +1974,7 @@
           menuBack.hidden = true;
           sfx("death");
           mode = "over";
+          achievementsEl.hidden = true;
           resetJoy();
           let record = kills > best;
           if (record) {
@@ -2729,6 +2856,8 @@
             }
             drops.push({ x: e.x + 16, y: e.y, type: "loot", imp: true, wave });
             awardEmbers(5);
+            profile.imps++;
+            checkAchievements();
             rings.push({ x: e.x, y: e.y, r: 14, life: 0.6, speed: 320, color: "#ffd46e" });
             showToast("TREASURE IMP · HOARD DROPPED · +5 EMBERS");
           }
@@ -2738,6 +2867,19 @@
             showToast("TRIAL CLEARED · GEAR CACHE");
           }
           if (spreadDepth < 2 && deathReactionBudget++ < 18) statusDeath(e, spreadDepth);
+          if (hero.class === "ember" && clock - (hero.emberPatchAt ?? -99) >= 0.4) {
+            hero.emberPatchAt = clock;
+            pools.push({
+              x: e.x,
+              y: e.y,
+              r: 29,
+              life: 1.35,
+              tick: 0.5,
+              power: Math.max(2, hero.damage * 0.14),
+              kind: "cinder",
+            });
+            if (pools.length > 35) pools.shift();
+          }
           kills++;
           if (kills % 3 === 0) awardEmbers(1);
           if (e.type === "boss") {
@@ -2791,6 +2933,8 @@
           if (e.type === "boss") {
             sfx("bossDown");
             runStats.bosses++;
+            profile.bosses++;
+            checkAchievements();
             boss = enemies.find((other) => other.type === "boss") || null;
             drops.push({ x: e.x + 18, y: e.y, type: "loot", value: 0, variant: e.variant, wave });
             showToast(
@@ -3020,6 +3164,8 @@
           let nextWave = 1 + Math.floor(waveClock / 20);
           if (nextWave > wave) {
             wave = nextWave;
+            profile.bestWave = Math.max(profile.bestWave, wave);
+            checkAchievements();
             if (wave >= 10 && !profile.ember) {
               profile.ember = true;
               saveProfile();
@@ -3088,7 +3234,7 @@
                 damage: hero.damage * (Math.random() < hero.critChance ? hero.critMultiplier : 1),
                 baseDamage: hero.damage,
                 color: hero.evolutions?.includes("barrage") ? "#ffc46f" : undefined,
-                chain: !!hero.chain || hero.weaponEffect === "arc",
+                chain: hero.class === "storm" || !!hero.chain || hero.weaponEffect === "arc",
                 arcRank: hero.weaponEffect === "arc" ? hero.weaponRank : 0,
                 pierceLeft: (hero.weaponEffect === "pierce" ? hero.weaponRank : 0) + (hero.pierceBonus || 0),
                 splash: true,
@@ -3555,6 +3701,7 @@
               for (const e of [...enemies])
                 if (Math.hypot(e.x - pool.x, e.y - pool.y) < pool.r + e.r) {
                   if (pool.kind === "frozen") afflict(e, "frost", pool.power);
+                  else if (pool.kind === "cinder") damageEnemy(e, pool.power, "burn", 2);
                   else if (pool.kind === "flame") {
                     afflict(e, "burn", pool.power);
                     damageEnemy(e, pool.power, "burn", 2);
@@ -4467,12 +4614,20 @@
               continue;
             ctx.globalAlpha = Math.min(0.45, pool.life * 0.16);
             ctx.fillStyle =
-              pool.kind === "frozen" ? "#86ccea" : pool.kind === "flame" ? "#e46a32" : "#5ac65d";
+              pool.kind === "frozen"
+                ? "#86ccea"
+                : ["flame", "cinder"].includes(pool.kind)
+                  ? "#e46a32"
+                  : "#5ac65d";
             ctx.beginPath();
             ctx.ellipse(pool.x, pool.y, pool.r, pool.r * 0.58, 0, 0, 7);
             ctx.fill();
             ctx.strokeStyle =
-              pool.kind === "frozen" ? "#c8f5ff" : pool.kind === "flame" ? "#ffc177" : "#adfa7d";
+              pool.kind === "frozen"
+                ? "#c8f5ff"
+                : ["flame", "cinder"].includes(pool.kind)
+                  ? "#ffc177"
+                  : "#adfa7d";
             ctx.lineWidth = 3;
             ctx.stroke();
             ctx.globalAlpha = 1;
