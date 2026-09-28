@@ -16,10 +16,12 @@ Everything is in `index.html` except the sprites in `assets/`.
 
 ## What's in this version
 
-Based on ChatGPT's second version (embers + upgrade shrine, unlockable Stormcaller hero, 1×/1.25×/1.5× speed toggle, Inferno / Storm Crown / Plague Heart / Ember Barrage evolutions, runner rings and elite hunts), plus:
+ChatGPT's third version, built on the merged file from this repo. Includes:
 
-- **Two more evolutions:** Grave Nova II + Frost Fairy → **Absolute Zero**; Arcane Lance II + Arcane Fairy → **Arcane Tempest**. Evolution cards are highlighted in gold.
-- **Treasure imp:** appears on wave 2 and in the wave-surprise rotation. It flees; catch it within 14 seconds for a gear cache, XP and embers. A gold arrow points to it.
-- **Elite modifiers:** elite hunts roll Swift, Splitting (breaks into runners) or Armored (half damage).
-- **Gentler XP curve** after the first few levels so level-ups don't come every few seconds.
-- **Bug fix:** boss slam attacks ("DODGE THE MARK") threw an error and never dealt damage; they now hit if you stay in the marked circle.
+- **Heroes:** Crypt Mage, Stormcaller (defeat a boss) and Emberweaver (reach wave 10 or earn 300 lifetime embers).
+- **Embers and upgrade shrine** with 6 permanent upgrades; the death screen shows embers earned and the next unlock.
+- **Evolutions:** Inferno, Storm Crown, Plague Heart, Ember Barrage, Absolute Zero, Arcane Tempest.
+- **Wave surprises:** runner rings, elite hunts (swift / splitting / armored) and a fleeing treasure imp.
+- **New level-up cards:** Phase Bolts, Soul Harvest, Voltaic Crits.
+- **Boss telegraphs** fill up over the wind-up and play a warning sound; slams deal damage (the original never did, due to a bug).
+- Lighter glow rendering for phones, 1×/1.25×/1.5× speed toggle, versioned saves.
