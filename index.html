@@ -324,6 +324,20 @@
         padding: 12px 15px;
         margin-top: 9px;
       }
+      .choice em {
+        display: block;
+        font-size: 11px;
+        font-style: normal;
+        font-weight: 700;
+        color: #ffd46e;
+        margin-top: 3px;
+      }
+      .choice.evolution {
+        border-color: #ffd46e;
+        background: linear-gradient(120deg, #4a3413, #2b2433);
+        box-shadow: 0 0 18px #ffb84a55;
+        color: #ffe7a8;
+      }
       .choice small {
         display: block;
         font-size: 13px;
@@ -656,6 +670,7 @@
                 siteNext,
                 xpReserve,
                 trialChoicePending,
+                eventCycle,
               }),
             );
             lastSavedClock = clock;
@@ -697,6 +712,7 @@
           siteCycle = saved.siteCycle || 0;
           siteNext = saved.siteNext || clock + 30;
           xpReserve = saved.xpReserve || 0;
+          eventCycle = saved.eventCycle || 0;
           clearWall(hero);
           for (const e of enemies) clearWall(e);
           trialChoicePending = saved.trialChoicePending || 0;
@@ -744,7 +760,7 @@
             r: 14,
             hp: 100,
             maxHp: 100,
-            speed: 190,
+            speed: 225,
             damage: 24,
             armor: 30,
             maxArmor: 30,
@@ -752,9 +768,9 @@
             armorStyle: "cloth",
             lastHit: -99,
             range: 265,
-            baseRate: 0.34,
+            baseRate: 0.29,
             attackHaste: 0,
-            rate: 0.34,
+            rate: 0.29,
             critChance: 0.05,
             critMultiplier: 1.5,
             cast: 0,
@@ -779,6 +795,7 @@
             shieldCharges: 0,
             hasteUntil: 0,
             inv: 0,
+            evos: [],
           };
           runStats = { damage: 0, hpLost: 0, armorBlocked: 0, bosses: 0 };
           weaponDryStreak = 0;
@@ -797,6 +814,7 @@
           siteNext = 42;
           xpReserve = 0;
           trialChoicePending = 0;
+          eventCycle = 0;
           for (let i = 0; i < 3; i++) createSite(true);
           boss = null;
           weapon = null;
@@ -814,7 +832,7 @@
           kills = 0;
           level = 1;
           xp = 0;
-          needed = 8;
+          needed = 5;
           shake = 0;
           flash = 0;
           mode = "play";
@@ -1039,15 +1057,39 @@
             picks = [featured, ...picks.filter((o) => o !== featured)].slice(0, 3);
           }
           if (level % 5 === 0 && fairyChoices.length) {
-            let guaranteed = fairyChoices[0];
+            let guaranteed = fairyChoices[Math.floor(Math.random() * fairyChoices.length)];
             picks = picks.filter((p) => p.name !== guaranteed.name);
             picks.unshift(guaranteed);
             picks = picks.slice(0, 3);
           }
+          let evo = EVOLUTIONS.find((o) => !hasEvo(o.key) && o.ready());
+          if (evo) {
+            picks = [
+              {
+                name: evo.name,
+                text: evo.text,
+                evolution: true,
+                apply: () => {
+                  hero.evos = [...(hero.evos || []), evo.key];
+                  flash = 0.6;
+                  rings.push({ x: hero.x, y: hero.y, r: 20, life: 0.8, speed: 520, color: "#ffd46e" });
+                },
+              },
+              ...picks,
+            ].slice(0, 3);
+            descEl.textContent = "Your powers have combined. An evolution is ready.";
+          }
           for (const p of picks) {
-            let b = document.createElement("button");
-            b.className = "choice";
-            b.innerHTML = p.name + "<small>" + p.text + "</small>";
+            let b = document.createElement("button"),
+              hint = p.evolution ? "" : evolutionHint(p.name);
+            b.className = p.evolution ? "choice evolution" : "choice";
+            b.innerHTML =
+              (p.evolution ? "✦ EVOLUTION · " : "") +
+              p.name +
+              "<small>" +
+              p.text +
+              "</small>" +
+              (hint ? "<em>" + hint + "</em>" : "");
             b.onclick = () => {
               sfx("loot");
               p.apply();
@@ -1120,7 +1162,9 @@
           resetJoy();
           kickerEl.textContent = drop.trial
             ? "HUNTER’S TRIAL CACHE"
-            : (bossNames[drop.variant] || "CRYPT WARDEN") + " TREASURE";
+            : drop.imp
+              ? "TREASURE IMP HOARD"
+              : (bossNames[drop.variant] || "CRYPT WARDEN") + " TREASURE";
           titleEl.innerHTML = "CHOOSE<br>YOUR GEAR";
           descEl.textContent = "A weapon, armor, and a random third find. Rare+ weapon after two dry drops.";
           start.hidden = true;
@@ -1443,9 +1487,125 @@
             e.preventDefault();
         });
         addEventListener("keyup", (e) => (keys[e.key.toLowerCase()] = false));
+        const WAVE_SECONDS = 20;
+        let eventCycle = 0;
+        // Owning both halves of a pair unlocks an evolution, offered first at the next level-up.
+        const EVOLUTIONS = [
+          {
+            key: "inferno",
+            name: "INFERNO",
+            text: "Burning foes erupt in huge blasts that spread their flames",
+            hints: { Firebrand: "Flame Fairy", "Flame Fairy": "Firebrand" },
+            ready: () => hero.fire && hero.fairies.includes("flame"),
+          },
+          {
+            key: "storm",
+            name: "STORM CROWN",
+            text: "Lightning strikes a nearby foe every second and chains to 3 more",
+            hints: { "Chain Spark": "Lightning Fairy", "Lightning Fairy": "Chain Spark III" },
+            ready: () => hero.chain >= 3 && hero.fairies.includes("lightning"),
+          },
+          {
+            key: "plague",
+            name: "PLAGUE",
+            text: "Poison deals +60% damage and spreads between enemies",
+            hints: { "Venom Bolts": "Venom Fairy", "Venom Fairy": "Venom Bolts" },
+            ready: () => hero.poison && hero.fairies.includes("venom"),
+          },
+          {
+            key: "barrage",
+            name: "EMBER BARRAGE",
+            text: "Every 3rd volley also fires a ring of 12 bolts",
+            hints: { "Twin Flame": "max Quick Hands", "Quick Hands": "4 bolts (Twin Flame)" },
+            ready: () => hero.projectiles >= 4 && hero.attackHaste >= 0.3,
+          },
+          {
+            key: "zero",
+            name: "ABSOLUTE ZERO",
+            text: "Chilled foes move 40% slower and take +35% damage",
+            hints: { "GRAVE NOVA": "Frost Fairy", "Frost Fairy": "Grave Nova II" },
+            ready: () => (hero.novaRank || 0) >= 2 && hero.fairies.includes("frost"),
+          },
+          {
+            key: "tempest",
+            name: "ARCANE TEMPEST",
+            text: "Arcane Lance fires three beams that pierce every foe",
+            hints: { "ARCANE LANCE": "Arcane Fairy", "Arcane Fairy": "Arcane Lance II" },
+            ready: () => (hero.blades || 0) >= 2 && hero.fairies.includes("arcane"),
+          },
+        ];
+        function hasEvo(key) {
+          return !!hero.evos && hero.evos.includes(key);
+        }
+        function evolutionHint(optionName) {
+          for (const evo of EVOLUTIONS) {
+            if (hasEvo(evo.key)) continue;
+            for (const part in evo.hints)
+              if (optionName.startsWith(part)) return "✦ Evolves with " + evo.hints[part] + " → " + evo.name;
+          }
+          return "";
+        }
+        function runWaveEvent() {
+          let kind = ["surround", "elite", "treasure"][eventCycle++ % 3];
+          if (kind === "surround") spawnSurround();
+          else if (kind === "elite") spawnElite();
+          else spawnTreasureImp();
+        }
+        function spawnSurround() {
+          let count = Math.min(22, 95 - enemies.length),
+            radius = Math.hypot(w, h) / 2 + 20;
+          if (count < 8) return;
+          for (let i = 0; i < count; i++) {
+            spawnEnemy(i % 3 === 0 ? "runner" : "ghoul");
+            let e = enemies[enemies.length - 1],
+              a = (i / count) * Math.PI * 2;
+            e.x = hero.x + Math.cos(a) * radius;
+            e.y = hero.y + Math.sin(a) * radius;
+            clearWall(e);
+          }
+          showToast("SURROUNDED · BREAK OUT");
+          sfx("upgrade");
+        }
+        const eliteMods = { swift: "SWIFT", splitting: "SPLITTING", armored: "ARMORED" };
+        function spawnElite() {
+          if (enemies.length > 92) return;
+          let type = wave >= 8 ? "champion" : "brute",
+            mod = ["swift", "splitting", "armored"][Math.floor(Math.random() * 3)];
+          spawnEnemy(type);
+          let e = enemies[enemies.length - 1];
+          e.elite = mod;
+          e.hp = e.max = e.max * 4;
+          e.r = Math.round(e.r * 1.2);
+          if (mod === "swift") e.speed *= 1.6;
+          showToast("ELITE " + (type === "champion" ? "CHAMPION" : "BRUTE") + " · " + eliteMods[mod]);
+          sfx("upgrade");
+        }
+        function spawnTreasureImp() {
+          if (enemies.length > 94) return;
+          spawnEnemy("runner");
+          let e = enemies[enemies.length - 1],
+            a = Math.random() * Math.PI * 2;
+          e.x = hero.x + Math.cos(a) * 230;
+          e.y = hero.y + Math.sin(a) * 230;
+          clearWall(e);
+          e.treasure = true;
+          e.hp = e.max = e.max * 5;
+          e.speed = hero.speed * 0.78;
+          e.escape = clock + 14;
+          showToast("TREASURE IMP · CATCH IT!");
+          sfx("loot");
+        }
+        // A random point just past the edge of the visible screen, so new enemies arrive quickly.
+        function offscreenPoint(margin) {
+          let hw = w / 2 + margin,
+            hh = h / 2 + margin,
+            t = Math.random() * (hw + hh) * 2;
+          if (t < hw * 2) return { x: hero.x - hw + t, y: hero.y + (Math.random() < 0.5 ? -hh : hh) };
+          t -= hw * 2;
+          return { x: hero.x + (Math.random() < 0.5 ? -hw : hw), y: hero.y - hh + t };
+        }
         function spawnEnemy(forcedType) {
-          let a = Math.random() * Math.PI * 2,
-            r = wave < 3 ? Math.max(w, h) * 0.43 + 80 : Math.max(w, h) * 0.68 + 110,
+          let edge = offscreenPoint(wave < 3 ? 50 : 80),
             roll = Math.random();
           let zone = Math.floor((wave - 1) / 5) % zoneNames.length,
             type =
@@ -1487,8 +1647,8 @@
                           : 42) *
             (1 + clock / 125);
           enemies.push({
-            x: hero.x + Math.cos(a) * r,
-            y: hero.y + Math.sin(a) * r,
+            x: edge.x,
+            y: edge.y,
             hp,
             max: hp,
             type,
@@ -1509,7 +1669,7 @@
                             ? 117
                             : 67) *
               (1 + clock / 350) *
-              0.88,
+              1.12,
             r:
               type === "sentinel"
                 ? 22
@@ -1845,11 +2005,13 @@
           }
         }
         function drawSiteCompass() {
-          let active = sites
-            .filter((o) => !o.used)
-            .sort(
-              (a, b) => Math.hypot(a.x - hero.x, a.y - hero.y) - Math.hypot(b.x - hero.x, b.y - hero.y),
-            )[0];
+          let active =
+            enemies.find((e) => e.treasure) ||
+            sites
+              .filter((o) => !o.used)
+              .sort(
+                (a, b) => Math.hypot(a.x - hero.x, a.y - hero.y) - Math.hypot(b.x - hero.x, b.y - hero.y),
+              )[0];
           if (!active) return;
           let dx = active.x - hero.x,
             dy = active.y - hero.y,
@@ -1865,7 +2027,7 @@
           ctx.fill();
           ctx.translate(x, y);
           ctx.rotate(angle);
-          ctx.fillStyle = siteColors[active.kind];
+          ctx.fillStyle = active.treasure ? "#ffd46e" : siteColors[active.kind];
           ctx.beginPath();
           ctx.moveTo(12, 0);
           ctx.lineTo(-6, -7);
@@ -1892,44 +2054,46 @@
                   target = e;
                 }
               }
-              if (target) {
-                let dx = target.x - hero.x,
-                  dy = target.y - hero.y,
-                  d = Math.hypot(dx, dy) || 1,
-                  ux = dx / d,
-                  uy = dy / d,
-                  reach = Math.min(330, d + 95 + blades * 22),
-                  hits = 0;
-                let candidates = [];
-                for (const e of enemies) {
-                  let ex = e.x - hero.x,
-                    ey = e.y - hero.y,
-                    along = ex * ux + ey * uy,
-                    side = Math.abs(ex * uy - ey * ux);
-                  if (along > 0 && along < reach && side < e.r + 11) candidates.push({ e, along });
+              let tempest = hasEvo("tempest");
+              if (target)
+                for (const turn of tempest ? [0, -0.6, 0.6] : [0]) {
+                  let dx = target.x - hero.x,
+                    dy = target.y - hero.y,
+                    d = Math.hypot(dx, dy) || 1,
+                    ux = Math.cos(Math.atan2(dy, dx) + turn),
+                    uy = Math.sin(Math.atan2(dy, dx) + turn),
+                    reach = tempest ? 330 : Math.min(330, d + 95 + blades * 22),
+                    hits = 0;
+                  let candidates = [];
+                  for (const e of enemies) {
+                    let ex = e.x - hero.x,
+                      ey = e.y - hero.y,
+                      along = ex * ux + ey * uy,
+                      side = Math.abs(ex * uy - ey * ux);
+                    if (along > 0 && along < reach && side < e.r + 11) candidates.push({ e, along });
+                  }
+                  candidates.sort((a, b) => a.along - b.along);
+                  for (const item of candidates) {
+                    if (!tempest && hits >= blades) break;
+                    damageEnemy(
+                      item.e,
+                      hero.damage * (0.55 + blades * 0.2) * (1 + (hero.arcaneAmp || 0) * 0.15),
+                      "arcane",
+                    );
+                    hits++;
+                  }
+                  arcs.push({
+                    x1: hero.x,
+                    y1: hero.y - 12,
+                    x2: hero.x + ux * reach,
+                    y2: hero.y + uy * reach - 12,
+                    life: 0.22,
+                    beam: true,
+                  });
+                  if (arcs.length > 45) arcs.splice(0, arcs.length - 45);
+                  hero.cast = 0.18;
+                  sfx("cast");
                 }
-                candidates.sort((a, b) => a.along - b.along);
-                for (const item of candidates) {
-                  if (hits >= blades) break;
-                  damageEnemy(
-                    item.e,
-                    hero.damage * (0.55 + blades * 0.2) * (1 + (hero.arcaneAmp || 0) * 0.15),
-                    "arcane",
-                  );
-                  hits++;
-                }
-                arcs.push({
-                  x1: hero.x,
-                  y1: hero.y - 12,
-                  x2: hero.x + ux * reach,
-                  y2: hero.y + uy * reach - 12,
-                  life: 0.22,
-                  beam: true,
-                });
-                if (arcs.length > 45) arcs.splice(0, arcs.length - 45);
-                hero.cast = 0.18;
-                sfx("cast");
-              }
             }
           }
           if (hero.meteorRank) {
@@ -2073,6 +2237,8 @@
               floater(e.x, e.y - 25, "SHIELD BROKEN", "#a4e7ff");
             }
           }
+          if (e.elite === "armored") amount *= 0.5;
+          if (e.frostTime > 0 && hasEvo("zero")) amount *= 1.35;
           if (kind === "crit") sfx("crit");
           else if (kind === "physical") sfx("hit");
           runStats.damage += Math.min(e.hp, amount);
@@ -2100,6 +2266,7 @@
             showToast("TRIAL CLEARED · GEAR CACHE");
           }
           if (spreadDepth < 2 && deathReactionBudget++ < 18) statusDeath(e, spreadDepth);
+          if (e.elite || e.treasure) rewardSpecial(e);
           kills++;
           if (hero.leech) hero.hp = Math.min(hero.maxHp, hero.hp + hero.leech);
           if (hero.soulWard) hero.armor = Math.min(hero.maxArmor, hero.armor + hero.soulWard);
@@ -2138,7 +2305,7 @@
             showToast(boss ? "GUARDIAN DOWN · 1 LEFT" : (bossNames[e.variant] || "GUARDIAN") + " DEFEATED");
           } else if (e.type === "champion") {
             drops.push({ x: e.x + 10, y: e.y, type: "heal", value: 25 });
-            showToast("CHAMPION DEFEATED");
+            if (!e.elite) showToast("CHAMPION DEFEATED");
           } else if (e.type === "caster") {
             showToast("HEXER DEFEATED");
           } else if (Math.random() < 0.055) drops.push({ x: e.x + 12, y: e.y, type: "heal", value: 18 });
@@ -2150,18 +2317,53 @@
             drops.push({ x: e.x + 20, y: e.y - 10, type, value: 0, expires: clock + 22 });
           }
         }
+        function rewardSpecial(e) {
+          let orbs = e.treasure ? 8 : 5,
+            value = Math.max(3, level) * (e.treasure ? 1.5 : 1);
+          for (let k = 0; k < orbs; k++) {
+            let a = (k / orbs) * Math.PI * 2;
+            drops.push({ x: e.x + Math.cos(a) * 30, y: e.y + Math.sin(a) * 30, type: "xp", value });
+          }
+          rings.push({ x: e.x, y: e.y, r: 14, life: 0.6, speed: 320, color: "#ffd46e" });
+          burst(e.x, e.y, "#ffd46e", 26);
+          sfx("bossDown");
+          if (e.treasure) {
+            drops.push({ x: e.x + 16, y: e.y, type: "loot", imp: true, wave });
+            showToast("TREASURE IMP · HOARD DROPPED");
+            return;
+          }
+          let roll = Math.random();
+          drops.push({
+            x: e.x + 20,
+            y: e.y - 10,
+            type: roll < 0.2 ? "nuke" : roll < 0.6 ? "shield" : "haste",
+            value: 0,
+            expires: clock + 22,
+          });
+          if (e.elite === "splitting")
+            for (let k = 0; k < 4 && enemies.length < 110; k++) {
+              spawnEnemy("runner");
+              let child = enemies[enemies.length - 1];
+              child.x = e.x + Math.cos(k * 1.57) * 26;
+              child.y = e.y + Math.sin(k * 1.57) * 26;
+              clearWall(child);
+            }
+          showToast("ELITE SLAIN");
+        }
         function statusDeath(e, depth) {
           const x = e.x,
             y = e.y;
+          let inferno = e.burnTime > 0 && hasEvo("inferno"),
+            reach = inferno ? 115 : 64;
           let targets = enemies
-            .filter((other) => Math.hypot(other.x - x, other.y - y) < 64 + other.r)
-            .slice(0, 8);
+            .filter((other) => Math.hypot(other.x - x, other.y - y) < reach + other.r)
+            .slice(0, inferno ? 12 : 8);
           if (e.burnTime > 0) {
-            rings.push({ x, y, r: 8, life: 0.38, speed: 160, color: "#ff904a" });
-            burst(x, y, "#ff9a51", 18);
+            rings.push({ x, y, r: 8, life: 0.38, speed: inferno ? 300 : 160, color: "#ff904a" });
+            burst(x, y, "#ff9a51", inferno ? 26 : 18);
             for (const other of targets) {
-              afflict(other, "burn", Math.max(hero.damage * 0.32, e.burnPower || 0));
-              damageEnemy(other, Math.max(3, hero.damage * 0.28), "burn", depth + 1);
+              afflict(other, "burn", Math.max(hero.damage * (inferno ? 0.5 : 0.32), e.burnPower || 0));
+              damageEnemy(other, Math.max(3, hero.damage * (inferno ? 0.7 : 0.28)), "burn", depth + 1);
             }
           }
           if (e.poisonTime > 0) {
@@ -2212,9 +2414,10 @@
             power = { poison: 0.18, burn: 0.25, frost: 0.12 };
           let active = e[kind + "Time"] > 0;
           e[kind + "Time"] = Math.max(e[kind + "Time"] || 0, durations[kind]);
+          let boost = kind === "poison" && hasEvo("plague") ? 1.6 : 1;
           e[kind + "Power"] = active
-            ? Math.max(e[kind + "Power"] || 0, hit * power[kind])
-            : hit * power[kind];
+            ? Math.max(e[kind + "Power"] || 0, hit * power[kind] * boost)
+            : hit * power[kind] * boost;
         }
         function tickStatuses(e, dt) {
           let active = ["poison", "burn", "frost"].filter((kind) => e[kind + "Time"] > 0);
@@ -2223,6 +2426,25 @@
             if (e.dotClock >= 0.5) {
               e.dotClock -= 0.5;
               let amount = active.reduce((sum, kind) => sum + (e[kind + "Power"] || 0), 0);
+              if (e.poisonTime > 0 && hasEvo("plague")) {
+                for (const other of enemies) {
+                  if (other === e || other.poisonTime > 0) continue;
+                  if (Math.abs(other.x - e.x) < 85 && Math.abs(other.y - e.y) < 85) {
+                    other.poisonTime = 4;
+                    other.poisonPower = e.poisonPower;
+                    arcs.push({
+                      x1: e.x,
+                      y1: e.y,
+                      x2: other.x,
+                      y2: other.y,
+                      life: 0.2,
+                      beam: false,
+                      plague: true,
+                    });
+                    break;
+                  }
+                }
+              }
               damageEnemy(e, amount, active.length === 1 ? active[0] : "mixed");
             }
           } else e.dotClock = 0;
@@ -2337,7 +2559,7 @@
             xp += transfer;
             xpReserve -= transfer;
           }
-          let nextWave = 1 + Math.floor(clock / 28);
+          let nextWave = 1 + Math.floor(clock / WAVE_SECONDS);
           if (nextWave > wave) {
             wave = nextWave;
             showToast(
@@ -2349,6 +2571,8 @@
             flash = 0.25;
             hero.hp = Math.min(hero.maxHp, hero.hp + 10);
             if (wave % 2 === 0) spawnEncounter();
+            if (wave === 2) spawnTreasureImp();
+            else if (wave >= 5 && wave % 2 === 1 && wave % 3 !== 0) runWaveEvent();
             if (wave % 3 === 0) {
               let livingBosses = enemies.filter((e) => e.type === "boss"),
                 twin = wave >= 12 || level >= 25,
@@ -2382,7 +2606,7 @@
           spawn -= dt;
           if (spawn <= 0 && enemies.length < 95) {
             spawnEnemy();
-            spawn = Math.max(0.17, 0.73 - clock * 0.0075) * (Math.random() * 0.45 + 0.78);
+            spawn = Math.max(0.15, 0.48 - clock * 0.005) * (Math.random() * 0.45 + 0.78);
           }
           attack -= dt;
           if (attack <= 0) {
@@ -2425,6 +2649,25 @@
                     splash: true,
                     element: "flame",
                     color: "#ff925e",
+                  });
+                }
+              }
+              hero.volley = (hero.volley || 0) + 1;
+              if (hasEvo("barrage") && hero.volley % 3 === 0) {
+                for (let k = 0; k < 12; k++) {
+                  let a = (k / 12) * Math.PI * 2 + clock;
+                  shots.push({
+                    x: hero.x,
+                    y: hero.y,
+                    vx: Math.cos(a) * 470,
+                    vy: Math.sin(a) * 470,
+                    life: 0.7,
+                    damage: hero.damage * 0.6,
+                    baseDamage: hero.damage * 0.6,
+                    chain: false,
+                    splash: true,
+                    element: "flame",
+                    color: "#ffb35e",
                   });
                 }
               }
@@ -2532,6 +2775,53 @@
               }
             }
           }
+          if (hasEvo("storm")) {
+            hero.stormCd = (hero.stormCd || 0) - dt;
+            if (hero.stormCd <= 0) {
+              let near = enemies.filter((e) => Math.abs(e.x - hero.x) < 300 && Math.abs(e.y - hero.y) < 300);
+              if (near.length) {
+                let source = near[Math.floor(Math.random() * near.length)],
+                  seen = new Set([source]);
+                arcs.push({
+                  x1: source.x,
+                  y1: source.y - 280,
+                  x2: source.x,
+                  y2: source.y,
+                  life: 0.3,
+                  electric: true,
+                });
+                burst(source.x, source.y, "#fff289", 10);
+                damageEnemy(source, hero.damage * 0.9, "lightning");
+                for (let hop = 0; hop < 3; hop++) {
+                  let next = null,
+                    range = 150 * 150;
+                  for (const other of enemies) {
+                    if (seen.has(other)) continue;
+                    let d = (other.x - source.x) ** 2 + (other.y - source.y) ** 2;
+                    if (d < range) {
+                      range = d;
+                      next = other;
+                    }
+                  }
+                  if (!next) break;
+                  arcs.push({
+                    x1: source.x,
+                    y1: source.y,
+                    x2: next.x,
+                    y2: next.y,
+                    life: 0.24,
+                    electric: true,
+                  });
+                  damageEnemy(next, hero.damage * 0.5, "lightning");
+                  seen.add(next);
+                  source = next;
+                }
+                if (arcs.length > 45) arcs.splice(0, arcs.length - 45);
+                sfx("crit");
+              }
+              hero.stormCd = 1;
+            }
+          }
           for (let i = shots.length - 1; i >= 0; i--) {
             let shot = shots[i];
             shot.x += shot.vx * dt;
@@ -2617,6 +2907,28 @@
               d = Math.hypot(dx, dy) || 1;
             e.faceX = dx / d;
             e.faceY = dy / d;
+            if (e.treasure) {
+              if (clock > e.escape) {
+                enemies.splice(enemies.indexOf(e), 1);
+                burst(e.x, e.y, "#ffd46e", 16);
+                showToast("THE IMP ESCAPED");
+                continue;
+              }
+              e.faceX = -e.faceX;
+              e.faceY = -e.faceY;
+              e.walking = 1;
+              e.stepPhase = (e.stepPhase || 0) + dt * 14;
+              let step = e.speed * (e.frostTime > 0 ? 0.62 : 1) * dt,
+                wobble = Math.sin(clock * 2.3 + e.max) * 0.7;
+              moveAroundWalls(
+                e,
+                (-dx / d + (dy / d) * wobble) * step,
+                (-dy / d - (dx / d) * wobble) * step,
+                dt,
+                true,
+              );
+              continue;
+            }
             if (e.type === "sentinel" || e.type === "burrower")
               e.recover = Math.max(0, (e.recover || 0) - dt);
             if (e.type === "burrower") {
@@ -2662,7 +2974,7 @@
               let step =
                 e.speed *
                 (e.recover > 0 ? 0.4 : 1) *
-                (e.frostTime > 0 ? 0.62 : e.poisonTime > 0 ? 0.82 : 1) *
+                (e.frostTime > 0 ? (hasEvo("zero") ? 0.38 : 0.62) : e.poisonTime > 0 ? 0.82 : 1) *
                 dt;
               moveAroundWalls(e, (dx / d) * step, (dy / d) * step, dt, true);
             } else clearWall(e);
@@ -2681,7 +2993,8 @@
                 e.slam.time -= dt;
                 if (e.slam.time <= 0) {
                   let slam = e.slam;
-                  ((e.slam = null), (color = e.variant === "oracle" ? "#8df0ee" : "#ff8c67"));
+                  e.slam = null;
+                  let color = e.variant === "oracle" ? "#8df0ee" : "#ff8c67";
                   rings.push({ x: slam.x, y: slam.y, r: 10, life: 0.42, speed: slam.r * 2.4, color });
                   burst(slam.x, slam.y, color, 24);
                   shake = 8;
@@ -2896,7 +3209,7 @@
               if (xp >= needed) {
                 saveRun(true);
                 xp -= needed;
-                needed = 12 + 7 * level + 2 * level * level;
+                needed = Math.round(8 + 5 * level + 1.5 * level * level);
                 updateHud();
                 levelUp();
                 break;
@@ -2906,7 +3219,7 @@
           if (mode === "play" && xp >= needed) {
             saveRun(true);
             xp -= needed;
-            needed = 12 + 7 * level + 2 * level * level;
+            needed = Math.round(8 + 5 * level + 1.5 * level * level);
             updateHud();
             levelUp();
           }
@@ -3112,6 +3425,14 @@
             ctx.arc(x, y + r * 0.7, r + 9 + Math.sin(clock * 3) * 2, 0, 7);
             ctx.stroke();
           }
+          if (e.elite || e.treasure) {
+            let pulse = 0.6 + Math.sin(clock * 6) * 0.25;
+            ctx.strokeStyle = "rgba(255, 212, 110, " + pulse + ")";
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            ctx.arc(x, y + r * 0.5, r + 12 + Math.sin(clock * 4) * 3, 0, 7);
+            ctx.stroke();
+          }
           ctx.save();
           if (e.hitFlash > 0) ctx.filter = "brightness(1.9)";
           if (e.type === "skeleton") ctx.filter = "grayscale(1) brightness(1.35)";
@@ -3137,6 +3458,12 @@
             ctx.arc(x, y, r + 5 + Math.sin(clock * 9) * 1.5, 0, 7);
             ctx.stroke();
             ctx.shadowBlur = 0;
+          }
+          if (e.elite || e.treasure) {
+            ctx.fillStyle = "#ffd46e";
+            ctx.font = "900 10px system-ui";
+            ctx.textAlign = "center";
+            ctx.fillText(e.treasure ? "TREASURE IMP" : "ELITE · " + eliteMods[e.elite], x, y - r - 20);
           }
           if (e.hp < e.max) {
             ctx.fillStyle = "#10171a";
@@ -3675,9 +4002,9 @@
             )
               continue;
             ctx.globalAlpha = Math.min(1, arc.life * 5);
-            ctx.strokeStyle = arc.beam ? "#c093ff" : "#8df8ff";
+            ctx.strokeStyle = arc.plague ? "#9dfa71" : arc.beam ? "#c093ff" : "#8df8ff";
             ctx.shadowBlur = arc.beam ? 14 : 19;
-            ctx.shadowColor = arc.beam ? "#9251ff" : "#59eaff";
+            ctx.shadowColor = arc.plague ? "#5fd846" : arc.beam ? "#9251ff" : "#59eaff";
             ctx.lineWidth = arc.beam ? 8 : 5;
             ctx.beginPath();
             ctx.moveTo(arc.x1, arc.y1);
