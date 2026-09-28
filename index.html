@@ -210,6 +210,25 @@
       .sound-toggle:active {
         transform: scale(0.96);
       }
+      .speed-toggle {
+        position: absolute;
+        left: 12px;
+        bottom: calc(env(safe-area-inset-bottom) + 53px);
+        z-index: 5;
+        min-width: 78px;
+        height: 36px;
+        padding: 0 7px;
+        border: 1px solid #e2bc7499;
+        border-radius: 9px;
+        color: #fff0ce;
+        background: #332a20dd;
+        box-shadow: 0 3px 12px #000a;
+        font: 800 11px system-ui;
+        touch-action: manipulation;
+      }
+      .speed-toggle:active {
+        transform: scale(0.96);
+      }
       .joystick {
         position: absolute;
         width: 116px;
@@ -298,6 +317,29 @@
         line-height: 1.45;
         color: #d0c7af;
       }
+      .meta-bar {
+        color: #ffd18a;
+        font-size: 14px;
+        font-weight: 800;
+        margin: 0 0 12px;
+      }
+      .menu-secondary {
+        width: 100%;
+        min-height: 42px;
+        margin: 0 0 9px;
+        border: 1px solid #b9996a;
+        border-radius: 10px;
+        background: #323536;
+        color: #f5d7a3;
+        font: 800 14px system-ui;
+      }
+      .menu-secondary[hidden] {
+        display: none;
+      }
+      .card {
+        max-height: 90dvh;
+        overflow-y: auto;
+      }
       .resume {
         margin-bottom: 9px;
         background: linear-gradient(90deg, #b3eadf, #ffd692) !important;
@@ -324,26 +366,17 @@
         padding: 12px 15px;
         margin-top: 9px;
       }
-      .choice em {
-        display: block;
-        font-size: 11px;
-        font-style: normal;
-        font-weight: 700;
-        color: #ffd46e;
-        margin-top: 3px;
-      }
-      .choice.evolution {
-        border-color: #ffd46e;
-        background: linear-gradient(120deg, #4a3413, #2b2433);
-        box-shadow: 0 0 18px #ffb84a55;
-        color: #ffe7a8;
-      }
       .choice small {
         display: block;
         font-size: 13px;
         line-height: 1.4;
         color: #d0c2ed;
         font-weight: 500;
+      }
+      .choice:disabled,
+      .menu-secondary:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
       }
       .choice:active,
       .primary:active {
@@ -416,7 +449,8 @@
         <span id="bossname">CRYPT WARDEN</span>
         <div><i id="bosshp"></i></div>
       </div>
-      <button class="sound-toggle" id="soundToggle" aria-label="Toggle sound">🔊 SOUND</button>
+      <button class="sound-toggle" id="soundToggle" aria-label="Toggle sound">🔊 SOUND</button
+      ><button class="speed-toggle" id="speedToggle" aria-label="Game speed, tap to change">SPEED 1×</button>
       <div class="joystick" id="joystick" aria-label="Movement joystick">
         <div class="stick" id="stick"></div>
       </div>
@@ -430,8 +464,12 @@
             Survive the crypt. Your bolts burst on impact. Collect blue embers to level up, grab rare relics,
             and follow the glowing markers to wells, forges, and vaults.
           </p>
+          <div class="meta-bar" id="metaBar"></div>
           <div id="choices"></div>
-          <button class="primary resume" id="resume" hidden>CONTINUE RUN</button
+          <button class="menu-secondary" id="shrineBtn">UPGRADE SHRINE</button
+          ><button class="menu-secondary" id="heroBtn">HERO: CRYPT MAGE</button
+          ><button class="menu-secondary" id="menuBack" hidden>BACK TO TITLE</button
+          ><button class="primary resume" id="resume" hidden>CONTINUE RUN</button
           ><button class="primary" id="start">ENTER THE CRYPT</button>
         </div>
       </div>
@@ -447,6 +485,7 @@
           stick = $("stick"),
           joystick = $("joystick"),
           soundToggle = $("soundToggle"),
+          speedToggle = $("speedToggle"),
           healthEl = $("health"),
           armorfillEl = $("armorfill"),
           xpEl = $("xp"),
@@ -466,6 +505,10 @@
           descEl = $("description"),
           kickerEl = $("kicker"),
           choicesEl = $("choices"),
+          metaEl = $("metaBar"),
+          shrineBtn = $("shrineBtn"),
+          heroBtn = $("heroBtn"),
+          menuBack = $("menuBack"),
           resumeBtn = $("resume"),
           start = $("start");
         let art = {},
@@ -543,6 +586,7 @@
           siteNext = 42,
           xpReserve = 0,
           trialChoicePending = 0,
+          waveClock = 0,
           joy = { id: null, x: 0, y: 0, dx: 0, dy: 0 },
           keys = {},
           boss = null,
@@ -552,8 +596,136 @@
         try {
           best = +(localStorage.getItem("ember-crypt-best") || 0);
         } catch {}
+        const profileKey = "ember-crypt-profile-v1";
+        let profile = { embers: 0, total: 0, upgrades: {}, storm: false, migrated: false },
+          selectedHero = "mage",
+          runEmbers = 0,
+          pickupBonus = 0;
+        try {
+          let prior = JSON.parse(localStorage.getItem(profileKey) || "null");
+          if (prior && typeof prior === "object") {
+            profile.embers = Math.max(0, Math.floor(Number(prior.embers) || 0));
+            profile.total = Math.max(profile.embers, Math.floor(Number(prior.total) || 0));
+            profile.storm = !!prior.storm;
+            profile.migrated = !!prior.migrated;
+            for (const k of ["power", "vigor", "fleet", "magnet", "armor", "reroll"])
+              profile.upgrades[k] = Math.min(5, Math.max(0, Math.floor(Number(prior.upgrades?.[k]) || 0)));
+            selectedHero = prior.selectedHero === "storm" ? "storm" : "mage";
+          }
+        } catch {}
+        function saveProfile() {
+          try {
+            localStorage.setItem(profileKey, JSON.stringify({ ...profile, selectedHero }));
+          } catch {}
+        }
+        function awardEmbers(n) {
+          runEmbers += n;
+          profile.embers += n;
+          profile.total += n;
+          saveProfile();
+        }
+        function updateMeta() {
+          metaEl.textContent =
+            "✦ " + profile.embers + " EMBERS · " + (selectedHero === "storm" ? "STORMCALLER" : "CRYPT MAGE");
+          heroBtn.textContent = profile.storm
+            ? "HERO: " + (selectedHero === "storm" ? "STORMCALLER" : "CRYPT MAGE")
+            : "STORMCALLER · DEFEAT A BOSS";
+          heroBtn.disabled = !profile.storm;
+        }
+        const shrinePowers = [
+          { key: "power", name: "EMBER EDGE", detail: "+5% starting damage", cap: 5, cost: 14 },
+          { key: "vigor", name: "LIFE SIGIL", detail: "+10 starting health", cap: 5, cost: 12 },
+          { key: "fleet", name: "SWIFT BOOTS", detail: "+5% starting move speed", cap: 4, cost: 14 },
+          { key: "magnet", name: "ORB CHARM", detail: "+18 pickup radius", cap: 5, cost: 10 },
+          { key: "armor", name: "IRON OATH", detail: "+10 starting armor", cap: 5, cost: 12 },
+          { key: "reroll", name: "FATE TOKEN", detail: "+1 free power reroll per run", cap: 2, cost: 38 },
+        ];
+        function showTitleMenu() {
+          mode = "menu";
+          kickerEl.textContent = "ONE-THUMB DUNGEON SURVIVAL";
+          titleEl.innerHTML = "EMBER<br>CRYPT";
+          descEl.textContent =
+            "Survive the crypt. Collect embers, unlock permanent upgrades, and grow stronger between runs.";
+          choicesEl.replaceChildren();
+          updateMeta();
+          metaEl.hidden = false;
+          shrineBtn.hidden = false;
+          heroBtn.hidden = false;
+          menuBack.hidden = true;
+          start.hidden = false;
+          let saved = readRun();
+          resumeBtn.hidden = !saved;
+          start.textContent = saved ? "NEW RUN" : "ENTER THE CRYPT";
+          panel.classList.remove("hidden");
+        }
+        function showShrine() {
+          mode = "shrine";
+          resetJoy();
+          kickerEl.textContent = "POWER THAT LASTS";
+          titleEl.innerHTML = "UPGRADE<br>SHRINE";
+          descEl.textContent = "Spend embers on upgrades for future runs.";
+          updateMeta();
+          shrineBtn.hidden = true;
+          heroBtn.hidden = true;
+          start.hidden = true;
+          resumeBtn.hidden = true;
+          menuBack.hidden = false;
+          choicesEl.replaceChildren();
+          for (const upgrade of shrinePowers) {
+            let rank = profile.upgrades[upgrade.key] || 0,
+              cost = upgrade.cost + rank * upgrade.cost,
+              button = document.createElement("button");
+            button.className = "choice";
+            button.disabled = rank >= upgrade.cap || profile.embers < cost;
+            button.innerHTML =
+              upgrade.name +
+              " · " +
+              rank +
+              "/" +
+              upgrade.cap +
+              (rank >= upgrade.cap ? " · MAX" : " · ✦ " + cost) +
+              "<small>" +
+              upgrade.detail +
+              "</small>";
+            button.onclick = () => {
+              if (profile.embers < cost || rank >= upgrade.cap) return;
+              profile.embers -= cost;
+              profile.upgrades[upgrade.key] = rank + 1;
+              saveProfile();
+              sfx("upgrade");
+              showShrine();
+            };
+            choicesEl.append(button);
+          }
+        }
+        shrineBtn.addEventListener("click", showShrine);
+        menuBack.addEventListener("click", showTitleMenu);
+        heroBtn.addEventListener("click", () => {
+          if (!profile.storm) return;
+          selectedHero = selectedHero === "mage" ? "storm" : "mage";
+          saveProfile();
+          updateMeta();
+        });
         let deathReactionBudget = 0,
-          frameErrors = 0;
+          frameErrors = 0,
+          gameSpeed = 1;
+        try {
+          let savedSpeed = Number(localStorage.getItem("ember-crypt-speed"));
+          if ([1, 1.25, 1.5].includes(savedSpeed)) gameSpeed = savedSpeed;
+        } catch {}
+        function updateSpeedButton() {
+          speedToggle.textContent = "SPEED " + gameSpeed + "×";
+          speedToggle.setAttribute("aria-label", "Game speed " + gameSpeed + " times, tap to change");
+        }
+        speedToggle.addEventListener("click", () => {
+          let choices = [1, 1.25, 1.5];
+          gameSpeed = choices[(choices.indexOf(gameSpeed) + 1) % choices.length];
+          try {
+            localStorage.setItem("ember-crypt-speed", String(gameSpeed));
+          } catch {}
+          updateSpeedButton();
+        });
+        updateSpeedButton();
         let soundEnabled = true,
           audioCtx = null,
           lastPlayed = {};
@@ -645,12 +817,14 @@
               saveKey,
               JSON.stringify({
                 version: 1,
+                balanceVersion: 2,
                 hero,
                 enemies,
                 drops,
                 pools,
                 hazards,
                 clock,
+                waveClock,
                 spawn,
                 attack,
                 fairyTimers,
@@ -670,7 +844,7 @@
                 siteNext,
                 xpReserve,
                 trialChoicePending,
-                eventCycle,
+                runEmbers,
               }),
             );
             lastSavedClock = clock;
@@ -683,6 +857,15 @@
             return;
           }
           hero = saved.hero;
+          hero.evolutions = hero.evolutions || [];
+          pickupBonus = hero.pickupBonus || 0;
+          runEmbers = saved.runEmbers || 0;
+          if ((saved.runStats?.bosses || 0) > 0 || saved.wave >= 10) {
+            if (!profile.storm) {
+              profile.storm = true;
+              saveProfile();
+            }
+          }
           enemies = saved.enemies;
           drops = saved.drops || [];
           pools = saved.pools || [];
@@ -694,6 +877,10 @@
           floaters = [];
           meteors = [];
           clock = saved.clock;
+          waveClock =
+            saved.balanceVersion === 2
+              ? (saved.waveClock ?? (saved.wave - 1) * 20)
+              : Math.max(0, (saved.wave - 1) * 20 + ((saved.clock % 28) / 28) * 20);
           spawn = saved.spawn || 0;
           attack = saved.attack || 0;
           fairyTimers = saved.fairyTimers || {};
@@ -704,6 +891,14 @@
           level = saved.level;
           xp = saved.xp;
           needed = saved.needed;
+          if (saved.balanceVersion !== 2) {
+            let oldNeeded = Math.max(1, needed);
+            needed = level === 1 ? 8 : 8 + 4 * (level - 1) + (level - 1) * (level - 1);
+            xp = Math.min(needed * 0.99, (xp / oldNeeded) * needed);
+            hero.speed += 40;
+            hero.baseRate = 0.28;
+            hero.rate = 0.28 / (1 + (hero.attackHaste || 0));
+          }
           runStats = saved.runStats || { damage: 0, hpLost: 0, armorBlocked: 0, bosses: 0 };
           weaponDryStreak = saved.weaponDryStreak || 0;
           weapon = saved.weapon || null;
@@ -712,12 +907,14 @@
           siteCycle = saved.siteCycle || 0;
           siteNext = saved.siteNext || clock + 30;
           xpReserve = saved.xpReserve || 0;
-          eventCycle = saved.eventCycle || 0;
           clearWall(hero);
           for (const e of enemies) clearWall(e);
           trialChoicePending = saved.trialChoicePending || 0;
           boss = enemies.find((e) => e.type === "boss") || null;
-          gearEl.textContent = (weapon?.name || "Apprentice Staff") + " · " + (armor?.name || "Cloth Robe");
+          gearEl.textContent =
+            (weapon?.name || (hero.class === "storm" ? "Storm Staff" : "Apprentice Staff")) +
+            " · " +
+            (armor?.name || "Cloth Robe");
           mode = "play";
           panel.classList.add("hidden");
           resumeBtn.hidden = true;
@@ -733,7 +930,24 @@
         if (readRun()) {
           resumeBtn.hidden = false;
           start.textContent = "NEW RUN";
+          let prior = readRun();
+          if ((prior.runStats?.bosses || 0) > 0 || prior.wave >= 10) {
+            profile.storm = true;
+            saveProfile();
+          }
         }
+        if (!profile.migrated) {
+          let previous = readRun(),
+            veteran = Math.min(
+              90,
+              Math.floor(Math.max(best, previous?.kills || 0) / 30) + (previous?.runStats?.bosses || 0) * 3,
+            );
+          profile.embers += veteran;
+          profile.total += veteran;
+          profile.migrated = true;
+          saveProfile();
+        }
+        showTitleMenu();
         function resize() {
           const b = game.getBoundingClientRect();
           w = b.width;
@@ -754,23 +968,28 @@
           clearRun();
           ensureAudio();
           sfx("start");
+          runEmbers = 0;
           hero = {
             x: 0,
             y: 0,
             r: 14,
-            hp: 100,
-            maxHp: 100,
-            speed: 225,
-            damage: 24,
-            armor: 30,
-            maxArmor: 30,
+            hp: (selectedHero === "storm" ? 85 : 100) + 10 * (profile.upgrades.vigor || 0),
+            maxHp: (selectedHero === "storm" ? 85 : 100) + 10 * (profile.upgrades.vigor || 0),
+            speed: Math.round(
+              (selectedHero === "storm" ? 245 : 230) * (1 + (profile.upgrades.fleet || 0) * 0.05),
+            ),
+            damage: Math.round(
+              (selectedHero === "storm" ? 21 : 24) * (1 + (profile.upgrades.power || 0) * 0.05),
+            ),
+            armor: (selectedHero === "storm" ? 22 : 30) + 10 * (profile.upgrades.armor || 0),
+            maxArmor: (selectedHero === "storm" ? 22 : 30) + 10 * (profile.upgrades.armor || 0),
             armorBonus: 0,
             armorStyle: "cloth",
             lastHit: -99,
             range: 265,
-            baseRate: 0.29,
+            baseRate: selectedHero === "storm" ? 0.31 : 0.28,
             attackHaste: 0,
-            rate: 0.29,
+            rate: selectedHero === "storm" ? 0.31 : 0.28,
             critChance: 0.05,
             critMultiplier: 1.5,
             cast: 0,
@@ -790,12 +1009,15 @@
             leech: 0,
             poison: false,
             fire: false,
-            fairies: [],
+            evolutions: [],
+            fairies: selectedHero === "storm" ? ["lightning"] : [],
+            class: selectedHero,
+            rerolls: profile.upgrades.reroll || 0,
+            pickupBonus: 18 * (profile.upgrades.magnet || 0),
             shieldUntil: 0,
             shieldCharges: 0,
             hasteUntil: 0,
             inv: 0,
-            evos: [],
           };
           runStats = { damage: 0, hpLost: 0, armorBlocked: 0, bosses: 0 };
           weaponDryStreak = 0;
@@ -814,14 +1036,17 @@
           siteNext = 42;
           xpReserve = 0;
           trialChoicePending = 0;
-          eventCycle = 0;
+          waveClock = 0;
           for (let i = 0; i < 3; i++) createSite(true);
+          pickupBonus = hero.pickupBonus || 0;
           boss = null;
           weapon = null;
           armor = null;
           bossbar.hidden = true;
-          gearEl.textContent = "Apprentice Staff · Cloth Robe";
+          gearEl.textContent =
+            (selectedHero === "storm" ? "Storm Staff" : "Apprentice Staff") + " · Cloth Robe";
           clock = 0;
+          waveClock = 0;
           spawn = 0;
           attack = 0;
           fairyTimers = {};
@@ -832,7 +1057,7 @@
           kills = 0;
           level = 1;
           xp = 0;
-          needed = 5;
+          needed = 8;
           shake = 0;
           flash = 0;
           mode = "play";
@@ -895,6 +1120,10 @@
           sfx("upgrade");
           mode = "upgrade";
           resetJoy();
+          metaEl.hidden = true;
+          shrineBtn.hidden = true;
+          heroBtn.hidden = true;
+          menuBack.hidden = true;
           level++;
           if (level % 5 === 0) {
             xpBonus += 0.2;
@@ -927,7 +1156,7 @@
             },
             {
               name: "Quick Hands",
-              text: "+10% attack haste (max 30%)",
+              text: "+10% attack haste (max 30%) · max rank pairs with Twin Flame",
               available: () => hero.attackHaste < 0.3,
               apply: () => {
                 hero.attackHaste = Math.min(0.3, Math.round((hero.attackHaste + 0.1) * 100) / 100);
@@ -955,7 +1184,7 @@
             { name: "Long Reach", text: "+55 attack range", apply: () => (hero.range += 55) },
             {
               name: "Twin Flame",
-              text: "Fire one extra bolt (up to 5 extra)",
+              text: "Fire one extra bolt (up to 5 extra) · max rank pairs with max haste",
               available: () => hero.projectiles < 6,
               apply: () => (hero.projectiles = Math.min(6, hero.projectiles + 1)),
             },
@@ -980,20 +1209,25 @@
               pct = 45 + rank * 10;
             options.push({
               name: "Chain Spark " + ["I", "II", "III", "IV"][rank - 1],
-              text: jumps + " extra enemies · " + pct + "% first-jump damage",
+              text:
+                jumps +
+                " extra enemies · " +
+                pct +
+                "% first-jump damage" +
+                (rank === 4 ? " · pairs with Lightning Fairy" : ""),
               apply: () => (hero.chain = rank),
             });
           }
           if (!hero.poison)
             options.push({
               name: "Venom Bolts",
-              text: "Hits poison enemies for 4 seconds and slow them",
+              text: "Hits poison enemies · pairs with Venom Fairy for Plague",
               apply: () => (hero.poison = true),
             });
           if (!hero.fire)
             options.push({
               name: "Firebrand",
-              text: "Hits ignite enemies for 3 seconds",
+              text: "Hits ignite enemies · pairs with Flame Fairy for Inferno",
               apply: () => (hero.fire = true),
             });
           const spellChoices = [
@@ -1030,14 +1264,22 @@
           const fairyChoices =
             level >= 5
               ? [
-                  { kind: "flame", name: "Flame Fairy", text: "Burning fireballs with splash damage" },
+                  {
+                    kind: "flame",
+                    name: "Flame Fairy",
+                    text: "Burning fireballs · pairs with Firebrand for Inferno",
+                  },
                   { kind: "frost", name: "Frost Fairy", text: "Icy bolts slow enemy movement" },
-                  { kind: "venom", name: "Venom Fairy", text: "Toxic bolts poison enemies" },
+                  {
+                    kind: "venom",
+                    name: "Venom Fairy",
+                    text: "Toxic bolts · pairs with Venom Bolts for Plague",
+                  },
                   { kind: "arcane", name: "Arcane Fairy", text: "Violet magic beams pierce two enemies" },
                   {
                     kind: "lightning",
                     name: "Lightning Fairy",
-                    text: "Electric strikes jump to two more enemies",
+                    text: "Electric strikes · pairs with Chain Spark IV for Storm Crown",
                   },
                 ]
                   .filter((f) => !hero.fairies.includes(f.kind))
@@ -1051,62 +1293,102 @@
                   }))
               : [];
           options.push(...fairyChoices);
-          let picks = options.sort(() => Math.random() - 0.5).slice(0, 3);
-          if (level % 3 === 0 && spellChoices.length) {
-            let featured = spellChoices.find((o) => o.name.includes(" I")) || spellChoices[0];
-            picks = [featured, ...picks.filter((o) => o !== featured)].slice(0, 3);
-          }
-          if (level % 5 === 0 && fairyChoices.length) {
-            let guaranteed = fairyChoices[Math.floor(Math.random() * fairyChoices.length)];
-            picks = picks.filter((p) => p.name !== guaranteed.name);
-            picks.unshift(guaranteed);
-            picks = picks.slice(0, 3);
-          }
-          let evo = EVOLUTIONS.find((o) => !hasEvo(o.key) && o.ready());
-          if (evo) {
-            picks = [
+          const owned = hero.evolutions || [],
+            evolutionChoices = [
               {
-                name: evo.name,
-                text: evo.text,
-                evolution: true,
-                apply: () => {
-                  hero.evos = [...(hero.evos || []), evo.key];
-                  flash = 0.6;
-                  rings.push({ x: hero.x, y: hero.y, r: 20, life: 0.8, speed: 520, color: "#ffd46e" });
-                },
+                key: "inferno",
+                name: "INFERNO",
+                text: "Burning kills leave fire pools that ignite and damage nearby foes",
+                ready: hero.fire && hero.fairies.includes("flame"),
               },
-              ...picks,
-            ].slice(0, 3);
-            descEl.textContent = "Your powers have combined. An evolution is ready.";
+              {
+                key: "storm",
+                name: "STORM CROWN",
+                text: "Call automatic chain lightning strikes around you",
+                ready: hero.chain >= 4 && hero.fairies.includes("lightning"),
+              },
+              {
+                key: "plague",
+                name: "PLAGUE HEART",
+                text: "Poison deaths leave larger, longer-lasting toxic pools",
+                ready: hero.poison && hero.fairies.includes("venom"),
+              },
+              {
+                key: "barrage",
+                name: "EMBER BARRAGE",
+                text: "Fire volleys 25% faster with blazing bolts",
+                ready: hero.projectiles >= 6 && hero.attackHaste >= 0.3,
+              },
+            ]
+              .filter((o) => o.ready && !owned.includes(o.key))
+              .map((o) => ({
+                name: "EVOLUTION · " + o.name,
+                text: o.text,
+                apply: () => {
+                  hero.evolutions.push(o.key);
+                  sfx("upgrade");
+                  flash = 0.7;
+                },
+              }));
+          options.push(...evolutionChoices);
+          let previous = new Set();
+          function showPicks() {
+            choicesEl.replaceChildren();
+            let pool = options.filter((o) => !previous.has(o.name));
+            if (pool.length < 3) pool = options;
+            let picks = pool.sort(() => Math.random() - 0.5).slice(0, 3);
+            if (evolutionChoices.length) {
+              let featured = evolutionChoices[0];
+              picks = [featured, ...picks.filter((o) => o !== featured)].slice(0, 3);
+            }
+            if (level % 3 === 0 && spellChoices.length && !evolutionChoices.length) {
+              let featured = spellChoices.find((o) => o.name.includes(" I")) || spellChoices[0];
+              picks = [featured, ...picks.filter((o) => o !== featured)].slice(0, 3);
+            }
+            if (level % 5 === 0 && fairyChoices.length && !evolutionChoices.length) {
+              let guaranteed = fairyChoices[0];
+              picks = picks.filter((p) => p.name !== guaranteed.name);
+              picks.unshift(guaranteed);
+              picks = picks.slice(0, 3);
+            }
+            previous = new Set(picks.map((o) => o.name));
+            for (const p of picks) {
+              let b = document.createElement("button");
+              b.className = "choice";
+              b.innerHTML = p.name + "<small>" + p.text + "</small>";
+              b.onclick = () => {
+                sfx("loot");
+                p.apply();
+                panel.classList.add("hidden");
+                mode = "play";
+                updateHud();
+                saveRun(true);
+                showToast(p.name.toUpperCase());
+                last = performance.now();
+              };
+              choicesEl.append(b);
+            }
+            if (hero.rerolls > 0) {
+              let b = document.createElement("button");
+              b.className = "choice";
+              b.innerHTML = "REROLL · " + hero.rerolls + " LEFT<small>Draw three new power choices.</small>";
+              b.onclick = () => {
+                hero.rerolls--;
+                showPicks();
+              };
+              choicesEl.append(b);
+            }
           }
-          for (const p of picks) {
-            let b = document.createElement("button"),
-              hint = p.evolution ? "" : evolutionHint(p.name);
-            b.className = p.evolution ? "choice evolution" : "choice";
-            b.innerHTML =
-              (p.evolution ? "✦ EVOLUTION · " : "") +
-              p.name +
-              "<small>" +
-              p.text +
-              "</small>" +
-              (hint ? "<em>" + hint + "</em>" : "");
-            b.onclick = () => {
-              sfx("loot");
-              p.apply();
-              panel.classList.add("hidden");
-              mode = "play";
-              updateHud();
-              saveRun(true);
-              showToast(p.name.toUpperCase());
-              last = performance.now();
-            };
-            choicesEl.append(b);
-          }
+          showPicks();
           panel.classList.remove("hidden");
         }
         function offerTrialChoice() {
           mode = "trial";
           resetJoy();
+          metaEl.hidden = true;
+          shrineBtn.hidden = true;
+          heroBtn.hidden = true;
+          menuBack.hidden = true;
           kickerEl.textContent = "WAVE " + wave + " · CROSSROADS";
           titleEl.innerHTML = "CHOOSE YOUR<br>PATH";
           descEl.textContent = "Recover now, or clear a marked ambush for a gear cache.";
@@ -1160,11 +1442,13 @@
         function offerLoot(drop) {
           mode = "loot";
           resetJoy();
+          metaEl.hidden = true;
+          shrineBtn.hidden = true;
+          heroBtn.hidden = true;
+          menuBack.hidden = true;
           kickerEl.textContent = drop.trial
             ? "HUNTER’S TRIAL CACHE"
-            : drop.imp
-              ? "TREASURE IMP HOARD"
-              : (bossNames[drop.variant] || "CRYPT WARDEN") + " TREASURE";
+            : (bossNames[drop.variant] || "CRYPT WARDEN") + " TREASURE";
           titleEl.innerHTML = "CHOOSE<br>YOUR GEAR";
           descEl.textContent = "A weapon, armor, and a random third find. Rare+ weapon after two dry drops.";
           start.hidden = true;
@@ -1379,6 +1663,11 @@
         function gameOver() {
           clearRun();
           resumeBtn.hidden = true;
+          updateMeta();
+          metaEl.hidden = false;
+          shrineBtn.hidden = false;
+          heroBtn.hidden = false;
+          menuBack.hidden = true;
           sfx("death");
           mode = "over";
           resetJoy();
@@ -1413,9 +1702,25 @@
             " kills · HP lost: " +
             Math.round(runStats.hpLost) +
             " · " +
-            (weapon?.name || "Apprentice Staff") +
+            (weapon?.name || (hero.class === "storm" ? "Storm Staff" : "Apprentice Staff")) +
             " / " +
-            (armor?.name || "Cloth Robe");
+            (armor?.name || "Cloth Robe") +
+            " · ✦ " +
+            runEmbers +
+            " embers earned this run. " +
+            (profile.storm ? "Stormcaller unlocked." : "Defeat a boss to unlock Stormcaller.") +
+            " " +
+            (() => {
+              let costs = shrinePowers
+                  .filter((u) => (profile.upgrades[u.key] || 0) < u.cap)
+                  .map((u) => u.cost * (1 + (profile.upgrades[u.key] || 0))),
+                cost = Math.min(...costs);
+              return Number.isFinite(cost)
+                ? profile.embers >= cost
+                  ? "An upgrade is ready at the shrine."
+                  : "Next upgrade: ✦ " + cost + " (" + (cost - profile.embers) + " more)."
+                : "All shrine upgrades purchased.";
+            })();
           choicesEl.replaceChildren();
           start.textContent = "TRY AGAIN";
           start.hidden = false;
@@ -1487,125 +1792,11 @@
             e.preventDefault();
         });
         addEventListener("keyup", (e) => (keys[e.key.toLowerCase()] = false));
-        const WAVE_SECONDS = 20;
-        let eventCycle = 0;
-        // Owning both halves of a pair unlocks an evolution, offered first at the next level-up.
-        const EVOLUTIONS = [
-          {
-            key: "inferno",
-            name: "INFERNO",
-            text: "Burning foes erupt in huge blasts that spread their flames",
-            hints: { Firebrand: "Flame Fairy", "Flame Fairy": "Firebrand" },
-            ready: () => hero.fire && hero.fairies.includes("flame"),
-          },
-          {
-            key: "storm",
-            name: "STORM CROWN",
-            text: "Lightning strikes a nearby foe every second and chains to 3 more",
-            hints: { "Chain Spark": "Lightning Fairy", "Lightning Fairy": "Chain Spark III" },
-            ready: () => hero.chain >= 3 && hero.fairies.includes("lightning"),
-          },
-          {
-            key: "plague",
-            name: "PLAGUE",
-            text: "Poison deals +60% damage and spreads between enemies",
-            hints: { "Venom Bolts": "Venom Fairy", "Venom Fairy": "Venom Bolts" },
-            ready: () => hero.poison && hero.fairies.includes("venom"),
-          },
-          {
-            key: "barrage",
-            name: "EMBER BARRAGE",
-            text: "Every 3rd volley also fires a ring of 12 bolts",
-            hints: { "Twin Flame": "max Quick Hands", "Quick Hands": "4 bolts (Twin Flame)" },
-            ready: () => hero.projectiles >= 4 && hero.attackHaste >= 0.3,
-          },
-          {
-            key: "zero",
-            name: "ABSOLUTE ZERO",
-            text: "Chilled foes move 40% slower and take +35% damage",
-            hints: { "GRAVE NOVA": "Frost Fairy", "Frost Fairy": "Grave Nova II" },
-            ready: () => (hero.novaRank || 0) >= 2 && hero.fairies.includes("frost"),
-          },
-          {
-            key: "tempest",
-            name: "ARCANE TEMPEST",
-            text: "Arcane Lance fires three beams that pierce every foe",
-            hints: { "ARCANE LANCE": "Arcane Fairy", "Arcane Fairy": "Arcane Lance II" },
-            ready: () => (hero.blades || 0) >= 2 && hero.fairies.includes("arcane"),
-          },
-        ];
-        function hasEvo(key) {
-          return !!hero.evos && hero.evos.includes(key);
-        }
-        function evolutionHint(optionName) {
-          for (const evo of EVOLUTIONS) {
-            if (hasEvo(evo.key)) continue;
-            for (const part in evo.hints)
-              if (optionName.startsWith(part)) return "✦ Evolves with " + evo.hints[part] + " → " + evo.name;
-          }
-          return "";
-        }
-        function runWaveEvent() {
-          let kind = ["surround", "elite", "treasure"][eventCycle++ % 3];
-          if (kind === "surround") spawnSurround();
-          else if (kind === "elite") spawnElite();
-          else spawnTreasureImp();
-        }
-        function spawnSurround() {
-          let count = Math.min(22, 95 - enemies.length),
-            radius = Math.hypot(w, h) / 2 + 20;
-          if (count < 8) return;
-          for (let i = 0; i < count; i++) {
-            spawnEnemy(i % 3 === 0 ? "runner" : "ghoul");
-            let e = enemies[enemies.length - 1],
-              a = (i / count) * Math.PI * 2;
-            e.x = hero.x + Math.cos(a) * radius;
-            e.y = hero.y + Math.sin(a) * radius;
-            clearWall(e);
-          }
-          showToast("SURROUNDED · BREAK OUT");
-          sfx("upgrade");
-        }
-        const eliteMods = { swift: "SWIFT", splitting: "SPLITTING", armored: "ARMORED" };
-        function spawnElite() {
-          if (enemies.length > 92) return;
-          let type = wave >= 8 ? "champion" : "brute",
-            mod = ["swift", "splitting", "armored"][Math.floor(Math.random() * 3)];
-          spawnEnemy(type);
-          let e = enemies[enemies.length - 1];
-          e.elite = mod;
-          e.hp = e.max = e.max * 4;
-          e.r = Math.round(e.r * 1.2);
-          if (mod === "swift") e.speed *= 1.6;
-          showToast("ELITE " + (type === "champion" ? "CHAMPION" : "BRUTE") + " · " + eliteMods[mod]);
-          sfx("upgrade");
-        }
-        function spawnTreasureImp() {
-          if (enemies.length > 94) return;
-          spawnEnemy("runner");
-          let e = enemies[enemies.length - 1],
-            a = Math.random() * Math.PI * 2;
-          e.x = hero.x + Math.cos(a) * 230;
-          e.y = hero.y + Math.sin(a) * 230;
-          clearWall(e);
-          e.treasure = true;
-          e.hp = e.max = e.max * 5;
-          e.speed = hero.speed * 0.78;
-          e.escape = clock + 14;
-          showToast("TREASURE IMP · CATCH IT!");
-          sfx("loot");
-        }
-        // A random point just past the edge of the visible screen, so new enemies arrive quickly.
-        function offscreenPoint(margin) {
-          let hw = w / 2 + margin,
-            hh = h / 2 + margin,
-            t = Math.random() * (hw + hh) * 2;
-          if (t < hw * 2) return { x: hero.x - hw + t, y: hero.y + (Math.random() < 0.5 ? -hh : hh) };
-          t -= hw * 2;
-          return { x: hero.x + (Math.random() < 0.5 ? -hw : hw), y: hero.y - hh + t };
-        }
         function spawnEnemy(forcedType) {
-          let edge = offscreenPoint(wave < 3 ? 50 : 80),
+          let side = Math.floor(Math.random() * 4),
+            offset = Math.random() - 0.5,
+            x = hero.x + (side < 2 ? offset * (w + 60) : (side === 2 ? -1 : 1) * (w / 2 + 55)),
+            y = hero.y + (side < 2 ? (side === 0 ? -1 : 1) * (h / 2 + 55) : offset * (h + 60)),
             roll = Math.random();
           let zone = Math.floor((wave - 1) / 5) % zoneNames.length,
             type =
@@ -1647,8 +1838,8 @@
                           : 42) *
             (1 + clock / 125);
           enemies.push({
-            x: edge.x,
-            y: edge.y,
+            x,
+            y,
             hp,
             max: hp,
             type,
@@ -1738,6 +1929,29 @@
             siteNext = clock + 48;
             sites = sites.filter((o) => !o.used && Math.hypot(hero.x - o.x, hero.y - o.y) < 1700);
             if (sites.length < 3) createSite();
+          }
+        }
+        function spawnWaveSurprise() {
+          if (enemies.length > 83) return;
+          if (wave % 2) {
+            for (let i = 0; i < 8; i++) {
+              spawnEnemy("runner");
+              let e = enemies[enemies.length - 1],
+                a = (i * Math.PI) / 4,
+                r = Math.min(w, h) * 0.68 + 85;
+              e.x = hero.x + Math.cos(a) * r;
+              e.y = hero.y + Math.sin(a) * r;
+              clearWall(e);
+            }
+            showToast("ASH RING · RUNNERS CLOSING IN");
+          } else {
+            spawnEnemy("champion");
+            let e = enemies[enemies.length - 1];
+            e.eventElite = true;
+            e.hp *= 1.6;
+            e.max = e.hp;
+            e.speed *= 1.2;
+            showToast("ELITE HUNT · CLAIM THE SHIELD");
           }
         }
         function spawnEncounter() {
@@ -2005,13 +2219,11 @@
           }
         }
         function drawSiteCompass() {
-          let active =
-            enemies.find((e) => e.treasure) ||
-            sites
-              .filter((o) => !o.used)
-              .sort(
-                (a, b) => Math.hypot(a.x - hero.x, a.y - hero.y) - Math.hypot(b.x - hero.x, b.y - hero.y),
-              )[0];
+          let active = sites
+            .filter((o) => !o.used)
+            .sort(
+              (a, b) => Math.hypot(a.x - hero.x, a.y - hero.y) - Math.hypot(b.x - hero.x, b.y - hero.y),
+            )[0];
           if (!active) return;
           let dx = active.x - hero.x,
             dy = active.y - hero.y,
@@ -2027,7 +2239,7 @@
           ctx.fill();
           ctx.translate(x, y);
           ctx.rotate(angle);
-          ctx.fillStyle = active.treasure ? "#ffd46e" : siteColors[active.kind];
+          ctx.fillStyle = siteColors[active.kind];
           ctx.beginPath();
           ctx.moveTo(12, 0);
           ctx.lineTo(-6, -7);
@@ -2038,6 +2250,39 @@
           ctx.restore();
         }
         function updateSpells(dt) {
+          if (hero.evolutions?.includes("storm")) {
+            hero.stormCd = (hero.stormCd || 0) - dt;
+            if (hero.stormCd <= 0) {
+              let nearby = enemies
+                  .filter((e) => Math.abs(e.x - hero.x) < 275 && Math.abs(e.y - hero.y) < 275)
+                  .slice(0, 24),
+                target = nearby.find((e) => Math.hypot(e.x - hero.x, e.y - hero.y) < 275);
+              if (target) {
+                let source = { x: hero.x, y: hero.y - 18 },
+                  seen = new Set();
+                for (let i = 0; i < 3 && target; i++) {
+                  arcs.push({
+                    x1: source.x,
+                    y1: source.y,
+                    x2: target.x,
+                    y2: target.y,
+                    life: 0.3,
+                    electric: true,
+                  });
+                  seen.add(target);
+                  let old = target;
+                  damageEnemy(target, hero.damage * (0.8 - i * 0.12), "lightning");
+                  source = { x: old.x, y: old.y };
+                  target = nearby.find(
+                    (e) =>
+                      !seen.has(e) && enemies.includes(e) && Math.hypot(e.x - source.x, e.y - source.y) < 145,
+                  );
+                }
+                if (arcs.length > 45) arcs.splice(0, arcs.length - 45);
+                hero.stormCd = 2.3;
+              }
+            }
+          }
           let blades = hero.blades || 0;
           if (blades) {
             hero.bladeTick = (hero.bladeTick || 0) - dt;
@@ -2054,46 +2299,44 @@
                   target = e;
                 }
               }
-              let tempest = hasEvo("tempest");
-              if (target)
-                for (const turn of tempest ? [0, -0.6, 0.6] : [0]) {
-                  let dx = target.x - hero.x,
-                    dy = target.y - hero.y,
-                    d = Math.hypot(dx, dy) || 1,
-                    ux = Math.cos(Math.atan2(dy, dx) + turn),
-                    uy = Math.sin(Math.atan2(dy, dx) + turn),
-                    reach = tempest ? 330 : Math.min(330, d + 95 + blades * 22),
-                    hits = 0;
-                  let candidates = [];
-                  for (const e of enemies) {
-                    let ex = e.x - hero.x,
-                      ey = e.y - hero.y,
-                      along = ex * ux + ey * uy,
-                      side = Math.abs(ex * uy - ey * ux);
-                    if (along > 0 && along < reach && side < e.r + 11) candidates.push({ e, along });
-                  }
-                  candidates.sort((a, b) => a.along - b.along);
-                  for (const item of candidates) {
-                    if (!tempest && hits >= blades) break;
-                    damageEnemy(
-                      item.e,
-                      hero.damage * (0.55 + blades * 0.2) * (1 + (hero.arcaneAmp || 0) * 0.15),
-                      "arcane",
-                    );
-                    hits++;
-                  }
-                  arcs.push({
-                    x1: hero.x,
-                    y1: hero.y - 12,
-                    x2: hero.x + ux * reach,
-                    y2: hero.y + uy * reach - 12,
-                    life: 0.22,
-                    beam: true,
-                  });
-                  if (arcs.length > 45) arcs.splice(0, arcs.length - 45);
-                  hero.cast = 0.18;
-                  sfx("cast");
+              if (target) {
+                let dx = target.x - hero.x,
+                  dy = target.y - hero.y,
+                  d = Math.hypot(dx, dy) || 1,
+                  ux = dx / d,
+                  uy = dy / d,
+                  reach = Math.min(330, d + 95 + blades * 22),
+                  hits = 0;
+                let candidates = [];
+                for (const e of enemies) {
+                  let ex = e.x - hero.x,
+                    ey = e.y - hero.y,
+                    along = ex * ux + ey * uy,
+                    side = Math.abs(ex * uy - ey * ux);
+                  if (along > 0 && along < reach && side < e.r + 11) candidates.push({ e, along });
                 }
+                candidates.sort((a, b) => a.along - b.along);
+                for (const item of candidates) {
+                  if (hits >= blades) break;
+                  damageEnemy(
+                    item.e,
+                    hero.damage * (0.55 + blades * 0.2) * (1 + (hero.arcaneAmp || 0) * 0.15),
+                    "arcane",
+                  );
+                  hits++;
+                }
+                arcs.push({
+                  x1: hero.x,
+                  y1: hero.y - 12,
+                  x2: hero.x + ux * reach,
+                  y2: hero.y + uy * reach - 12,
+                  life: 0.22,
+                  beam: true,
+                });
+                if (arcs.length > 45) arcs.splice(0, arcs.length - 45);
+                hero.cast = 0.18;
+                sfx("cast");
+              }
             }
           }
           if (hero.meteorRank) {
@@ -2237,8 +2480,6 @@
               floater(e.x, e.y - 25, "SHIELD BROKEN", "#a4e7ff");
             }
           }
-          if (e.elite === "armored") amount *= 0.5;
-          if (e.frostTime > 0 && hasEvo("zero")) amount *= 1.35;
           if (kind === "crit") sfx("crit");
           else if (kind === "physical") sfx("hit");
           runStats.damage += Math.min(e.hp, amount);
@@ -2260,14 +2501,28 @@
           }
           if (e.hp > 0) return;
           enemies.splice(enemies.indexOf(e), 1);
+          if (e.eventElite) {
+            drops.push({ x: e.x + 18, y: e.y, type: "shield", expires: clock + 22 });
+            drops.push({ x: e.x - 16, y: e.y, type: "xp", value: Math.max(8, level * 2) });
+            awardEmbers(5);
+            showToast("ELITE HUNT CLEARED · +5 EMBERS");
+          }
           if (e.trial && !enemies.some((other) => other.trial)) {
             drops.push({ x: e.x + 18, y: e.y, type: "loot", trial: true, wave });
             drops.push({ x: e.x - 14, y: e.y, type: "xp", value: Math.max(12, level * 3) });
             showToast("TRIAL CLEARED · GEAR CACHE");
           }
           if (spreadDepth < 2 && deathReactionBudget++ < 18) statusDeath(e, spreadDepth);
-          if (e.elite || e.treasure) rewardSpecial(e);
           kills++;
+          if (kills % 3 === 0) awardEmbers(1);
+          if (e.type === "boss") {
+            awardEmbers(16);
+            if (!profile.storm) {
+              profile.storm = true;
+              saveProfile();
+              hero.justUnlockedStorm = true;
+            }
+          }
           if (hero.leech) hero.hp = Math.min(hero.maxHp, hero.hp + hero.leech);
           if (hero.soulWard) hero.armor = Math.min(hero.maxArmor, hero.armor + hero.soulWard);
           flash = e.type === "boss" ? 0.9 : 0.12;
@@ -2302,10 +2557,17 @@
             runStats.bosses++;
             boss = enemies.find((other) => other.type === "boss") || null;
             drops.push({ x: e.x + 18, y: e.y, type: "loot", value: 0, variant: e.variant, wave });
-            showToast(boss ? "GUARDIAN DOWN · 1 LEFT" : (bossNames[e.variant] || "GUARDIAN") + " DEFEATED");
+            showToast(
+              hero.justUnlockedStorm
+                ? "STORMCALLER UNLOCKED"
+                : boss
+                  ? "GUARDIAN DOWN · 1 LEFT"
+                  : (bossNames[e.variant] || "GUARDIAN") + " DEFEATED",
+            );
+            hero.justUnlockedStorm = false;
           } else if (e.type === "champion") {
             drops.push({ x: e.x + 10, y: e.y, type: "heal", value: 25 });
-            if (!e.elite) showToast("CHAMPION DEFEATED");
+            showToast("CHAMPION DEFEATED");
           } else if (e.type === "caster") {
             showToast("HEXER DEFEATED");
           } else if (Math.random() < 0.055) drops.push({ x: e.x + 12, y: e.y, type: "heal", value: 18 });
@@ -2317,63 +2579,42 @@
             drops.push({ x: e.x + 20, y: e.y - 10, type, value: 0, expires: clock + 22 });
           }
         }
-        function rewardSpecial(e) {
-          let orbs = e.treasure ? 8 : 5,
-            value = Math.max(3, level) * (e.treasure ? 1.5 : 1);
-          for (let k = 0; k < orbs; k++) {
-            let a = (k / orbs) * Math.PI * 2;
-            drops.push({ x: e.x + Math.cos(a) * 30, y: e.y + Math.sin(a) * 30, type: "xp", value });
-          }
-          rings.push({ x: e.x, y: e.y, r: 14, life: 0.6, speed: 320, color: "#ffd46e" });
-          burst(e.x, e.y, "#ffd46e", 26);
-          sfx("bossDown");
-          if (e.treasure) {
-            drops.push({ x: e.x + 16, y: e.y, type: "loot", imp: true, wave });
-            showToast("TREASURE IMP · HOARD DROPPED");
-            return;
-          }
-          let roll = Math.random();
-          drops.push({
-            x: e.x + 20,
-            y: e.y - 10,
-            type: roll < 0.2 ? "nuke" : roll < 0.6 ? "shield" : "haste",
-            value: 0,
-            expires: clock + 22,
-          });
-          if (e.elite === "splitting")
-            for (let k = 0; k < 4 && enemies.length < 110; k++) {
-              spawnEnemy("runner");
-              let child = enemies[enemies.length - 1];
-              child.x = e.x + Math.cos(k * 1.57) * 26;
-              child.y = e.y + Math.sin(k * 1.57) * 26;
-              clearWall(child);
-            }
-          showToast("ELITE SLAIN");
-        }
         function statusDeath(e, depth) {
           const x = e.x,
             y = e.y;
-          let inferno = e.burnTime > 0 && hasEvo("inferno"),
-            reach = inferno ? 115 : 64;
-          let targets = enemies
-            .filter((other) => Math.hypot(other.x - x, other.y - y) < reach + other.r)
-            .slice(0, inferno ? 12 : 8);
+          let inferno = hero.evolutions?.includes("inferno"),
+            plague = hero.evolutions?.includes("plague"),
+            targets = enemies
+              .filter((other) => Math.hypot(other.x - x, other.y - y) < (inferno ? 86 : 64) + other.r)
+              .slice(0, 8);
           if (e.burnTime > 0) {
-            rings.push({ x, y, r: 8, life: 0.38, speed: inferno ? 300 : 160, color: "#ff904a" });
-            burst(x, y, "#ff9a51", inferno ? 26 : 18);
+            rings.push({ x, y, r: 8, life: 0.38, speed: 160, color: "#ff904a" });
+            burst(x, y, "#ff9a51", 18);
+            if (inferno) {
+              pools.push({
+                x,
+                y,
+                r: 43,
+                life: 2.8,
+                tick: 0,
+                power: Math.max(4, hero.damage * 0.19),
+                kind: "flame",
+              });
+              if (pools.length > 45) pools.shift();
+            }
             for (const other of targets) {
-              afflict(other, "burn", Math.max(hero.damage * (inferno ? 0.5 : 0.32), e.burnPower || 0));
-              damageEnemy(other, Math.max(3, hero.damage * (inferno ? 0.7 : 0.28)), "burn", depth + 1);
+              afflict(other, "burn", Math.max(hero.damage * 0.32, e.burnPower || 0));
+              damageEnemy(other, Math.max(3, hero.damage * 0.28), "burn", depth + 1);
             }
           }
           if (e.poisonTime > 0) {
             pools.push({
               x,
               y,
-              r: 48,
-              life: 4,
+              r: plague ? 72 : 48,
+              life: plague ? 5.5 : 4,
               tick: 0,
-              power: Math.max(2, hero.damage * 0.12, e.poisonPower || 0),
+              power: Math.max(2, hero.damage * (plague ? 0.18 : 0.12), e.poisonPower || 0),
               kind: "poison",
             });
             if (pools.length > 45) pools.shift();
@@ -2414,10 +2655,9 @@
             power = { poison: 0.18, burn: 0.25, frost: 0.12 };
           let active = e[kind + "Time"] > 0;
           e[kind + "Time"] = Math.max(e[kind + "Time"] || 0, durations[kind]);
-          let boost = kind === "poison" && hasEvo("plague") ? 1.6 : 1;
           e[kind + "Power"] = active
-            ? Math.max(e[kind + "Power"] || 0, hit * power[kind] * boost)
-            : hit * power[kind] * boost;
+            ? Math.max(e[kind + "Power"] || 0, hit * power[kind])
+            : hit * power[kind];
         }
         function tickStatuses(e, dt) {
           let active = ["poison", "burn", "frost"].filter((kind) => e[kind + "Time"] > 0);
@@ -2426,25 +2666,6 @@
             if (e.dotClock >= 0.5) {
               e.dotClock -= 0.5;
               let amount = active.reduce((sum, kind) => sum + (e[kind + "Power"] || 0), 0);
-              if (e.poisonTime > 0 && hasEvo("plague")) {
-                for (const other of enemies) {
-                  if (other === e || other.poisonTime > 0) continue;
-                  if (Math.abs(other.x - e.x) < 85 && Math.abs(other.y - e.y) < 85) {
-                    other.poisonTime = 4;
-                    other.poisonPower = e.poisonPower;
-                    arcs.push({
-                      x1: e.x,
-                      y1: e.y,
-                      x2: other.x,
-                      y2: other.y,
-                      life: 0.2,
-                      beam: false,
-                      plague: true,
-                    });
-                    break;
-                  }
-                }
-              }
               damageEnemy(e, amount, active.length === 1 ? active[0] : "mixed");
             }
           } else e.dotClock = 0;
@@ -2559,7 +2780,8 @@
             xp += transfer;
             xpReserve -= transfer;
           }
-          let nextWave = 1 + Math.floor(clock / WAVE_SECONDS);
+          waveClock += dt;
+          let nextWave = 1 + Math.floor(waveClock / 20);
           if (nextWave > wave) {
             wave = nextWave;
             showToast(
@@ -2571,8 +2793,6 @@
             flash = 0.25;
             hero.hp = Math.min(hero.maxHp, hero.hp + 10);
             if (wave % 2 === 0) spawnEncounter();
-            if (wave === 2) spawnTreasureImp();
-            else if (wave >= 5 && wave % 2 === 1 && wave % 3 !== 0) runWaveEvent();
             if (wave % 3 === 0) {
               let livingBosses = enemies.filter((e) => e.type === "boss"),
                 twin = wave >= 12 || level >= 25,
@@ -2591,6 +2811,7 @@
               }
               if (twin) showToast("TWIN GUARDIANS RISE");
             }
+            if (wave >= 5 && wave % 3 === 2) spawnWaveSurprise();
             if (
               wave >= 4 &&
               wave % 3 === 1 &&
@@ -2606,7 +2827,7 @@
           spawn -= dt;
           if (spawn <= 0 && enemies.length < 95) {
             spawnEnemy();
-            spawn = Math.max(0.15, 0.48 - clock * 0.005) * (Math.random() * 0.45 + 0.78);
+            spawn = Math.max(0.16, 0.48 - clock * 0.005) * (Math.random() * 0.45 + 0.78);
           }
           attack -= dt;
           if (attack <= 0) {
@@ -2625,6 +2846,7 @@
                 life: 0.75,
                 damage: hero.damage * (Math.random() < hero.critChance ? hero.critMultiplier : 1),
                 baseDamage: hero.damage,
+                color: hero.evolutions?.includes("barrage") ? "#ffc46f" : undefined,
                 chain: !!hero.chain || hero.weaponEffect === "arc",
                 arcRank: hero.weaponEffect === "arc" ? hero.weaponRank : 0,
                 pierceLeft: hero.weaponEffect === "pierce" ? hero.weaponRank : 0,
@@ -2652,26 +2874,7 @@
                   });
                 }
               }
-              hero.volley = (hero.volley || 0) + 1;
-              if (hasEvo("barrage") && hero.volley % 3 === 0) {
-                for (let k = 0; k < 12; k++) {
-                  let a = (k / 12) * Math.PI * 2 + clock;
-                  shots.push({
-                    x: hero.x,
-                    y: hero.y,
-                    vx: Math.cos(a) * 470,
-                    vy: Math.sin(a) * 470,
-                    life: 0.7,
-                    damage: hero.damage * 0.6,
-                    baseDamage: hero.damage * 0.6,
-                    chain: false,
-                    splash: true,
-                    element: "flame",
-                    color: "#ffb35e",
-                  });
-                }
-              }
-              attack = hero.rate;
+              attack = hero.rate * (hero.evolutions?.includes("barrage") ? 0.75 : 1);
               hero.cast = 0.18;
               sfx("cast");
             }
@@ -2775,53 +2978,6 @@
               }
             }
           }
-          if (hasEvo("storm")) {
-            hero.stormCd = (hero.stormCd || 0) - dt;
-            if (hero.stormCd <= 0) {
-              let near = enemies.filter((e) => Math.abs(e.x - hero.x) < 300 && Math.abs(e.y - hero.y) < 300);
-              if (near.length) {
-                let source = near[Math.floor(Math.random() * near.length)],
-                  seen = new Set([source]);
-                arcs.push({
-                  x1: source.x,
-                  y1: source.y - 280,
-                  x2: source.x,
-                  y2: source.y,
-                  life: 0.3,
-                  electric: true,
-                });
-                burst(source.x, source.y, "#fff289", 10);
-                damageEnemy(source, hero.damage * 0.9, "lightning");
-                for (let hop = 0; hop < 3; hop++) {
-                  let next = null,
-                    range = 150 * 150;
-                  for (const other of enemies) {
-                    if (seen.has(other)) continue;
-                    let d = (other.x - source.x) ** 2 + (other.y - source.y) ** 2;
-                    if (d < range) {
-                      range = d;
-                      next = other;
-                    }
-                  }
-                  if (!next) break;
-                  arcs.push({
-                    x1: source.x,
-                    y1: source.y,
-                    x2: next.x,
-                    y2: next.y,
-                    life: 0.24,
-                    electric: true,
-                  });
-                  damageEnemy(next, hero.damage * 0.5, "lightning");
-                  seen.add(next);
-                  source = next;
-                }
-                if (arcs.length > 45) arcs.splice(0, arcs.length - 45);
-                sfx("crit");
-              }
-              hero.stormCd = 1;
-            }
-          }
           for (let i = shots.length - 1; i >= 0; i--) {
             let shot = shots[i];
             shot.x += shot.vx * dt;
@@ -2907,28 +3063,6 @@
               d = Math.hypot(dx, dy) || 1;
             e.faceX = dx / d;
             e.faceY = dy / d;
-            if (e.treasure) {
-              if (clock > e.escape) {
-                enemies.splice(enemies.indexOf(e), 1);
-                burst(e.x, e.y, "#ffd46e", 16);
-                showToast("THE IMP ESCAPED");
-                continue;
-              }
-              e.faceX = -e.faceX;
-              e.faceY = -e.faceY;
-              e.walking = 1;
-              e.stepPhase = (e.stepPhase || 0) + dt * 14;
-              let step = e.speed * (e.frostTime > 0 ? 0.62 : 1) * dt,
-                wobble = Math.sin(clock * 2.3 + e.max) * 0.7;
-              moveAroundWalls(
-                e,
-                (-dx / d + (dy / d) * wobble) * step,
-                (-dy / d - (dx / d) * wobble) * step,
-                dt,
-                true,
-              );
-              continue;
-            }
             if (e.type === "sentinel" || e.type === "burrower")
               e.recover = Math.max(0, (e.recover || 0) - dt);
             if (e.type === "burrower") {
@@ -2974,7 +3108,7 @@
               let step =
                 e.speed *
                 (e.recover > 0 ? 0.4 : 1) *
-                (e.frostTime > 0 ? (hasEvo("zero") ? 0.38 : 0.62) : e.poisonTime > 0 ? 0.82 : 1) *
+                (e.frostTime > 0 ? 0.62 : e.poisonTime > 0 ? 0.82 : 1) *
                 dt;
               moveAroundWalls(e, (dx / d) * step, (dy / d) * step, dt, true);
             } else clearWall(e);
@@ -2993,8 +3127,7 @@
                 e.slam.time -= dt;
                 if (e.slam.time <= 0) {
                   let slam = e.slam;
-                  e.slam = null;
-                  let color = e.variant === "oracle" ? "#8df0ee" : "#ff8c67";
+                  ((e.slam = null), (color = e.variant === "oracle" ? "#8df0ee" : "#ff8c67"));
                   rings.push({ x: slam.x, y: slam.y, r: 10, life: 0.42, speed: slam.r * 2.4, color });
                   burst(slam.x, slam.y, color, 24);
                   shake = 8;
@@ -3130,7 +3263,10 @@
               for (const e of [...enemies])
                 if (Math.hypot(e.x - pool.x, e.y - pool.y) < pool.r + e.r) {
                   if (pool.kind === "frozen") afflict(e, "frost", pool.power);
-                  else {
+                  else if (pool.kind === "flame") {
+                    afflict(e, "burn", pool.power);
+                    damageEnemy(e, pool.power, "burn", 2);
+                  } else {
                     afflict(e, "poison", pool.power);
                     damageEnemy(e, pool.power, "poison", 2);
                   }
@@ -3175,7 +3311,11 @@
               dy = hero.y - o.y,
               d = Math.hypot(dx, dy);
             if (magnetTimer > 0 && o.type === "xp") o.magnetized = true;
-            if ((d < (o.type === "xp" && level < 3 ? 160 : 105) || o.magnetized) && d > 1) {
+            if (
+              (d < (o.type === "xp" ? (level < 4 ? 195 : 130) + (hero.pickupBonus || 0) : 105) ||
+                o.magnetized) &&
+              d > 1
+            ) {
               let speed = o.magnetized ? Math.max(850, d * 3) : 300;
               o.x += (dx / d) * Math.min(d, speed * dt);
               o.y += (dy / d) * Math.min(d, speed * dt);
@@ -3209,7 +3349,7 @@
               if (xp >= needed) {
                 saveRun(true);
                 xp -= needed;
-                needed = Math.round(8 + 5 * level + 1.5 * level * level);
+                needed = 8 + 4 * level + level * level;
                 updateHud();
                 levelUp();
                 break;
@@ -3219,7 +3359,7 @@
           if (mode === "play" && xp >= needed) {
             saveRun(true);
             xp -= needed;
-            needed = Math.round(8 + 5 * level + 1.5 * level * level);
+            needed = 8 + 4 * level + level * level;
             updateHud();
             levelUp();
           }
@@ -3425,14 +3565,6 @@
             ctx.arc(x, y + r * 0.7, r + 9 + Math.sin(clock * 3) * 2, 0, 7);
             ctx.stroke();
           }
-          if (e.elite || e.treasure) {
-            let pulse = 0.6 + Math.sin(clock * 6) * 0.25;
-            ctx.strokeStyle = "rgba(255, 212, 110, " + pulse + ")";
-            ctx.lineWidth = 3;
-            ctx.beginPath();
-            ctx.arc(x, y + r * 0.5, r + 12 + Math.sin(clock * 4) * 3, 0, 7);
-            ctx.stroke();
-          }
           ctx.save();
           if (e.hitFlash > 0) ctx.filter = "brightness(1.9)";
           if (e.type === "skeleton") ctx.filter = "grayscale(1) brightness(1.35)";
@@ -3459,12 +3591,6 @@
             ctx.stroke();
             ctx.shadowBlur = 0;
           }
-          if (e.elite || e.treasure) {
-            ctx.fillStyle = "#ffd46e";
-            ctx.font = "900 10px system-ui";
-            ctx.textAlign = "center";
-            ctx.fillText(e.treasure ? "TREASURE IMP" : "ELITE · " + eliteMods[e.elite], x, y - r - 20);
-          }
           if (e.hp < e.max) {
             ctx.fillStyle = "#10171a";
             ctx.fillRect(x - r, y - r - 14, r * 2, 5);
@@ -3488,7 +3614,7 @@
           ctx.beginPath();
           ctx.ellipse(x, y + 18, 19, 7, 0, 0, 7);
           ctx.fill();
-          ctx.strokeStyle = hero.armor > 0 ? "#85d7e899" : "#bb9b6288";
+          ctx.strokeStyle = hero.class === "storm" ? "#ffe47abb" : hero.armor > 0 ? "#85d7e899" : "#bb9b6288";
           ctx.lineWidth = 2;
           ctx.beginPath();
           ctx.arc(x, y + 9, 22 + Math.sin(clock * 4) * 1.5, 0, 7);
@@ -3501,7 +3627,13 @@
             let pulse = Math.sin(Math.min(1, hero.cast / 0.18) * Math.PI),
               staffX = x + (side ? Math.sign(fx) * 27 : fy < 0 ? 14 : -13),
               staffY = y - 30;
-            ctx.strokeStyle = hero.poison ? "#a5ff86" : hero.fire ? "#ffb067" : "#92f1ff";
+            ctx.strokeStyle = hero.poison
+              ? "#a5ff86"
+              : hero.fire
+                ? "#ffb067"
+                : hero.class === "storm"
+                  ? "#ffe77f"
+                  : "#92f1ff";
             ctx.lineWidth = 2;
             ctx.shadowBlur = 14;
             ctx.shadowColor = ctx.strokeStyle;
@@ -3951,6 +4083,13 @@
           for (const e of enemies)
             if (e.x > left - 80 && e.x < left + w + 220 && e.y > top - 80 && e.y < top + h + 220) {
               drawEnemy(e);
+              if (e.eventElite) {
+                ctx.strokeStyle = "#ffd27c";
+                ctx.lineWidth = 3;
+                ctx.beginPath();
+                ctx.arc(e.x, e.y, Math.max(6, e.r + 9), 0, 7);
+                ctx.stroke();
+              }
               if (e.trial) {
                 ctx.strokeStyle = "#e2a2ff";
                 ctx.lineWidth = 2;
@@ -4002,9 +4141,9 @@
             )
               continue;
             ctx.globalAlpha = Math.min(1, arc.life * 5);
-            ctx.strokeStyle = arc.plague ? "#9dfa71" : arc.beam ? "#c093ff" : "#8df8ff";
+            ctx.strokeStyle = arc.beam ? "#c093ff" : "#8df8ff";
             ctx.shadowBlur = arc.beam ? 14 : 19;
-            ctx.shadowColor = arc.plague ? "#5fd846" : arc.beam ? "#9251ff" : "#59eaff";
+            ctx.shadowColor = arc.beam ? "#9251ff" : "#59eaff";
             ctx.lineWidth = arc.beam ? 8 : 5;
             ctx.beginPath();
             ctx.moveTo(arc.x1, arc.y1);
@@ -4021,13 +4160,16 @@
             if (pool.x < left - 80 || pool.x > left + w + 220 || pool.y < top - 80 || pool.y > top + h + 220)
               continue;
             ctx.globalAlpha = Math.min(0.45, pool.life * 0.16);
-            ctx.fillStyle = pool.kind === "frozen" ? "#86ccea" : "#5ac65d";
-            ctx.shadowColor = pool.kind === "frozen" ? "#a1e9ff" : "#7feb74";
+            ctx.fillStyle =
+              pool.kind === "frozen" ? "#86ccea" : pool.kind === "flame" ? "#e46a32" : "#5ac65d";
+            ctx.shadowColor =
+              pool.kind === "frozen" ? "#a1e9ff" : pool.kind === "flame" ? "#ffad59" : "#7feb74";
             ctx.shadowBlur = 15;
             ctx.beginPath();
             ctx.ellipse(pool.x, pool.y, pool.r, pool.r * 0.58, 0, 0, 7);
             ctx.fill();
-            ctx.strokeStyle = pool.kind === "frozen" ? "#c8f5ff" : "#adfa7d";
+            ctx.strokeStyle =
+              pool.kind === "frozen" ? "#c8f5ff" : pool.kind === "flame" ? "#ffc177" : "#adfa7d";
             ctx.lineWidth = 3;
             ctx.stroke();
             ctx.globalAlpha = 1;
@@ -4160,7 +4302,7 @@
           last = t;
           try {
             if (mode !== "error") {
-              update(dt);
+              update(dt * gameSpeed);
               draw();
               frameErrors = 0;
             }
