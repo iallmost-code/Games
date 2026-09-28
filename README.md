@@ -14,15 +14,12 @@ python3 -m http.server 8000
 
 Everything is in `index.html` except the sprites in `assets/`.
 
-## Changes from the original
+## What's in this version
 
-- **Faster pacing:** 20-second waves, enemies spawn just off-screen and move faster, quicker early level-ups, faster hero movement and fire rate.
-- **Evolutions:** owning both halves of a pair offers a gold evolution at the next level-up. Level-up cards show what each upgrade pairs with.
-  - Firebrand + Flame Fairy → **Inferno**
-  - Chain Spark III + Lightning Fairy → **Storm Crown**
-  - Venom Bolts + Venom Fairy → **Plague**
-  - 4 bolts + max Quick Hands → **Ember Barrage**
-  - Grave Nova II + Frost Fairy → **Absolute Zero**
-  - Arcane Lance II + Arcane Fairy → **Arcane Tempest**
-- **Wave events:** a treasure imp on wave 2, then surround swarms, elites (swift / splitting / armored) and treasure imps on odd non-boss waves.
+Based on ChatGPT's second version (embers + upgrade shrine, unlockable Stormcaller hero, 1×/1.25×/1.5× speed toggle, Inferno / Storm Crown / Plague Heart / Ember Barrage evolutions, runner rings and elite hunts), plus:
+
+- **Two more evolutions:** Grave Nova II + Frost Fairy → **Absolute Zero**; Arcane Lance II + Arcane Fairy → **Arcane Tempest**. Evolution cards are highlighted in gold.
+- **Treasure imp:** appears on wave 2 and in the wave-surprise rotation. It flees; catch it within 14 seconds for a gear cache, XP and embers. A gold arrow points to it.
+- **Elite modifiers:** elite hunts roll Swift, Splitting (breaks into runners) or Armored (half damage).
+- **Gentler XP curve** after the first few levels so level-ups don't come every few seconds.
 - **Bug fix:** boss slam attacks ("DODGE THE MARK") threw an error and never dealt damage; they now hit if you stay in the marked circle.

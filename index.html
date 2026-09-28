@@ -366,6 +366,12 @@
         padding: 12px 15px;
         margin-top: 9px;
       }
+      .choice.evolution {
+        border-color: #ffd46e;
+        background: linear-gradient(120deg, #4a3413, #2b2433);
+        box-shadow: 0 0 18px #ffb84a55;
+        color: #ffe7a8;
+      }
       .choice small {
         display: block;
         font-size: 13px;
@@ -1234,7 +1240,7 @@
             {
               rank: hero.blades || 0,
               name: "ARCANE LANCE",
-              description: "Fire a violet beam that pierces more foes at higher ranks",
+              description: "Violet piercing beam · rank II pairs with Arcane Fairy",
               key: "blades",
             },
             {
@@ -1246,7 +1252,7 @@
             {
               rank: hero.novaRank || 0,
               name: "GRAVE NOVA",
-              description: "Pulse frost damage and slow surrounding foes",
+              description: "Frost pulse that slows foes · rank II pairs with Frost Fairy",
               key: "novaRank",
             },
           ]
@@ -1269,13 +1275,21 @@
                     name: "Flame Fairy",
                     text: "Burning fireballs · pairs with Firebrand for Inferno",
                   },
-                  { kind: "frost", name: "Frost Fairy", text: "Icy bolts slow enemy movement" },
+                  {
+                    kind: "frost",
+                    name: "Frost Fairy",
+                    text: "Icy bolts · pairs with Grave Nova II for Absolute Zero",
+                  },
                   {
                     kind: "venom",
                     name: "Venom Fairy",
                     text: "Toxic bolts · pairs with Venom Bolts for Plague",
                   },
-                  { kind: "arcane", name: "Arcane Fairy", text: "Violet magic beams pierce two enemies" },
+                  {
+                    kind: "arcane",
+                    name: "Arcane Fairy",
+                    text: "Piercing beams · pairs with Arcane Lance II for Arcane Tempest",
+                  },
                   {
                     kind: "lightning",
                     name: "Lightning Fairy",
@@ -1319,6 +1333,18 @@
                 text: "Fire volleys 25% faster with blazing bolts",
                 ready: hero.projectiles >= 6 && hero.attackHaste >= 0.3,
               },
+              {
+                key: "zero",
+                name: "ABSOLUTE ZERO",
+                text: "Chilled foes move 40% slower and take +35% damage",
+                ready: (hero.novaRank || 0) >= 2 && hero.fairies.includes("frost"),
+              },
+              {
+                key: "tempest",
+                name: "ARCANE TEMPEST",
+                text: "Arcane Lance fires three beams that pierce every foe",
+                ready: (hero.blades || 0) >= 2 && hero.fairies.includes("arcane"),
+              },
             ]
               .filter((o) => o.ready && !owned.includes(o.key))
               .map((o) => ({
@@ -1354,7 +1380,7 @@
             previous = new Set(picks.map((o) => o.name));
             for (const p of picks) {
               let b = document.createElement("button");
-              b.className = "choice";
+              b.className = p.name.startsWith("EVOLUTION") ? "choice evolution" : "choice";
               b.innerHTML = p.name + "<small>" + p.text + "</small>";
               b.onclick = () => {
                 sfx("loot");
@@ -1448,7 +1474,9 @@
           menuBack.hidden = true;
           kickerEl.textContent = drop.trial
             ? "HUNTER’S TRIAL CACHE"
-            : (bossNames[drop.variant] || "CRYPT WARDEN") + " TREASURE";
+            : drop.imp
+              ? "TREASURE IMP HOARD"
+              : (bossNames[drop.variant] || "CRYPT WARDEN") + " TREASURE";
           titleEl.innerHTML = "CHOOSE<br>YOUR GEAR";
           descEl.textContent = "A weapon, armor, and a random third find. Rare+ weapon after two dry drops.";
           start.hidden = true;
@@ -1931,9 +1959,30 @@
             if (sites.length < 3) createSite();
           }
         }
+        const eliteMods = { swift: "SWIFT", splitting: "SPLITTING", armored: "ARMORED" };
+        function spawnTreasureImp() {
+          if (enemies.length > 94) return;
+          spawnEnemy("runner");
+          let e = enemies[enemies.length - 1],
+            a = Math.random() * Math.PI * 2;
+          e.x = hero.x + Math.cos(a) * 230;
+          e.y = hero.y + Math.sin(a) * 230;
+          clearWall(e);
+          e.treasure = true;
+          e.hp = e.max = e.max * 5;
+          e.speed = hero.speed * 0.78;
+          e.escape = clock + 14;
+          showToast("TREASURE IMP · CATCH IT!");
+          sfx("loot");
+        }
         function spawnWaveSurprise() {
           if (enemies.length > 83) return;
-          if (wave % 2) {
+          let kind = Math.floor((wave - 5) / 3) % 3;
+          if (kind === 2) {
+            spawnTreasureImp();
+            return;
+          }
+          if (kind === 0) {
             for (let i = 0; i < 8; i++) {
               spawnEnemy("runner");
               let e = enemies[enemies.length - 1],
@@ -1947,11 +1996,12 @@
           } else {
             spawnEnemy("champion");
             let e = enemies[enemies.length - 1];
-            e.eventElite = true;
+            let mod = ["swift", "splitting", "armored"][Math.floor(Math.random() * 3)];
+            e.eventElite = mod;
             e.hp *= 1.6;
             e.max = e.hp;
-            e.speed *= 1.2;
-            showToast("ELITE HUNT · CLAIM THE SHIELD");
+            e.speed *= mod === "swift" ? 1.6 : 1.2;
+            showToast("ELITE HUNT · " + eliteMods[mod]);
           }
         }
         function spawnEncounter() {
@@ -2219,11 +2269,13 @@
           }
         }
         function drawSiteCompass() {
-          let active = sites
-            .filter((o) => !o.used)
-            .sort(
-              (a, b) => Math.hypot(a.x - hero.x, a.y - hero.y) - Math.hypot(b.x - hero.x, b.y - hero.y),
-            )[0];
+          let active =
+            enemies.find((e) => e.treasure) ||
+            sites
+              .filter((o) => !o.used)
+              .sort(
+                (a, b) => Math.hypot(a.x - hero.x, a.y - hero.y) - Math.hypot(b.x - hero.x, b.y - hero.y),
+              )[0];
           if (!active) return;
           let dx = active.x - hero.x,
             dy = active.y - hero.y,
@@ -2239,7 +2291,7 @@
           ctx.fill();
           ctx.translate(x, y);
           ctx.rotate(angle);
-          ctx.fillStyle = siteColors[active.kind];
+          ctx.fillStyle = active.treasure ? "#ffd46e" : siteColors[active.kind];
           ctx.beginPath();
           ctx.moveTo(12, 0);
           ctx.lineTo(-6, -7);
@@ -2299,44 +2351,46 @@
                   target = e;
                 }
               }
-              if (target) {
-                let dx = target.x - hero.x,
-                  dy = target.y - hero.y,
-                  d = Math.hypot(dx, dy) || 1,
-                  ux = dx / d,
-                  uy = dy / d,
-                  reach = Math.min(330, d + 95 + blades * 22),
-                  hits = 0;
-                let candidates = [];
-                for (const e of enemies) {
-                  let ex = e.x - hero.x,
-                    ey = e.y - hero.y,
-                    along = ex * ux + ey * uy,
-                    side = Math.abs(ex * uy - ey * ux);
-                  if (along > 0 && along < reach && side < e.r + 11) candidates.push({ e, along });
+              let tempest = hero.evolutions?.includes("tempest");
+              if (target)
+                for (const turn of tempest ? [0, -0.6, 0.6] : [0]) {
+                  let dx = target.x - hero.x,
+                    dy = target.y - hero.y,
+                    d = Math.hypot(dx, dy) || 1,
+                    ux = Math.cos(Math.atan2(dy, dx) + turn),
+                    uy = Math.sin(Math.atan2(dy, dx) + turn),
+                    reach = tempest ? 330 : Math.min(330, d + 95 + blades * 22),
+                    hits = 0;
+                  let candidates = [];
+                  for (const e of enemies) {
+                    let ex = e.x - hero.x,
+                      ey = e.y - hero.y,
+                      along = ex * ux + ey * uy,
+                      side = Math.abs(ex * uy - ey * ux);
+                    if (along > 0 && along < reach && side < e.r + 11) candidates.push({ e, along });
+                  }
+                  candidates.sort((a, b) => a.along - b.along);
+                  for (const item of candidates) {
+                    if (!tempest && hits >= blades) break;
+                    damageEnemy(
+                      item.e,
+                      hero.damage * (0.55 + blades * 0.2) * (1 + (hero.arcaneAmp || 0) * 0.15),
+                      "arcane",
+                    );
+                    hits++;
+                  }
+                  arcs.push({
+                    x1: hero.x,
+                    y1: hero.y - 12,
+                    x2: hero.x + ux * reach,
+                    y2: hero.y + uy * reach - 12,
+                    life: 0.22,
+                    beam: true,
+                  });
+                  if (arcs.length > 45) arcs.splice(0, arcs.length - 45);
+                  hero.cast = 0.18;
+                  sfx("cast");
                 }
-                candidates.sort((a, b) => a.along - b.along);
-                for (const item of candidates) {
-                  if (hits >= blades) break;
-                  damageEnemy(
-                    item.e,
-                    hero.damage * (0.55 + blades * 0.2) * (1 + (hero.arcaneAmp || 0) * 0.15),
-                    "arcane",
-                  );
-                  hits++;
-                }
-                arcs.push({
-                  x1: hero.x,
-                  y1: hero.y - 12,
-                  x2: hero.x + ux * reach,
-                  y2: hero.y + uy * reach - 12,
-                  life: 0.22,
-                  beam: true,
-                });
-                if (arcs.length > 45) arcs.splice(0, arcs.length - 45);
-                hero.cast = 0.18;
-                sfx("cast");
-              }
             }
           }
           if (hero.meteorRank) {
@@ -2480,6 +2534,8 @@
               floater(e.x, e.y - 25, "SHIELD BROKEN", "#a4e7ff");
             }
           }
+          if (e.eventElite === "armored") amount *= 0.5;
+          if (e.frostTime > 0 && hero.evolutions?.includes("zero")) amount *= 1.35;
           if (kind === "crit") sfx("crit");
           else if (kind === "physical") sfx("hit");
           runStats.damage += Math.min(e.hp, amount);
@@ -2506,6 +2562,29 @@
             drops.push({ x: e.x - 16, y: e.y, type: "xp", value: Math.max(8, level * 2) });
             awardEmbers(5);
             showToast("ELITE HUNT CLEARED · +5 EMBERS");
+            if (e.eventElite === "splitting")
+              for (let k = 0; k < 4 && enemies.length < 110; k++) {
+                spawnEnemy("runner");
+                let child = enemies[enemies.length - 1];
+                child.x = e.x + Math.cos(k * 1.57) * 26;
+                child.y = e.y + Math.sin(k * 1.57) * 26;
+                clearWall(child);
+              }
+          }
+          if (e.treasure) {
+            for (let k = 0; k < 8; k++) {
+              let a = (k / 8) * Math.PI * 2;
+              drops.push({
+                x: e.x + Math.cos(a) * 30,
+                y: e.y + Math.sin(a) * 30,
+                type: "xp",
+                value: Math.max(3, level) * 1.5,
+              });
+            }
+            drops.push({ x: e.x + 16, y: e.y, type: "loot", imp: true, wave });
+            awardEmbers(5);
+            rings.push({ x: e.x, y: e.y, r: 14, life: 0.6, speed: 320, color: "#ffd46e" });
+            showToast("TREASURE IMP · HOARD DROPPED · +5 EMBERS");
           }
           if (e.trial && !enemies.some((other) => other.trial)) {
             drops.push({ x: e.x + 18, y: e.y, type: "loot", trial: true, wave });
@@ -2811,6 +2890,7 @@
               }
               if (twin) showToast("TWIN GUARDIANS RISE");
             }
+            if (wave === 2) spawnTreasureImp();
             if (wave >= 5 && wave % 3 === 2) spawnWaveSurprise();
             if (
               wave >= 4 &&
@@ -3063,6 +3143,28 @@
               d = Math.hypot(dx, dy) || 1;
             e.faceX = dx / d;
             e.faceY = dy / d;
+            if (e.treasure) {
+              if (clock > e.escape) {
+                enemies.splice(enemies.indexOf(e), 1);
+                burst(e.x, e.y, "#ffd46e", 16);
+                showToast("THE IMP ESCAPED");
+                continue;
+              }
+              e.faceX = -e.faceX;
+              e.faceY = -e.faceY;
+              e.walking = 1;
+              e.stepPhase = (e.stepPhase || 0) + dt * 14;
+              let step = e.speed * (e.frostTime > 0 ? 0.62 : 1) * dt,
+                wobble = Math.sin(clock * 2.3 + e.max) * 0.7;
+              moveAroundWalls(
+                e,
+                (-dx / d + (dy / d) * wobble) * step,
+                (-dy / d - (dx / d) * wobble) * step,
+                dt,
+                true,
+              );
+              continue;
+            }
             if (e.type === "sentinel" || e.type === "burrower")
               e.recover = Math.max(0, (e.recover || 0) - dt);
             if (e.type === "burrower") {
@@ -3108,7 +3210,13 @@
               let step =
                 e.speed *
                 (e.recover > 0 ? 0.4 : 1) *
-                (e.frostTime > 0 ? 0.62 : e.poisonTime > 0 ? 0.82 : 1) *
+                (e.frostTime > 0
+                  ? hero.evolutions?.includes("zero")
+                    ? 0.38
+                    : 0.62
+                  : e.poisonTime > 0
+                    ? 0.82
+                    : 1) *
                 dt;
               moveAroundWalls(e, (dx / d) * step, (dy / d) * step, dt, true);
             } else clearWall(e);
@@ -3127,7 +3235,8 @@
                 e.slam.time -= dt;
                 if (e.slam.time <= 0) {
                   let slam = e.slam;
-                  ((e.slam = null), (color = e.variant === "oracle" ? "#8df0ee" : "#ff8c67"));
+                  e.slam = null;
+                  let color = e.variant === "oracle" ? "#8df0ee" : "#ff8c67";
                   rings.push({ x: slam.x, y: slam.y, r: 10, life: 0.42, speed: slam.r * 2.4, color });
                   burst(slam.x, slam.y, color, 24);
                   shake = 8;
@@ -3349,7 +3458,7 @@
               if (xp >= needed) {
                 saveRun(true);
                 xp -= needed;
-                needed = 8 + 4 * level + level * level;
+                needed = Math.round(8 + 5 * level + 1.5 * level * level);
                 updateHud();
                 levelUp();
                 break;
@@ -3359,7 +3468,7 @@
           if (mode === "play" && xp >= needed) {
             saveRun(true);
             xp -= needed;
-            needed = 8 + 4 * level + level * level;
+            needed = Math.round(8 + 5 * level + 1.5 * level * level);
             updateHud();
             levelUp();
           }
@@ -4083,12 +4192,20 @@
           for (const e of enemies)
             if (e.x > left - 80 && e.x < left + w + 220 && e.y > top - 80 && e.y < top + h + 220) {
               drawEnemy(e);
-              if (e.eventElite) {
+              if (e.eventElite || e.treasure) {
                 ctx.strokeStyle = "#ffd27c";
                 ctx.lineWidth = 3;
                 ctx.beginPath();
                 ctx.arc(e.x, e.y, Math.max(6, e.r + 9), 0, 7);
                 ctx.stroke();
+                ctx.fillStyle = "#ffd46e";
+                ctx.font = "900 10px system-ui";
+                ctx.textAlign = "center";
+                ctx.fillText(
+                  e.treasure ? "TREASURE IMP" : "ELITE · " + (eliteMods[e.eventElite] || "HUNT"),
+                  e.x,
+                  e.y - e.r - 20,
+                );
               }
               if (e.trial) {
                 ctx.strokeStyle = "#e2a2ff";
