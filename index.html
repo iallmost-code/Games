@@ -409,6 +409,52 @@
         box-shadow: 0 0 18px #ffb84a55;
         color: #ffe7a8;
       }
+      .choice.fire {
+        border-color: #ff9a59;
+        background: #42291f;
+      }
+      .choice.poison {
+        border-color: #9bea7c;
+        background: #263822;
+      }
+      .choice.frost {
+        border-color: #a6e9ff;
+        background: #253c48;
+      }
+      .choice.lightning {
+        border-color: #ffe783;
+        background: #40391e;
+      }
+      .choice.arcane {
+        border-color: #c89cff;
+        background: #342945;
+      }
+      .choice.shadow {
+        border-color: #9062b8;
+        background: #2b223c;
+      }
+      .choice.shared {
+        border-color: #93999d;
+        background: #333638;
+      }
+      .choice.evolution.fire {
+        background: linear-gradient(120deg, #64321c, #342522);
+      }
+      .choice.evolution.poison {
+        background: linear-gradient(120deg, #394724, #302a20);
+      }
+      .choice.evolution.frost {
+        background: linear-gradient(120deg, #2a4f63, #28313c);
+      }
+      .choice.evolution.lightning {
+        background: linear-gradient(120deg, #5a4e1e, #30323f);
+      }
+      .choice.evolution.arcane {
+        background: linear-gradient(120deg, #4b3266, #322f4a);
+      }
+      .choice.evolution.shadow {
+        background: linear-gradient(120deg, #382650, #292336);
+      }
       .choice small {
         display: block;
         font-size: 13px;
@@ -715,9 +761,9 @@
         }
         const heroNames = { mage: "CRYPT MAGE", storm: "STORMCALLER", ember: "EMBERWEAVER" };
         const heroTraits = {
-          mage: "Piercing staff · bolts pass through one foe",
-          storm: "Storm staff · bolts chain once · sturdier armor",
-          ember: "Cinder staff · defeated foes leave brief fire patches",
+          mage: "ARCANE + SHADOW · Piercing staff and soul magic",
+          storm: "FROST + LIGHTNING · Chaining bolts and ice magic",
+          ember: "FIRE + POISON · Cinder patches and blight magic",
         };
         const achievementGoals = [
           {
@@ -979,8 +1025,8 @@
         });
         game.addEventListener("pointerdown", ensureAudio, { passive: true });
         updateSoundButton();
-        const saveKey = "ember-crypt-save-v3";
-        const legacySaveKeys = ["ember-crypt-save-v2", "ember-crypt-save-v1"];
+        const saveKey = "ember-crypt-save-v4";
+        const legacySaveKeys = ["ember-crypt-save-v3", "ember-crypt-save-v2", "ember-crypt-save-v1"];
         const xpNeeded = (rank) => Math.round(10 + 6 * rank + 2 * rank * rank);
         function compatibleRun(saved, balance) {
           return (
@@ -1034,14 +1080,19 @@
           try {
             let saved = JSON.parse(localStorage.getItem(saveKey) || "null");
             if (saved) {
-              if (saved.version === 3 && compatibleRun(saved, 3)) return saved;
+              if (saved.version === 4 && compatibleRun(saved, 4)) return saved;
               localStorage.removeItem(saveKey);
             }
             for (const key of legacySaveKeys) {
               let legacy = JSON.parse(localStorage.getItem(key) || "null");
               if (!legacy) continue;
               localStorage.removeItem(key);
-              if ((legacy.version === 1 || legacy.version === 2) && migrateRun(legacy)) {
+              if (
+                (legacy.version === 3 && compatibleRun(legacy, 3)) ||
+                ((legacy.version === 1 || legacy.version === 2) && migrateRun(legacy))
+              ) {
+                legacy.version = 4;
+                legacy.balanceVersion = 4;
                 localStorage.setItem(saveKey, JSON.stringify(legacy));
                 return legacy;
               }
@@ -1064,8 +1115,8 @@
             localStorage.setItem(
               saveKey,
               JSON.stringify({
-                version: 3,
-                balanceVersion: 3,
+                version: 4,
+                balanceVersion: 4,
                 hero,
                 enemies,
                 drops,
@@ -1256,6 +1307,10 @@
             blades: 0,
             meteorRank: 0,
             novaRank: 0,
+            blightRank: 0,
+            iceRank: 0,
+            orbitRank: 0,
+            frostBolts: false,
             meteorCd: 0,
             novaCd: 0,
             faceX: 0,
@@ -1401,15 +1456,23 @@
           descEl.textContent = "Pick one upgrade to keep fighting.";
           start.hidden = true;
           choicesEl.replaceChildren();
+          const allowedElements =
+            hero.class === "ember"
+              ? ["fire", "poison", "shared"]
+              : hero.class === "storm"
+                ? ["frost", "lightning", "shared"]
+                : ["arcane", "shadow", "shared"];
           const options = [
             {
               name: "PHASE BOLTS",
+              element: "arcane",
               text: "Staff bolts pierce 1 extra enemy · rank " + ((hero.pierceBonus || 0) + 1) + "/2",
               available: () => (hero.pierceBonus || 0) < 2,
               apply: () => (hero.pierceBonus = (hero.pierceBonus || 0) + 1),
             },
             {
               name: "SOUL HARVEST",
+              element: "shadow",
               text:
                 "Kills have a " +
                 (10 + (hero.xpBurst || 0) * 5) +
@@ -1421,6 +1484,7 @@
             },
             {
               name: "VOLTAIC CRITS",
+              element: "lightning",
               text:
                 "Critical hits spark to " +
                 (1 + (hero.critSpark || 0)) +
@@ -1432,12 +1496,14 @@
             },
             {
               name: "Soul Ward",
+              element: "shadow",
               text: "Restore 2 armor on each kill (max 6)",
               available: () => (hero.soulWard || 0) < 6,
               apply: () => (hero.soulWard = (hero.soulWard || 0) + 2),
             },
             {
               name: "Arcane Amplifier",
+              element: "arcane",
               text: "Arcane Lance and Arcane Fairy deal +15% damage (max 45%)",
               available: () => (hero.arcaneAmp || 0) < 3,
               apply: () => (hero.arcaneAmp = (hero.arcaneAmp || 0) + 1),
@@ -1478,7 +1544,12 @@
               available: () => hero.projectiles < 6,
               apply: () => (hero.projectiles = Math.min(6, hero.projectiles + 1)),
             },
-            { name: "Blood Ember", text: "Heal 2 health on each kill", apply: () => (hero.leech += 2) },
+            {
+              name: "Blood Ember",
+              element: "shadow",
+              text: "Heal 2 health on each kill",
+              apply: () => (hero.leech += 2),
+            },
             {
               name: "Keen Edge",
               text: "+5% critical chance (max 25%)",
@@ -1492,12 +1563,45 @@
               available: () => hero.critMultiplier < 2.5,
               apply: () => (hero.critMultiplier = Math.min(2.5, hero.critMultiplier + 0.25)),
             },
-          ].filter((o) => !o.available || o.available());
-          if (hero.chain < 4) {
+            {
+              name: "Heavy Strikes",
+              element: "shared",
+              text: "+8% staff damage · rank " + ((hero.heavyRank || 0) + 1) + "/3",
+              available: () => (hero.heavyRank || 0) < 3,
+              apply: () => {
+                hero.heavyRank = (hero.heavyRank || 0) + 1;
+                hero.damage = Math.round(hero.damage * 1.08);
+              },
+            },
+            {
+              name: "Fleet Foot",
+              element: "shared",
+              text: "+10 movement speed · rank " + ((hero.fleetRank || 0) + 1) + "/3",
+              available: () => (hero.fleetRank || 0) < 3,
+              apply: () => {
+                hero.fleetRank = (hero.fleetRank || 0) + 1;
+                hero.speed += 10;
+              },
+            },
+            {
+              name: "Long Reach",
+              element: "shared",
+              text: "+25 bolt range · rank " + ((hero.reachRank || 0) + 1) + "/3",
+              available: () => (hero.reachRank || 0) < 3,
+              apply: () => {
+                hero.reachRank = (hero.reachRank || 0) + 1;
+                hero.range += 25;
+              },
+            },
+          ].filter(
+            (o) => (!o.available || o.available()) && (!o.element || allowedElements.includes(o.element)),
+          );
+          if (hero.class === "storm" && hero.chain < 4) {
             let rank = hero.chain + 1,
               jumps = rank + 1,
               pct = 45 + rank * 10;
             options.push({
+              element: "lightning",
               name: "Chain Spark " + ["I", "II", "III", "IV"][rank - 1],
               text:
                 jumps +
@@ -1508,41 +1612,75 @@
               apply: () => (hero.chain = rank),
             });
           }
-          if (!hero.poison)
+          if (hero.class === "ember" && !hero.poison)
             options.push({
               name: "Venom Bolts",
+              element: "poison",
               text: "Hits poison enemies · pairs with Venom Fairy for Plague",
               apply: () => (hero.poison = true),
             });
-          if (!hero.fire)
+          if (hero.class === "ember" && !hero.fire)
             options.push({
               name: "Firebrand",
+              element: "fire",
               text: "Hits ignite enemies · pairs with Flame Fairy for Inferno",
               apply: () => (hero.fire = true),
+            });
+          if (hero.class === "storm" && !hero.frostBolts)
+            options.push({
+              name: "FROSTBITE BOLTS",
+              element: "frost",
+              text: "Staff bolts chill foes · pairs with Chain Spark III for Shatterstorm",
+              apply: () => (hero.frostBolts = true),
             });
           const spellChoices = [
             {
               rank: hero.blades || 0,
+              element: "arcane",
               name: "ARCANE LANCE",
               description: "Violet piercing beam · rank II pairs with Arcane Fairy",
               key: "blades",
             },
             {
               rank: hero.meteorRank || 0,
+              element: "fire",
               name: "METEOR SIGIL",
               description: "Call down fire on clustered enemies",
               key: "meteorRank",
             },
             {
+              rank: hero.blightRank || 0,
+              element: "poison",
+              name: "BLIGHT CLOUD",
+              description: "Poison cloud follows you · rank II pairs with Meteor Sigil III",
+              key: "blightRank",
+            },
+            {
+              rank: hero.iceRank || 0,
+              element: "frost",
+              name: "ICE SHARDS",
+              description: "Fan of piercing ice shards chills foes",
+              key: "iceRank",
+            },
+            {
+              rank: hero.orbitRank || 0,
+              element: "shadow",
+              name: "WRAITH ORBIT",
+              description: "Orbiting skulls strike foes · rank III pairs with Blood Ember",
+              key: "orbitRank",
+            },
+            {
               rank: hero.novaRank || 0,
+              element: "frost",
               name: "GRAVE NOVA",
               description: "Frost pulse that slows foes · rank II pairs with Frost Fairy",
               key: "novaRank",
             },
           ]
-            .filter((o) => o.rank < 3)
+            .filter((o) => o.rank < 3 && allowedElements.includes(o.element))
             .map((o) => ({
               name: o.name + " " + ["I", "II", "III"][o.rank],
+              element: o.element,
               text: o.description + " · rank " + (o.rank + 1) + "/3",
               apply: () => {
                 hero[o.key] = (hero[o.key] || 0) + 1;
@@ -1556,33 +1694,45 @@
               ? [
                   {
                     kind: "flame",
+                    element: "fire",
                     name: "Flame Fairy",
                     text: "Burning fireballs · pairs with Firebrand for Inferno",
                   },
                   {
                     kind: "frost",
+                    element: "frost",
                     name: "Frost Fairy",
                     text: "Icy bolts · pairs with Grave Nova II for Absolute Zero",
                   },
                   {
                     kind: "venom",
+                    element: "poison",
                     name: "Venom Fairy",
                     text: "Toxic bolts · pairs with Venom Bolts for Plague",
                   },
                   {
                     kind: "arcane",
+                    element: "arcane",
                     name: "Arcane Fairy",
                     text: "Piercing beams · pairs with Arcane Lance II for Arcane Tempest",
                   },
                   {
+                    kind: "shadow",
+                    element: "shadow",
+                    name: "Shadow Fairy",
+                    text: "Dark bolts heal you on hit · pairs with Soul Harvest for Soul Rift",
+                  },
+                  {
                     kind: "lightning",
+                    element: "lightning",
                     name: "Lightning Fairy",
                     text: "Electric strikes · pairs with Chain Spark IV for Storm Crown",
                   },
                 ]
-                  .filter((f) => !hero.fairies.includes(f.kind))
+                  .filter((f) => allowedElements.includes(f.element) && !hero.fairies.includes(f.kind))
                   .map((f) => ({
                     name: f.name,
+                    element: f.element,
                     text: f.text,
                     apply: () => {
                       hero.fairies.push(f.kind);
@@ -1595,44 +1745,79 @@
             evolutionChoices = [
               {
                 key: "inferno",
+                element: "fire",
                 name: "INFERNO",
                 text: "Burning kills leave fire pools that ignite and damage nearby foes",
                 ready: hero.fire && hero.fairies.includes("flame"),
               },
               {
                 key: "storm",
+                element: "lightning",
                 name: "STORM CROWN",
                 text: "Call automatic chain lightning strikes around you",
                 ready: hero.chain >= 4 && hero.fairies.includes("lightning"),
               },
               {
                 key: "plague",
+                element: "poison",
                 name: "PLAGUE HEART",
                 text: "Poison deaths leave larger, longer-lasting toxic pools",
                 ready: hero.poison && hero.fairies.includes("venom"),
               },
               {
                 key: "barrage",
+                element: "shared",
                 name: "EMBER BARRAGE",
                 text: "Fire volleys 25% faster with blazing bolts",
                 ready: hero.projectiles >= 4 && hero.attackHaste >= 0.3,
               },
               {
                 key: "zero",
+                element: "frost",
                 name: "ABSOLUTE ZERO",
                 text: "Chilled foes move 40% slower and take +35% damage",
                 ready: (hero.novaRank || 0) >= 2 && hero.fairies.includes("frost"),
               },
               {
                 key: "tempest",
+                element: "arcane",
                 name: "ARCANE TEMPEST",
                 text: "Arcane Lance fires three beams that pierce every foe",
                 ready: (hero.blades || 0) >= 2 && hero.fairies.includes("arcane"),
               },
+              {
+                key: "wildfire",
+                element: "poison",
+                name: "WILDFIRE BLIGHT",
+                text: "Meteors leave toxic pools that explode when ignited",
+                ready: hero.meteorRank >= 3 && hero.blightRank >= 2,
+              },
+              {
+                key: "shatter",
+                element: "frost",
+                name: "SHATTERSTORM",
+                text: "Lightning shatters chilled foes in an icy blast",
+                ready: hero.frostBolts && hero.chain >= 3,
+              },
+              {
+                key: "rift",
+                element: "shadow",
+                name: "SOUL RIFT",
+                text: "Kills open a rift that draws nearby foes inward",
+                ready: hero.xpBurst > 0 && hero.fairies.includes("shadow"),
+              },
+              {
+                key: "veil",
+                element: "shadow",
+                name: "REAPER’S VEIL",
+                text: "Orbiting skulls restore health on kills",
+                ready: hero.orbitRank >= 3 && hero.leech > 0,
+              },
             ]
-              .filter((o) => o.ready && !owned.includes(o.key))
+              .filter((o) => allowedElements.includes(o.element) && o.ready && !owned.includes(o.key))
               .map((o) => ({
                 name: "EVOLUTION · " + o.name,
+                element: o.element,
                 text: o.text,
                 apply: () => {
                   hero.evolutions.push(o.key);
@@ -1666,7 +1851,8 @@
             previous = new Set(picks.map((o) => o.name));
             for (const p of picks) {
               let b = document.createElement("button");
-              b.className = p.name.startsWith("EVOLUTION") ? "choice evolution" : "choice";
+              b.className =
+                "choice " + (p.element || "shared") + (p.name.startsWith("EVOLUTION") ? " evolution" : "");
               b.innerHTML = p.name + "<small>" + p.text + "</small>";
               b.onclick = () => {
                 sfx("loot");
@@ -1822,7 +2008,12 @@
             let bonus = Math.round(
                 (slot === "weapon" ? weaponBase : armorBase * (style === "heavy" ? 1.3 : 0.85)) * rarity.mult,
               ),
-              effect = slot === "weapon" ? ["pierce", "arc", "ember"][Math.floor(Math.random() * 3)] : null,
+              effect =
+                slot === "weapon"
+                  ? ({ mage: ["pierce", "shadow"], storm: ["arc", "frost"], ember: ["ember", "venom"] }[
+                      hero.class
+                    ] || ["pierce"])[Math.floor(Math.random() * 2)]
+                  : null,
               effectRank = slot === "weapon" ? Math.max(1, rarities.indexOf(rarity) - 1) : 0,
               baseName =
                 slot === "weapon"
@@ -1885,6 +2076,9 @@
                     pierce: "PIERCE " + effectRank + " extra",
                     arc: "CHAIN +" + effectRank + " jumps",
                     ember: "EMBER CONE " + effectRank,
+                    frost: "FROSTBITE " + effectRank,
+                    venom: "TOXIC BOLTS " + effectRank,
+                    shadow: "SIPHON BOLTS " + effectRank,
                   }[effect]
                 : "") +
               "</small>";
@@ -2833,6 +3027,18 @@
                   hits++;
                 }
               }
+              if (hero.evolutions?.includes("wildfire")) {
+                pools.push({
+                  x: m.x,
+                  y: m.y,
+                  r: m.r * 0.72,
+                  life: 3.4,
+                  tick: 0.25,
+                  power: hero.damage * 0.19,
+                  kind: "wildfire",
+                });
+                if (pools.length > 35) pools.shift();
+              }
               meteors.splice(i, 1);
               sfx("blast");
             }
@@ -2864,8 +3070,81 @@
               hero.novaCd = Math.max(5, 8.5 - hero.novaRank * 0.7);
             }
           }
+          if (hero.blightRank) {
+            hero.blightCd = (hero.blightCd || 0) - dt;
+            if (hero.blightCd <= 0) {
+              let radius = 58 + hero.blightRank * 13;
+              for (const e of enemies)
+                if (Math.hypot(e.x - hero.x, e.y - hero.y) < radius + e.r)
+                  afflict(e, "poison", hero.damage * (0.24 + hero.blightRank * 0.09));
+              hero.blightCd = 0.42;
+            }
+          }
+          if (hero.iceRank) {
+            hero.iceCd = (hero.iceCd || 0) - dt;
+            if (hero.iceCd <= 0) {
+              let target = enemies.find((e) => Math.hypot(e.x - hero.x, e.y - hero.y) < 290);
+              if (target) {
+                let angle = Math.atan2(target.y - hero.y, target.x - hero.x);
+                for (let j = -1; j <= 1; j++) {
+                  let a = angle + j * 0.24;
+                  shots.push({
+                    x: hero.x,
+                    y: hero.y - 8,
+                    vx: Math.cos(a) * 520,
+                    vy: Math.sin(a) * 520,
+                    life: 0.65,
+                    damage: hero.damage * (0.32 + hero.iceRank * 0.12),
+                    pierceLeft: 2,
+                    element: "frost",
+                    color: "#a9eaff",
+                    splash: false,
+                  });
+                }
+                hero.iceCd = Math.max(2.6, 5.1 - hero.iceRank * 0.65);
+                hero.cast = 0.2;
+              }
+            }
+          }
+          if (hero.orbitRank) {
+            let count = 1 + hero.orbitRank;
+            for (const e of [...enemies]) {
+              if (e.orbitHitUntil > clock || Math.hypot(e.x - hero.x, e.y - hero.y) > 90) continue;
+              for (let j = 0; j < count; j++) {
+                let a = clock * 2.7 + (j * Math.PI * 2) / count,
+                  sx = hero.x + Math.cos(a) * 48,
+                  sy = hero.y + Math.sin(a) * 34;
+                if (Math.hypot(e.x - sx, e.y - sy) < e.r + 14) {
+                  e.orbitHitUntil = clock + 0.7;
+                  damageEnemy(e, hero.damage * (0.24 + hero.orbitRank * 0.1), "shadow");
+                  if (!enemies.includes(e) && hero.evolutions?.includes("veil"))
+                    hero.hp = Math.min(hero.maxHp, hero.hp + 4);
+                  break;
+                }
+              }
+            }
+          }
         }
         function drawSpellEffects(left, top) {
+          if (hero.blightRank) {
+            ctx.fillStyle = "#65c86528";
+            ctx.beginPath();
+            ctx.ellipse(hero.x, hero.y, 58 + hero.blightRank * 13, 35 + hero.blightRank * 8, 0, 0, 7);
+            ctx.fill();
+          }
+          if (hero.orbitRank) {
+            let count = 1 + hero.orbitRank;
+            for (let i = 0; i < count; i++) {
+              let a = clock * 2.7 + (i * Math.PI * 2) / count;
+              ctx.fillStyle = "#ae83df";
+              ctx.beginPath();
+              ctx.arc(hero.x + Math.cos(a) * 48, hero.y + Math.sin(a) * 34 - 7, 8, 0, 7);
+              ctx.fill();
+              ctx.fillStyle = "#f4e4ff";
+              ctx.fillRect(hero.x + Math.cos(a) * 48 - 3, hero.y + Math.sin(a) * 34 - 9, 2, 2);
+              ctx.fillRect(hero.x + Math.cos(a) * 48 + 2, hero.y + Math.sin(a) * 34 - 9, 2, 2);
+            }
+          }
           for (const m of meteors) {
             if (m.x < left || m.x > left + w + 140 || m.y < top || m.y > top + h + 140) continue;
             ctx.strokeStyle = "#ffad66";
@@ -2930,6 +3209,20 @@
           }
           if (e.eventElite === "armored") amount *= 0.5;
           if (e.frostTime > 0 && hero.evolutions?.includes("zero")) amount *= 1.35;
+          if (
+            kind === "lightning" &&
+            e.frostTime > 0 &&
+            hero.evolutions?.includes("shatter") &&
+            (e.shatterAt || 0) < clock
+          ) {
+            e.shatterAt = clock + 1.4;
+            rings.push({ x: e.x, y: e.y, r: 8, life: 0.35, speed: 180, color: "#abe9ff" });
+            for (const other of [...enemies])
+              if (other !== e && Math.hypot(other.x - e.x, other.y - e.y) < 78 + other.r) {
+                afflict(other, "frost", hero.damage * 0.3);
+                damageEnemy(other, hero.damage * 0.4, "frost", 2);
+              }
+          }
           if (kind === "crit") sfx("crit");
           else if (kind === "physical") sfx("hit");
           runStats.damage += Math.min(e.hp, amount);
@@ -2988,6 +3281,22 @@
             showToast("TRIAL CLEARED · GEAR CACHE");
           }
           if (spreadDepth < 2 && deathReactionBudget++ < 18) statusDeath(e, spreadDepth);
+          if (
+            hero.evolutions?.includes("rift") &&
+            pools.filter((pool) => pool.kind === "rift").length < 5 &&
+            clock - (hero.riftAt ?? -99) > 0.75
+          ) {
+            hero.riftAt = clock;
+            pools.push({
+              x: e.x,
+              y: e.y,
+              r: 83,
+              life: 2.2,
+              tick: 0.5,
+              power: hero.damage * 0.12,
+              kind: "rift",
+            });
+          }
           if (
             hero.class === "ember" &&
             fromHeroBolt &&
@@ -3146,7 +3455,11 @@
           if (!element) return;
           for (let i = pools.length - 1; i >= 0; i--) {
             let pool = pools[i];
-            if (pool.kind !== "poison" || Math.hypot(pool.x - x, pool.y - y) > pool.r + 18) continue;
+            if (
+              !["poison", "wildfire"].includes(pool.kind) ||
+              Math.hypot(pool.x - x, pool.y - y) > pool.r + 18
+            )
+              continue;
             if (element === "frost") {
               pool.kind = "frozen";
               pool.life = 3.5;
@@ -3157,7 +3470,7 @@
               rings.push({ x: pool.x, y: pool.y, r: 9, life: 0.45, speed: 150, color: "#ffad59" });
               burst(pool.x, pool.y, "#ffad59", 22);
               for (const e of [...enemies])
-                if (Math.hypot(e.x - pool.x, e.y - pool.y) < 76 + e.r) {
+                if (Math.hypot(e.x - pool.x, e.y - pool.y) < (pool.kind === "wildfire" ? 100 : 76) + e.r) {
                   afflict(e, "burn", hero.damage * 0.4);
                   damageEnemy(e, Math.max(8, hero.damage * 0.4), "burn", 2);
                 }
@@ -3509,11 +3822,20 @@
                     vx: ((e.x - fx) / d) * 480,
                     vy: ((e.y - fy) / d) * 480,
                     life: 0.65,
-                    damage: hero.damage * (kind === "flame" ? 0.45 : kind === "frost" ? 0.35 : 0.3),
+                    damage:
+                      hero.damage *
+                      (kind === "flame" ? 0.45 : kind === "frost" ? 0.35 : kind === "shadow" ? 0.36 : 0.3),
                     chain: false,
                     splash: kind === "flame",
                     element: kind,
-                    color: kind === "flame" ? "#ff895c" : kind === "frost" ? "#91e6ff" : "#9afa85",
+                    color:
+                      kind === "flame"
+                        ? "#ff895c"
+                        : kind === "frost"
+                          ? "#91e6ff"
+                          : kind === "shadow"
+                            ? "#b68bdf"
+                            : "#9afa85",
                   });
                   fairyTimers[kind] = kind === "flame" ? 0.95 : 1.15;
                 }
@@ -3551,21 +3873,32 @@
                     shot.damage * (0.45 + (hero.chain + (shot.arcRank || 0)) * 0.1) * Math.pow(0.85, hop);
                   if (hero.poison) afflict(next, "poison", chainHit);
                   if (hero.fire) afflict(next, "burn", chainHit);
-                  damageEnemy(next, chainHit);
+                  damageEnemy(next, chainHit, "lightning");
                   seen.add(next);
                   source = next;
                 }
               }
-              if (hero.poison || shot.element === "venom") afflict(victim, "poison", shot.damage);
+              if (hero.poison || shot.element === "venom" || (shot.fromHero && hero.weaponEffect === "venom"))
+                afflict(victim, "poison", shot.damage);
               if (hero.fire || shot.element === "flame") afflict(victim, "burn", shot.damage);
-              if (shot.element === "frost") afflict(victim, "frost", shot.damage);
+              if (
+                shot.element === "frost" ||
+                (shot.fromHero && (hero.frostBolts || hero.weaponEffect === "frost"))
+              )
+                afflict(victim, "frost", shot.damage);
               damageEnemy(
                 victim,
                 shot.damage * (victim.type === "boss" && victim.recover > 0 ? 1.35 : 1),
-                shot.baseDamage && shot.damage > shot.baseDamage ? "crit" : "physical",
+                shot.baseDamage && shot.damage > shot.baseDamage
+                  ? "crit"
+                  : shot.chain
+                    ? "lightning"
+                    : "physical",
                 0,
                 !!shot.fromHero,
               );
+              if (shot.element === "shadow" || (shot.fromHero && hero.weaponEffect === "shadow"))
+                hero.hp = Math.min(hero.maxHp, hero.hp + Math.min(2, Math.max(0.5, shot.damage * 0.035)));
               if (hero.critSpark && shot.baseDamage && shot.damage > shot.baseDamage) {
                 let source = { x, y },
                   seen = new Set([victim]);
@@ -3945,12 +4278,24 @@
                   else if (pool.kind === "flame") {
                     afflict(e, "burn", pool.power);
                     damageEnemy(e, pool.power, "burn", 2);
+                  } else if (pool.kind === "rift") {
+                    damageEnemy(e, pool.power, "shadow", 2);
                   } else {
                     afflict(e, "poison", pool.power);
                     damageEnemy(e, pool.power, "poison", 2);
                   }
                 }
             }
+            if (pool.kind === "rift")
+              for (const e of enemies) {
+                let dx = pool.x - e.x,
+                  dy = pool.y - e.y,
+                  distance = Math.hypot(dx, dy);
+                if (distance > e.r + 12 && distance < pool.r + 42) {
+                  e.x += (dx / distance) * Math.min(distance - e.r - 12, 48 * dt);
+                  e.y += (dy / distance) * Math.min(distance - e.r - 12, 48 * dt);
+                }
+              }
           }
           if (hero.victoryPaid && !hero.endless) {
             saveRun(true);
@@ -4900,18 +5245,22 @@
             ctx.fillStyle =
               pool.kind === "frozen"
                 ? "#86ccea"
-                : ["flame", "cinder"].includes(pool.kind)
-                  ? "#e46a32"
-                  : "#5ac65d";
+                : pool.kind === "rift"
+                  ? "#9353c8"
+                  : ["flame", "cinder"].includes(pool.kind)
+                    ? "#e46a32"
+                    : "#5ac65d";
             ctx.beginPath();
             ctx.ellipse(pool.x, pool.y, pool.r, pool.r * 0.58, 0, 0, 7);
             ctx.fill();
             ctx.strokeStyle =
               pool.kind === "frozen"
                 ? "#c8f5ff"
-                : ["flame", "cinder"].includes(pool.kind)
-                  ? "#ffc177"
-                  : "#adfa7d";
+                : pool.kind === "rift"
+                  ? "#cda1ff"
+                  : ["flame", "cinder"].includes(pool.kind)
+                    ? "#ffc177"
+                    : "#adfa7d";
             ctx.lineWidth = 3;
             ctx.stroke();
             ctx.globalAlpha = 1;
@@ -4983,7 +5332,9 @@
                       ? "#c18aff"
                       : kind === "lightning"
                         ? "#fff289"
-                        : "#a5f697";
+                        : kind === "shadow"
+                          ? "#b88ee8"
+                          : "#a5f697";
             drawGlow(fx, fy, 12, color);
             ctx.fillStyle = color;
             ctx.beginPath();

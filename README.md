@@ -16,11 +16,11 @@ Everything is in `index.html` except the sprites in `assets/`.
 
 ## What's in this version
 
-ChatGPT's fifth version, built on the merged file from this repo. Includes:
+ChatGPT's sixth version, built on the merged file from this repo. Includes:
 
-- **Heroes:** Crypt Mage, Stormcaller (defeat a boss) and Emberweaver (reach wave 10 or earn 300 lifetime embers).
+- **Heroes with their own elements:** Crypt Mage (Arcane + Shadow), Stormcaller (Frost + Lightning, unlock: defeat a boss) and Emberweaver (Fire + Poison, unlock: wave 10 or 600 lifetime embers). Each hero only sees its own element cards plus shared stat cards, and loot weapons roll that hero's effects.
+- **Hero evolutions:** Emberweaver: Inferno, Plague Heart, Wildfire Blight. Stormcaller: Storm Crown, Absolute Zero, Shatterstorm. Crypt Mage: Arcane Tempest, Soul Rift, Reaper's Veil. Everyone: Ember Barrage.
 - **Embers and upgrade shrine** with 6 permanent upgrades; the death screen shows embers earned and the next unlock.
-- **Evolutions:** Inferno, Storm Crown, Plague Heart, Ember Barrage, Absolute Zero, Arcane Tempest.
 - **Wave surprises:** runner rings, elite hunts (swift / splitting / armored) and a fleeing treasure imp.
 - **Achievements:** Deep Delver, Boss Slayer, Spell Weaver, Imp Catcher (one-time ember rewards).
 - **New level-up cards:** Phase Bolts, Soul Harvest, Voltaic Crits.
