@@ -16,6 +16,8 @@ Everything is in `index.html` except the sprites in `assets/`.
 
 ## What's in this version
 
+- **Menus:** start screen, three named save slots (each with its own progress), main menu hub with separate Play / Shrine / Bestiary / Achievements / Settings screens, hero select with depth picker, pause menu, and a copyable save code to move a character between devices.
+
 ChatGPT's eighth version, built on the merged file from this repo. Includes:
 
 - **Heroes with their own elements:** Crypt Mage (Arcane + Shadow), Stormcaller (Frost + Lightning, unlock: defeat a boss) and Emberweaver (Fire + Poison, unlock: wave 10 or 600 lifetime embers). Each hero only sees its own element cards plus shared stat cards, and loot weapons roll that hero's effects.

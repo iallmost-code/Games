@@ -545,6 +545,325 @@
           bottom: calc(env(safe-area-inset-bottom) + 20px);
         }
       }
+
+      .sound-toggle,
+      .speed-toggle {
+        display: none !important;
+      }
+      .game:not(.playing) .hud,
+      .game:not(.playing) .joystick,
+      .game:not(.playing) .tip {
+        display: none;
+      }
+      .pause-control {
+        position: absolute;
+        z-index: 6;
+        right: calc(env(safe-area-inset-right) + 16px);
+        top: calc(env(safe-area-inset-top) + 16px);
+        border: 1px solid #e6c184aa;
+        background: #17222be8;
+        color: #f9dfaa;
+        border-radius: 12px;
+        min-width: 51px;
+        min-height: 48px;
+        font: 900 20px system-ui;
+        display: none;
+        box-shadow: 0 4px 16px #0009;
+      }
+      .game.playing .pause-control {
+        display: block;
+      }
+      .game.playing .stats {
+        padding-top: 56px;
+      }
+      .menu-shell {
+        position: absolute;
+        z-index: 8;
+        inset: 0;
+        background:
+          linear-gradient(#050b14de, #080d1bec),
+          url("assets/ash-floor.webp") center/300px repeat,
+          #10161b;
+        overflow: hidden;
+        touch-action: pan-y;
+      }
+      .menu-shell.hidden {
+        display: none;
+      }
+      .menu-shell::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+        background:
+          radial-gradient(ellipse at 50% 38%, #d4843540, transparent 48%),
+          linear-gradient(90deg, #03080d99, transparent 20%, transparent 80%, #03080d99);
+      }
+      .menu-embers {
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+        overflow: hidden;
+      }
+      .menu-embers i {
+        position: absolute;
+        left: var(--x);
+        bottom: -10px;
+        width: var(--s);
+        height: var(--s);
+        border-radius: 50%;
+        background: #ffa945;
+        box-shadow: 0 0 12px #ff9845;
+        animation: floatEmber var(--d) linear infinite;
+        animation-delay: var(--delay);
+        opacity: 0.68;
+      }
+      @keyframes floatEmber {
+        to {
+          transform: translate(var(--drift), -110dvh);
+          opacity: 0;
+        }
+      }
+      .menu-page {
+        position: relative;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        width: min(560px, 100%);
+        margin: auto;
+        padding: calc(env(safe-area-inset-top) + 22px) calc(env(safe-area-inset-right) + 20px)
+          calc(env(safe-area-inset-bottom) + 22px) calc(env(safe-area-inset-left) + 20px);
+      }
+      .menu-page.start-page {
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+      }
+      .menu-title {
+        color: #ffe4af;
+        font: 900 clamp(42px, 12vw, 72px)/0.95 system-ui;
+        letter-spacing: -0.055em;
+        text-shadow:
+          0 3px #4e2c1e,
+          0 9px 30px #ff8e4b88;
+        margin: 0;
+      }
+      .menu-title span {
+        display: block;
+        color: #ffb36a;
+      }
+      .start-prompt {
+        position: absolute;
+        bottom: calc(env(safe-area-inset-bottom) + 8%);
+        font: 900 19px system-ui;
+        letter-spacing: 0.18em;
+        color: #ffe1aa;
+        animation: startPulse 2.2s ease-in-out infinite;
+      }
+      @keyframes startPulse {
+        50% {
+          opacity: 0.45;
+          transform: scale(0.97);
+        }
+      }
+      .menu-version {
+        position: absolute;
+        right: calc(env(safe-area-inset-right) + 20px);
+        bottom: calc(env(safe-area-inset-bottom) + 12px);
+        font-size: 12px;
+        color: #a6a69e;
+      }
+      .menu-top {
+        display: flex;
+        align-items: center;
+        min-height: 50px;
+        gap: 12px;
+      }
+      .menu-back {
+        background: #19232bcf;
+        border: 1px solid #c9a56a;
+        color: #ffdcaa;
+        border-radius: 11px;
+        min-width: 56px;
+        min-height: 48px;
+        font: 800 15px system-ui;
+      }
+      .menu-head {
+        color: #ffdcaa;
+        font: 900 clamp(27px, 8vw, 38px)/1.05 system-ui;
+        margin: 16px 0 7px;
+        letter-spacing: 0.025em;
+      }
+      .menu-sub {
+        color: #c9cfcb;
+        font-size: 15px;
+        line-height: 1.4;
+        margin: 0 0 15px;
+      }
+      .menu-scroll {
+        flex: 1;
+        overflow-y: auto;
+        overscroll-behavior: contain;
+        min-height: 0;
+        padding-bottom: 10px;
+      }
+      .menu-actions {
+        flex: none;
+        padding-top: 10px;
+      }
+      .menu-button {
+        display: block;
+        width: 100%;
+        min-height: 56px;
+        margin: 10px 0 0;
+        padding: 11px 16px;
+        border: 1px solid #a9855a;
+        border-radius: 13px;
+        color: #f4e7ce;
+        background: linear-gradient(135deg, #2a3337ed, #1a2228ed);
+        text-align: left;
+        font: 800 18px/1.25 system-ui;
+        box-shadow:
+          inset 0 1px #ffffff18,
+          0 5px 15px #0005;
+      }
+      .menu-button.primary {
+        background: linear-gradient(110deg, #eab46b, #f6d39b);
+        color: #202128;
+        border-color: #ffe1ad;
+        text-align: center;
+      }
+      .menu-button.selected {
+        border-color: #ffe2a4;
+        background: #493727;
+      }
+      .menu-button:disabled {
+        opacity: 0.42;
+      }
+      .menu-button small {
+        display: block;
+        font: 500 13px/1.35 system-ui;
+        color: #c7cfd0;
+        margin-top: 5px;
+      }
+      .menu-button.primary small {
+        color: #443626;
+      }
+      .menu-inline {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+      }
+      .menu-inline > * {
+        flex: 1;
+      }
+      .menu-link {
+        border: 0;
+        background: transparent;
+        color: #a8e8ed;
+        text-decoration: underline;
+        padding: 12px;
+        font: 800 14px system-ui;
+        min-height: 44px;
+      }
+      .menu-label {
+        display: block;
+        color: #ffe1ae;
+        font: 800 14px system-ui;
+        margin: 16px 0 7px;
+      }
+      .menu-input {
+        width: 100%;
+        min-height: 52px;
+        border: 1px solid #a4afb2;
+        border-radius: 11px;
+        background: #132029;
+        color: #fff4e0;
+        font: 500 17px system-ui;
+        padding: 12px;
+      }
+      .menu-error {
+        color: #ffb4a8;
+        min-height: 22px;
+        font-size: 14px;
+        margin: 8px 0;
+      }
+      .menu-note {
+        color: #aabbbd;
+        font-size: 13px;
+        line-height: 1.4;
+      }
+      .slot-card {
+        border: 1px solid #987853;
+        border-radius: 15px;
+        background: #1a262bcf;
+        padding: 15px;
+        margin: 13px 0;
+      }
+      .slot-card b {
+        color: #ffe2ae;
+        font-size: 19px;
+      }
+      .slot-stats {
+        color: #c4cfcb;
+        font-size: 14px;
+        line-height: 1.5;
+        margin: 8px 0;
+      }
+      .hero-art {
+        display: block;
+        object-fit: contain;
+        height: min(27dvh, 220px);
+        width: 100%;
+        margin: 3px auto 5px;
+        filter: drop-shadow(0 8px 18px #000);
+      }
+      .hero-art.storm {
+        filter: hue-rotate(175deg) saturate(1.3) drop-shadow(0 0 18px #8ddcff);
+      }
+      .hero-art.ember {
+        filter: hue-rotate(-28deg) saturate(1.5) drop-shadow(0 0 18px #ff9351);
+      }
+      .hero-arrows {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+      }
+      .hero-arrows button {
+        background: #202d34;
+        border: 1px solid #c7a56f;
+        color: #ffe1ac;
+        width: 52px;
+        height: 48px;
+        border-radius: 12px;
+        font-size: 23px;
+      }
+      .hero-arrows strong {
+        color: #ffe0ac;
+        text-align: center;
+        font-size: 20px;
+      }
+      .menu-page .achievement,
+      .menu-page .bestiary-row {
+        background: #1a282cca;
+        border-radius: 9px;
+        padding: 12px;
+        margin: 8px 0;
+        font-size: 14px;
+      }
+      .menu-page .bestiary-row span {
+        white-space: normal;
+      }
+      .menu-page .bestiary {
+        max-height: none;
+      }
+      @media (prefers-reduced-motion: reduce) {
+        .menu-embers i,
+        .start-prompt {
+          animation: none;
+        }
+      }
     </style>
   </head>
   <body>
@@ -595,6 +914,11 @@
           ><button class="primary" id="start">ENTER THE CRYPT</button>
         </div>
       </div>
+      <button id="pauseControl" class="pause-control" aria-label="Pause game">Ⅱ</button>
+      <div id="menuShell" class="menu-shell" aria-live="polite">
+        <div class="menu-embers" id="menuEmbers"></div>
+        <div class="menu-page" id="menuPage"></div>
+      </div>
     </main>
     <script>
       (() => {
@@ -634,7 +958,11 @@
           heroBtn = $("heroBtn"),
           menuBack = $("menuBack"),
           resumeBtn = $("resume"),
-          start = $("start");
+          start = $("start"),
+          menuShell = $("menuShell"),
+          menuPage = $("menuPage"),
+          pauseControl = $("pauseControl"),
+          menuEmbers = $("menuEmbers");
         let art = {},
           floorPattern = null,
           walkFrames = new WeakMap();
@@ -740,90 +1068,799 @@
           boss = null,
           weapon = null,
           armor = null;
-        let best = 0;
-        try {
-          best = +(localStorage.getItem("ember-crypt-best") || 0);
-        } catch {}
-        const profileKey = "ember-crypt-profile-v1";
-        let profile = {
-            embers: 0,
-            total: 0,
-            upgrades: {},
-            storm: false,
-            ember: false,
-            migrated: false,
-            bestWave: 1,
-            bosses: 0,
-            bestEvolutions: 0,
-            imps: 0,
-            achievements: {},
-            met: [],
-            unlockedDepth: 0,
-            bestDepth: { mage: 0, storm: 0, ember: 0 },
-          },
+        const slotsKey = "ember-crypt-character-slots-v1";
+        const activeSlotKey = "ember-crypt-active-slot-v1";
+        const blankProfile = () => ({
+          embers: 0,
+          total: 0,
+          upgrades: {},
+          storm: false,
+          ember: false,
+          migrated: true,
+          bestWave: 1,
+          bosses: 0,
+          bestEvolutions: 0,
+          imps: 0,
+          achievements: {},
+          met: [],
+          unlockedDepth: 0,
+          bestDepth: { mage: 0, storm: 0, ember: 0 },
+        });
+        let slots = [null, null, null],
+          activeSlot = -1,
+          profileKey = "",
+          saveKey = "",
+          bestKey = "",
+          slotPlayUnstored = 0,
+          menuScreen = "start",
+          settingsReturn = "hub",
+          vibrationEnabled = true,
+          profile = blankProfile(),
           selectedHero = "mage",
           selectedDepth = 0,
           runEmbers = 0,
-          pickupBonus = 0;
-        try {
-          let prior = JSON.parse(localStorage.getItem(profileKey) || "null");
-          if (prior && typeof prior === "object") {
-            profile.embers = Math.max(0, Math.floor(Number(prior.embers) || 0));
-            profile.total = Math.max(profile.embers, Math.floor(Number(prior.total) || 0));
-            profile.storm = !!prior.storm;
-            profile.ember = !!prior.ember || profile.total >= 600;
-            profile.migrated = !!prior.migrated;
-            profile.unlockedDepth = Math.min(20, Math.max(0, Math.floor(Number(prior.unlockedDepth) || 0)));
-            profile.bestDepth = Object.fromEntries(
-              ["mage", "storm", "ember"].map((h) => [
-                h,
-                Math.min(20, Math.max(0, Math.floor(Number(prior.bestDepth?.[h]) || 0))),
-              ]),
-            );
-            selectedDepth = Math.min(
-              profile.unlockedDepth,
-              Math.max(0, Math.floor(Number(prior.selectedDepth) || 0)),
-            );
-            for (const k of ["bestWave", "bosses", "bestEvolutions", "imps"])
-              profile[k] = Math.max(k === "bestWave" ? 1 : 0, Math.floor(Number(prior[k]) || 0));
-            for (const k of ["wave10", "boss3", "evolve2", "imp5"])
-              profile.achievements[k] = !!prior.achievements?.[k];
-            profile.met = Array.isArray(prior.met)
-              ? prior.met.filter((key) =>
-                  [
-                    "ghoul",
-                    "charger",
-                    "runner",
-                    "brute",
-                    "skeleton",
-                    "sentinel",
-                    "burrower",
-                    "wraith",
-                    "caster",
-                    "champion",
-                    "cinderImp",
-                    "frostGolem",
-                    "sporeSpitter",
-                    "imp",
-                    "warden",
-                    "tyrant",
-                    "colossus",
-                    "oracle",
-                    "heart",
-                  ].includes(key),
-                )
-              : [];
-            for (const k of ["power", "vigor", "fleet", "magnet", "armor", "reroll"])
-              profile.upgrades[k] = Math.min(5, Math.max(0, Math.floor(Number(prior.upgrades?.[k]) || 0)));
-            selectedHero = ["storm", "ember"].includes(prior.selectedHero) ? prior.selectedHero : "mage";
-            if (selectedHero === "storm" && !profile.storm) selectedHero = "mage";
-            if (selectedHero === "ember" && !profile.ember) selectedHero = "mage";
+          pickupBonus = 0,
+          best = 0;
+        const slotProfileKey = (n) => "ember-crypt-slot-" + (n + 1) + "-profile";
+        const slotRunKey = (n) => "ember-crypt-slot-" + (n + 1) + "-run-v9";
+        const slotBestKey = (n) => "ember-crypt-slot-" + (n + 1) + "-best";
+        function persistSlots() {
+          try {
+            localStorage.setItem(slotsKey, JSON.stringify(slots));
+          } catch {}
+        }
+        function migrateSingleSave() {
+          try {
+            let old = localStorage.getItem(slotsKey);
+            if (old) {
+              let parsed = JSON.parse(old);
+              if (Array.isArray(parsed)) slots = [0, 1, 2].map((i) => parsed[i] || null);
+              return;
+            }
+            let oldProfile = localStorage.getItem("ember-crypt-profile-v1");
+            let oldRun = ["v8", "v7", "v6", "v5", "v4", "v3", "v2", "v1"]
+              .map((v) => localStorage.getItem("ember-crypt-save-" + v))
+              .find(Boolean);
+            let oldBest = localStorage.getItem("ember-crypt-best");
+            if (oldProfile || oldRun || oldBest) {
+              slots[0] = { name: "Crypt Walker", lastPlayed: Date.now(), playTime: 0 };
+              if (oldProfile) localStorage.setItem(slotProfileKey(0), oldProfile);
+              if (oldRun) localStorage.setItem(slotRunKey(0), oldRun);
+              if (oldBest) localStorage.setItem(slotBestKey(0), oldBest);
+            }
+            persistSlots();
+          } catch {}
+        }
+        migrateSingleSave();
+        function applyProfile(prior) {
+          profile = blankProfile();
+          selectedHero = "mage";
+          selectedDepth = 0;
+          if (!prior || typeof prior !== "object") return;
+          profile.embers = Math.max(0, Math.floor(Number(prior.embers) || 0));
+          profile.total = Math.max(profile.embers, Math.floor(Number(prior.total) || 0));
+          profile.storm = !!prior.storm;
+          profile.ember = !!prior.ember || profile.total >= 600;
+          profile.migrated = !!prior.migrated;
+          profile.unlockedDepth = Math.min(20, Math.max(0, Math.floor(Number(prior.unlockedDepth) || 0)));
+          for (const h of ["mage", "storm", "ember"])
+            profile.bestDepth[h] = Math.min(20, Math.max(0, Math.floor(Number(prior.bestDepth?.[h]) || 0)));
+          selectedDepth = Math.min(
+            profile.unlockedDepth,
+            Math.max(0, Math.floor(Number(prior.selectedDepth) || 0)),
+          );
+          for (const k of ["bestWave", "bosses", "bestEvolutions", "imps"])
+            profile[k] = Math.max(k === "bestWave" ? 1 : 0, Math.floor(Number(prior[k]) || 0));
+          for (const k of ["wave10", "boss3", "evolve2", "imp5"])
+            profile.achievements[k] = !!prior.achievements?.[k];
+          const allowed = [
+            "ghoul",
+            "charger",
+            "runner",
+            "brute",
+            "skeleton",
+            "sentinel",
+            "burrower",
+            "wraith",
+            "caster",
+            "champion",
+            "cinderImp",
+            "frostGolem",
+            "sporeSpitter",
+            "imp",
+            "warden",
+            "tyrant",
+            "colossus",
+            "oracle",
+            "heart",
+          ];
+          profile.met = Array.isArray(prior.met) ? prior.met.filter((k) => allowed.includes(k)) : [];
+          for (const k of ["power", "vigor", "fleet", "magnet", "armor", "reroll"])
+            profile.upgrades[k] = Math.min(5, Math.max(0, Math.floor(Number(prior.upgrades?.[k]) || 0)));
+          selectedHero = ["storm", "ember"].includes(prior.selectedHero) ? prior.selectedHero : "mage";
+          if ((selectedHero === "storm" && !profile.storm) || (selectedHero === "ember" && !profile.ember))
+            selectedHero = "mage";
+        }
+        function selectSlot(n) {
+          if (!slots[n]) return false;
+          activeSlot = n;
+          profileKey = slotProfileKey(n);
+          saveKey = slotRunKey(n);
+          bestKey = slotBestKey(n);
+          try {
+            applyProfile(JSON.parse(localStorage.getItem(profileKey) || "null"));
+            best = +(localStorage.getItem(bestKey) || 0);
+            localStorage.setItem(activeSlotKey, String(n));
+          } catch {
+            applyProfile(null);
+            best = 0;
           }
-        } catch {}
+          slots[n].lastPlayed = Date.now();
+          persistSlots();
+          try {
+            vibrationEnabled = localStorage.getItem("ember-crypt-vibrate-" + n) !== "0";
+          } catch {}
+          slotPlayUnstored = 0;
+          hero = null;
+          if (!profile.migrated) {
+            let previous = readRun();
+            let veteran = Math.min(
+              90,
+              Math.floor(Math.max(best, previous?.kills || 0) / 30) + (previous?.runStats?.bosses || 0) * 3,
+            );
+            profile.embers += veteran;
+            profile.total += veteran;
+            profile.migrated = true;
+            saveProfile();
+          }
+          return true;
+        }
         function saveProfile() {
+          if (activeSlot < 0) return;
           try {
             localStorage.setItem(profileKey, JSON.stringify({ ...profile, selectedHero, selectedDepth }));
           } catch {}
+        }
+        function saveSlotClock() {
+          if (activeSlot < 0 || !slots[activeSlot]) return;
+          slots[activeSlot].playTime = (slots[activeSlot].playTime || 0) + Math.floor(slotPlayUnstored);
+          slotPlayUnstored %= 1;
+          slots[activeSlot].lastPlayed = Date.now();
+          persistSlots();
+        }
+        function menuButton(label, action, small, kind = "") {
+          let b = document.createElement("button");
+          b.type = "button";
+          b.className = "menu-button " + kind;
+          b.textContent = label;
+          if (small) {
+            let caption = document.createElement("small");
+            caption.textContent = small;
+            b.append(caption);
+          }
+          b.onclick = action;
+          return b;
+        }
+        function menuText(tag, value, cls = "") {
+          let e = document.createElement(tag);
+          e.textContent = value;
+          e.className = cls;
+          return e;
+        }
+        function menuBase(title, back = "hub", sub = "") {
+          menuPage.replaceChildren();
+          menuPage.className = "menu-page";
+          menuShell.classList.remove("hidden");
+          game.classList.remove("playing");
+          let bar = menuText("div", "", "menu-top"),
+            go = menuButton("BACK", () => renderMenu(back));
+          go.className = "menu-back";
+          bar.append(go);
+          menuPage.append(bar, menuText("h2", title, "menu-head"));
+          if (sub) menuPage.append(menuText("p", sub, "menu-sub"));
+          let body = menuText("div", "", "menu-scroll");
+          menuPage.append(body);
+          return body;
+        }
+        function showStartScreen() {
+          mode = "menu";
+          menuScreen = "start";
+          panel.classList.add("hidden");
+          game.classList.remove("playing");
+          menuShell.classList.remove("hidden");
+          menuPage.replaceChildren();
+          menuPage.className = "menu-page start-page";
+          const title = document.createElement("h1");
+          title.className = "menu-title";
+          title.innerHTML = "EMBER<span>CRYPT</span>";
+          menuPage.append(title);
+          let last = Number(localStorage.getItem(activeSlotKey));
+          let lastValid = Number.isInteger(last) && last >= 0 && last < 3 && slots[last];
+          if (lastValid) {
+            let prompt = menuText("button", "TAP TO START", "start-prompt menu-link");
+            prompt.onclick = () => {
+              selectSlot(last);
+              showTitleMenu();
+            };
+            menuPage.append(prompt);
+            menuPage.append(
+              menuButton(
+                "CONTINUE AS " + slots[last].name,
+                () => {
+                  selectSlot(last);
+                  showTitleMenu();
+                },
+                null,
+                "primary",
+              ),
+            );
+            let switcher = menuText("button", "SWITCH CHARACTER", "menu-link");
+            switcher.onclick = () => renderMenu("slots");
+            menuPage.append(switcher);
+          } else {
+            let prompt = menuText("button", "TAP TO START", "start-prompt menu-link");
+            prompt.onclick = () => renderMenu("slots");
+            menuPage.append(prompt);
+            menuPage.onclick = (e) => {
+              if (e.target === menuPage || e.target === title) renderMenu("slots");
+            };
+          }
+          menuPage.append(menuText("span", "v57", "menu-version"));
+          if (!menuEmbers.children.length)
+            for (let i = 0; i < 22; i++) {
+              let ember = document.createElement("i");
+              ember.style.setProperty("--x", ((i * 47) % 100) + "%");
+              ember.style.setProperty("--s", 2 + (i % 4) + "px");
+              ember.style.setProperty("--d", 8 + (i % 9) + "s");
+              ember.style.setProperty("--delay", -i * 1.7 + "s");
+              ember.style.setProperty("--drift", ((i % 5) - 2) * 23 + "px");
+              menuEmbers.append(ember);
+            }
+        }
+        function renderMenu(screen) {
+          menuScreen = screen;
+          mode =
+            screen === "pause" || (screen === "settings" && settingsReturn === "pause") ? "paused" : "menu";
+          if (screen === "start") {
+            showStartScreen();
+            return;
+          }
+          if (screen === "slots") {
+            let body = menuBase(
+              "SAVE SLOTS",
+              activeSlot >= 0 ? "hub" : "start",
+              "Three independent characters on this device.",
+            );
+            for (let i = 0; i < 3; i++) {
+              let card = menuText("section", "", "slot-card");
+              if (!slots[i])
+                card.append(menuButton("SLOT " + (i + 1) + " · + NEW CHARACTER", () => renderNameEntry(i)));
+              else {
+                let savedProfile = {};
+                try {
+                  savedProfile = JSON.parse(localStorage.getItem(slotProfileKey(i)) || "{}");
+                } catch {}
+                let stats = menuText(
+                  "div",
+                  "✦ " +
+                    (savedProfile.embers || 0) +
+                    " embers · BEST DEPTH " +
+                    (savedProfile.unlockedDepth || 0) +
+                    " · " +
+                    Math.floor((slots[i].playTime || 0) / 3600) +
+                    "h " +
+                    Math.floor(((slots[i].playTime || 0) % 3600) / 60) +
+                    "m" +
+                    " · " +
+                    new Date(slots[i].lastPlayed || Date.now()).toLocaleDateString(),
+                  "slot-stats",
+                );
+                let icon = menuText(
+                  "span",
+                  savedProfile.selectedHero === "storm"
+                    ? "⚡"
+                    : savedProfile.selectedHero === "ember"
+                      ? "✹"
+                      : "✧",
+                );
+                icon.style.color =
+                  savedProfile.selectedHero === "storm"
+                    ? "#ffe783"
+                    : savedProfile.selectedHero === "ember"
+                      ? "#ff9a59"
+                      : "#c89cff";
+                icon.style.fontSize = "24px";
+                card.append(
+                  icon,
+                  menuText("b", " SLOT " + (i + 1) + " · " + slots[i].name),
+                  menuText(
+                    "div",
+                    "FAVORITE · " + (heroNames[savedProfile.selectedHero] || "CRYPT MAGE"),
+                    "slot-stats",
+                  ),
+                  stats,
+                  menuButton(
+                    "PLAY AS " + slots[i].name,
+                    () => {
+                      selectSlot(i);
+                      showTitleMenu();
+                    },
+                    null,
+                    "primary",
+                  ),
+                );
+                let del = menuText("button", "DELETE", "menu-link");
+                del.onclick = () => {
+                  del.textContent = "DELETE FOREVER";
+                  let warning = menuText(
+                    "p",
+                    "Delete " + slots[i].name + "? This can't be undone.",
+                    "menu-error",
+                  );
+                  card.append(warning);
+                  del.onclick = () => {
+                    for (const key of [slotProfileKey(i), slotRunKey(i), slotBestKey(i)])
+                      localStorage.removeItem(key);
+                    slots[i] = null;
+                    persistSlots();
+                    if (activeSlot === i) {
+                      activeSlot = -1;
+                      hero = null;
+                      localStorage.removeItem(activeSlotKey);
+                    }
+                    renderMenu("slots");
+                  };
+                };
+                card.append(del);
+              }
+              body.append(card);
+            }
+            return;
+          }
+          if (screen === "hub") {
+            if (activeSlot < 0) {
+              renderMenu("slots");
+              return;
+            }
+            let body = menuBase(
+              "EMBER CRYPT",
+              "start",
+              slots[activeSlot].name + " · ✦ " + profile.embers + " EMBERS",
+            );
+            if (readRun())
+              body.append(
+                menuButton("CONTINUE RUN", () => restoreRun(), "Return to your saved wave.", "primary"),
+              );
+            body.append(
+              menuButton("PLAY", () => renderMenu("heroes")),
+              menuButton("SHRINE", () => renderMenu("shrine")),
+              menuButton("BESTIARY", () => renderMenu("bestiary")),
+              menuButton("ACHIEVEMENTS", () => renderMenu("achievements")),
+              menuButton("SETTINGS", () => {
+                settingsReturn = "hub";
+                renderMenu("settings");
+              }),
+            );
+            return;
+          }
+          if (screen === "heroes") {
+            renderHeroScreen();
+            return;
+          }
+          if (screen === "shrine") {
+            let body = menuBase(
+              "UPGRADE SHRINE",
+              "hub",
+              "✦ " + profile.embers + " EMBERS · permanent upgrades",
+            );
+            for (const u of shrinePowers) {
+              let rank = profile.upgrades[u.key] || 0,
+                cost = u.cost * (rank + 1);
+              let b = menuButton(
+                u.name + " · " + rank + "/" + u.cap + (rank >= u.cap ? " · MAX" : " · ✦ " + cost),
+                () => {
+                  if (rank >= u.cap || profile.embers < cost) return;
+                  profile.embers -= cost;
+                  profile.upgrades[u.key] = rank + 1;
+                  saveProfile();
+                  sfx("upgrade");
+                  renderMenu("shrine");
+                },
+                u.detail,
+              );
+              b.disabled = rank >= u.cap || profile.embers < cost;
+              body.append(b);
+            }
+            return;
+          }
+          if (screen === "bestiary") {
+            let body = menuBase("BESTIARY", "hub", "Enemies you've encountered and their element matchups.");
+            showBestiary();
+            let view = menuText("div", "", "bestiary");
+            view.innerHTML = bestiaryEl.innerHTML;
+            body.append(view);
+            bestiaryEl.hidden = true;
+            return;
+          }
+          if (screen === "achievements") {
+            let body = menuBase("ACHIEVEMENTS", "hub", "One-time ember rewards for this character.");
+            showAchievements();
+            let view = menuText("div", "");
+            view.innerHTML = achievementsEl.innerHTML;
+            body.append(view);
+            achievementsEl.hidden = true;
+            return;
+          }
+          if (screen === "pause") {
+            let body = menuBase("PAUSED", "pause", slots[activeSlot]?.name + " · wave " + wave);
+            let back = menuPage.children[0]?.children[0];
+            if (back) back.onclick = resumePaused;
+            body.append(
+              menuButton("RESUME", resumePaused, null, "primary"),
+              menuButton("SETTINGS", () => {
+                settingsReturn = "pause";
+                renderMenu("settings");
+              }),
+            );
+            let quit = menuButton(
+              "QUIT RUN",
+              () => {
+                quit.textContent = "QUIT RUN · CONFIRM";
+                quit.onclick = () => {
+                  saveSlotClock();
+                  clearRun();
+                  hero = null;
+                  showTitleMenu();
+                };
+              },
+              "Embers earned stay with this character.",
+            );
+            body.append(quit);
+            return;
+          }
+          if (screen === "settings") {
+            renderSettings();
+            return;
+          }
+        }
+        const cryptNames = [
+          "Ash Warden",
+          "Vell the Pale",
+          "Rune Keeper",
+          "Cinder Vale",
+          "Morrow Knight",
+          "Thorn Seeker",
+        ];
+        function validName(value) {
+          let v = value.trim().replace(/\s+/g, " ");
+          return /^[A-Za-z0-9 ]{1,14}$/.test(v) ? v : null;
+        }
+        function renderNameEntry(slot, rename = false) {
+          let body = menuBase(
+            rename ? "RENAME CHARACTER" : "NEW CHARACTER",
+            rename ? "settings" : "slots",
+            "1–14 letters, numbers, or spaces.",
+          );
+          let input = document.createElement("input");
+          input.className = "menu-input";
+          input.maxLength = 14;
+          input.autocomplete = "off";
+          input.placeholder = "Character name";
+          input.value = rename ? slots[activeSlot].name : "";
+          let error = menuText("p", "", "menu-error");
+          body.append(
+            menuText("label", "NAME", "menu-label"),
+            input,
+            error,
+            menuButton("RANDOMIZE", () => {
+              input.value = cryptNames[Math.floor(Math.random() * cryptNames.length)];
+              error.textContent = "";
+            }),
+            menuButton(
+              rename ? "SAVE NAME" : "CREATE",
+              () => {
+                let name = validName(input.value);
+                if (!name) {
+                  error.textContent = "Use 1–14 letters, numbers, or spaces.";
+                  return;
+                }
+                if (rename) {
+                  slots[activeSlot].name = name;
+                  persistSlots();
+                  renderMenu("settings");
+                  return;
+                }
+                slots[slot] = { name, lastPlayed: Date.now(), playTime: 0 };
+                persistSlots();
+                localStorage.setItem(slotProfileKey(slot), JSON.stringify(blankProfile()));
+                selectSlot(slot);
+                showTitleMenu();
+              },
+              null,
+              "primary",
+            ),
+          );
+          setTimeout(() => input.focus(), 0);
+        }
+        function pauseRun(background = false) {
+          if (mode !== "play") return;
+          saveRun(true);
+          saveSlotClock();
+          mode = "paused";
+          resetJoy();
+          game.classList.remove("playing");
+          renderMenu("pause");
+          if (background) last = performance.now();
+        }
+        function resumePaused() {
+          if (mode !== "paused") return;
+          mode = "play";
+          menuShell.classList.add("hidden");
+          game.classList.add("playing");
+          last = performance.now();
+        }
+        pauseControl.addEventListener("click", () => pauseRun());
+        function codeChecksum(s) {
+          let h = 2166136261;
+          for (let i = 0; i < s.length; i++) h = Math.imul(h ^ s.charCodeAt(i), 16777619);
+          return (h >>> 0).toString(36);
+        }
+        function makeSaveCode() {
+          saveRun(true);
+          saveSlotClock();
+          let payload = {
+            version: 1,
+            name: slots[activeSlot].name,
+            profile: { ...profile, selectedHero, selectedDepth },
+            best,
+            playTime: slots[activeSlot].playTime,
+            run: readRun(),
+          };
+          let json = JSON.stringify(payload),
+            bytes = new TextEncoder().encode(json);
+          let binary = "";
+          for (let i = 0; i < bytes.length; i++) binary += String.fromCharCode(bytes[i]);
+          return (
+            "EC1." +
+            codeChecksum(json) +
+            "." +
+            btoa(binary).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/g, "")
+          );
+        }
+        function loadSaveCode(code) {
+          if (code.length > 1500000 || !/^EC1\.[a-z0-9]+\.[A-Za-z0-9_-]+$/.test(code))
+            throw Error("Invalid save code format.");
+          let parts = code.split("."),
+            json,
+            data;
+          try {
+            let binary = atob(parts[2].replace(/-/g, "+").replace(/_/g, "/"));
+            let bytes = Uint8Array.from(binary, (c) => c.charCodeAt(0));
+            json = new TextDecoder("utf-8", { fatal: true }).decode(bytes);
+            if (codeChecksum(json) !== parts[1]) throw Error("Save code is damaged or incomplete.");
+            data = JSON.parse(json);
+          } catch (e) {
+            if (e.message === "Save code is damaged or incomplete.") throw e;
+            throw Error("Invalid save code. Check the full code and try again.");
+          }
+          if (
+            data.version !== 1 ||
+            !validName(data.name) ||
+            !data.profile ||
+            typeof data.profile !== "object" ||
+            !Number.isFinite(Number(data.profile.embers)) ||
+            (data.run &&
+              !(
+                data.run.version === 9 &&
+                compatibleRun(data.run, 9) &&
+                Number.isFinite(data.run.hero.maxHp) &&
+                data.run.hero.maxHp > 0 &&
+                Number.isFinite(data.run.hero.maxArmor) &&
+                data.run.hero.maxArmor >= 0 &&
+                data.run.enemies.every(
+                  (e) =>
+                    Number.isFinite(e.x) &&
+                    Number.isFinite(e.y) &&
+                    Number.isFinite(e.hp) &&
+                    Number.isFinite(e.r) &&
+                    e.r >= 0,
+                ) &&
+                data.run.drops.every((d) => Number.isFinite(d.x) && Number.isFinite(d.y))
+              ))
+          )
+            throw Error("This save code is incompatible.");
+          return data;
+        }
+        function renderSettings() {
+          let body = menuBase("SETTINGS", settingsReturn, slots[activeSlot]?.name || "");
+          body.append(
+            menuButton("SOUND · " + (soundEnabled ? "ON" : "OFF"), () => {
+              soundToggle.click();
+              renderMenu("settings");
+            }),
+            menuButton(
+              "SPEED · " + gameSpeed + "×",
+              () => {
+                speedToggle.click();
+                renderMenu("settings");
+              },
+              "1× · 1.25× · 1.5×",
+            ),
+            menuButton("VIBRATION · " + (vibrationEnabled ? "ON" : "OFF"), () => {
+              vibrationEnabled = !vibrationEnabled;
+              localStorage.setItem("ember-crypt-vibrate-" + activeSlot, vibrationEnabled ? "1" : "0");
+              renderMenu("settings");
+            }),
+            menuButton("RENAME CHARACTER", () => renderNameEntry(activeSlot, true)),
+            menuButton("SWITCH CHARACTER", () => {
+              if (settingsReturn === "pause") saveRun(true);
+              saveSlotClock();
+              hero = null;
+              renderMenu("slots");
+            }),
+          );
+          body.append(menuText("h3", "SAVE CODE", "menu-head"));
+          let feedback = menuText("p", "", "menu-error");
+          body.append(feedback);
+          let output = document.createElement("textarea");
+          output.className = "menu-input";
+          output.rows = 3;
+          output.readOnly = true;
+          output.hidden = true;
+          output.setAttribute("aria-label", "Your save code");
+          body.append(
+            menuButton("COPY SAVE CODE", async () => {
+              let code = makeSaveCode();
+              try {
+                await navigator.clipboard.writeText(code);
+                feedback.textContent = "Save code copied.";
+              } catch {
+                output.hidden = false;
+                output.value = code;
+                output.select();
+                feedback.textContent = "Copy this selected code.";
+              }
+            }),
+            output,
+          );
+          let input = document.createElement("textarea");
+          input.className = "menu-input";
+          input.rows = 3;
+          input.placeholder = "Paste save code";
+          input.setAttribute("aria-label", "Paste save code");
+          body.append(menuText("label", "LOAD SAVE CODE", "menu-label"), input);
+          let load = menuButton("LOAD", () => {
+            let data;
+            try {
+              data = loadSaveCode(input.value.trim());
+            } catch (e) {
+              feedback.textContent = e.message || "Invalid save code.";
+              return;
+            }
+            load.textContent = "REPLACE THIS CHARACTER · CONFIRM";
+            feedback.textContent = "This replaces this slot's progress and saved run. Tap again to confirm.";
+            load.onclick = () => {
+              localStorage.setItem(profileKey, JSON.stringify(data.profile));
+              if (data.run) localStorage.setItem(saveKey, JSON.stringify(data.run));
+              else localStorage.removeItem(saveKey);
+              localStorage.setItem(bestKey, String(Math.max(0, Math.floor(Number(data.best) || 0))));
+              slots[activeSlot].name = validName(data.name);
+              slots[activeSlot].playTime = Math.max(0, Math.floor(Number(data.playTime) || 0));
+              persistSlots();
+              selectSlot(activeSlot);
+              showTitleMenu();
+            };
+          });
+          body.append(
+            load,
+            menuText(
+              "p",
+              "A code contains this character's progress and current run. Keep it somewhere safe.",
+              "menu-note",
+            ),
+          );
+        }
+        function renderHeroScreen() {
+          let body = menuBase(
+            "CHOOSE YOUR HERO",
+            "hub",
+            "Swipe or tap the arrows. Depths you've unlocked are below.",
+          );
+          const heroes = ["mage", "storm", "ember"];
+          let index = heroes.indexOf(selectedHero);
+          let art = document.createElement("img");
+          art.src = "assets/mage.webp";
+          art.className = "hero-art " + selectedHero;
+          art.alt = heroNames[selectedHero];
+          body.append(art);
+          let row = menuText("div", "", "hero-arrows"),
+            left = menuText("button", "‹"),
+            right = menuText("button", "›");
+          let label = menuText("strong", heroNames[selectedHero]);
+          const cycle = (step) => {
+            selectedHero = heroes[(heroes.indexOf(selectedHero) + step + 3) % 3];
+            saveProfile();
+            renderHeroScreen();
+          };
+          left.onclick = () => cycle(-1);
+          right.onclick = () => cycle(1);
+          row.append(left, label, right);
+          body.append(row);
+          let unlocked = selectedHero === "mage" || !!profile[selectedHero];
+          body.append(
+            menuText(
+              "p",
+              unlocked
+                ? heroTraits[selectedHero]
+                : "LOCKED · " +
+                    (selectedHero === "storm"
+                      ? "Defeat a boss"
+                      : "Reach wave 10 or earn 600 lifetime embers"),
+              "menu-sub",
+            ),
+            menuText("p", "BEST DEPTH " + (profile.bestDepth[selectedHero] || 0), "menu-sub"),
+          );
+          let touch = 0;
+          art.addEventListener(
+            "touchstart",
+            (e) => {
+              touch = e.touches[0].clientX;
+            },
+            { passive: true },
+          );
+          art.addEventListener(
+            "touchend",
+            (e) => {
+              let shift = e.changedTouches[0].clientX - touch;
+              if (Math.abs(shift) > 35) cycle(shift < 0 ? 1 : -1);
+            },
+            { passive: true },
+          );
+          body.append(
+            menuText(
+              "label",
+              "CRYPT DEPTH · " + selectedDepth + " · +" + selectedDepth * 25 + "% EMBERS",
+              "menu-label",
+            ),
+          );
+          let depthRow = menuText("div", "", "menu-inline");
+          let prev = menuButton("−", () => {
+            selectedDepth = Math.max(0, selectedDepth - 1);
+            saveProfile();
+            renderHeroScreen();
+          });
+          let next = menuButton("+", () => {
+            selectedDepth = Math.min(profile.unlockedDepth, selectedDepth + 1);
+            saveProfile();
+            renderHeroScreen();
+          });
+          prev.disabled = selectedDepth === 0;
+          next.disabled = selectedDepth >= profile.unlockedDepth;
+          depthRow.append(prev, menuText("strong", "DEPTH " + selectedDepth), next);
+          body.append(depthRow);
+          for (let n = 0; n < selectedDepth; n++)
+            body.append(
+              menuText(
+                "p",
+                "D" + (n + 1) + " · " + depthModifiers[Math.min(n, 4)] + (n >= 5 ? " (stacks)" : ""),
+                "menu-note",
+              ),
+            );
+          let actions = menuText("div", "", "menu-actions"),
+            enter = menuButton(
+              "ENTER THE CRYPT",
+              () => {
+                if (!unlocked) return;
+                begin();
+                menuShell.classList.add("hidden");
+                game.classList.add("playing");
+              },
+              null,
+              "primary",
+            );
+          enter.disabled = !unlocked;
+          actions.append(enter);
+          menuPage.append(actions);
         }
         function awardEmbers(n) {
           if (hero) {
@@ -1053,6 +2090,11 @@
           { key: "reroll", name: "FATE TOKEN", detail: "+1 free power reroll per run", cap: 2, cost: 76 },
         ];
         function showTitleMenu() {
+          mode = "menu";
+          panel.classList.add("hidden");
+          game.classList.remove("playing");
+          renderMenu("hub");
+          return;
           mode = "menu";
           kickerEl.textContent = "ONE-THUMB DUNGEON SURVIVAL";
           titleEl.innerHTML = "EMBER<br>CRYPT";
@@ -1294,16 +2336,8 @@
         });
         game.addEventListener("pointerdown", ensureAudio, { passive: true });
         updateSoundButton();
-        const saveKey = "ember-crypt-save-v8";
-        const legacySaveKeys = [
-          "ember-crypt-save-v7",
-          "ember-crypt-save-v6",
-          "ember-crypt-save-v5",
-          "ember-crypt-save-v4",
-          "ember-crypt-save-v3",
-          "ember-crypt-save-v2",
-          "ember-crypt-save-v1",
-        ];
+        const currentRunVersion = 9;
+        const legacySaveKeys = [];
         const xpNeeded = (rank) => Math.round(10 + 6 * rank + 2 * rank * rank);
         function compatibleRun(saved, balance) {
           return (
@@ -1357,7 +2391,22 @@
           try {
             let saved = JSON.parse(localStorage.getItem(saveKey) || "null");
             if (saved) {
-              if (saved.version === 8 && compatibleRun(saved, 8)) return saved;
+              if (saved.version === 9 && compatibleRun(saved, 9)) return saved;
+              if (
+                saved.version <= 8 &&
+                ((saved.version >= 3 && compatibleRun(saved, saved.version)) ||
+                  ((saved.version === 1 || saved.version === 2) && migrateRun(saved)))
+              ) {
+                saved.version = 9;
+                saved.balanceVersion = 9;
+                saved.hero.depth ||= 0;
+                saved.hero.emberFraction ||= 0;
+                saved.hero.relics ||= [];
+                saved.zoneHazards ||= [];
+                saved.zoneHazardNext ||= saved.clock + 10;
+                localStorage.setItem(saveKey, JSON.stringify(saved));
+                return saved;
+              }
               localStorage.removeItem(saveKey);
             }
             for (const key of legacySaveKeys) {
@@ -1403,8 +2452,8 @@
             localStorage.setItem(
               saveKey,
               JSON.stringify({
-                version: 8,
-                balanceVersion: 8,
+                version: 9,
+                balanceVersion: 9,
                 hero,
                 enemies,
                 drops,
@@ -1440,6 +2489,7 @@
               }),
             );
             lastSavedClock = clock;
+            saveSlotClock();
           } catch {}
         }
         function restoreRun() {
@@ -1518,6 +2568,8 @@
             (armor?.name || "Cloth Robe");
           mode = "play";
           panel.classList.add("hidden");
+          menuShell.classList.add("hidden");
+          game.classList.add("playing");
           bestiaryEl.hidden = true;
           resumeBtn.hidden = true;
           resetJoy();
@@ -1531,28 +2583,7 @@
           else showToast("RUN RESUMED");
         }
         resumeBtn.addEventListener("click", restoreRun);
-        if (readRun()) {
-          resumeBtn.hidden = false;
-          start.textContent = "NEW RUN";
-          let prior = readRun();
-          if ((prior.runStats?.bosses || 0) > 0 || prior.wave >= 10) {
-            profile.storm = true;
-            if (prior.wave >= 10) profile.ember = true;
-            saveProfile();
-          }
-        }
-        if (!profile.migrated) {
-          let previous = readRun(),
-            veteran = Math.min(
-              90,
-              Math.floor(Math.max(best, previous?.kills || 0) / 30) + (previous?.runStats?.bosses || 0) * 3,
-            );
-          profile.embers += veteran;
-          profile.total += veteran;
-          profile.migrated = true;
-          saveProfile();
-        }
-        showTitleMenu();
+        showStartScreen();
         function resize() {
           const b = game.getBoundingClientRect();
           w = b.width;
@@ -1698,6 +2729,8 @@
           joy.dx = joy.dy = 0;
           stick.style.transform = "";
           panel.classList.add("hidden");
+          menuShell.classList.add("hidden");
+          game.classList.add("playing");
           achievementsEl.hidden = true;
           bestiaryEl.hidden = true;
           start.hidden = false;
@@ -2581,11 +3614,13 @@
           resumeBtn.hidden = true;
           updateMeta();
           metaEl.hidden = false;
-          shrineBtn.hidden = false;
-          heroBtn.hidden = false;
+          shrineBtn.hidden = true;
+          heroBtn.hidden = true;
           menuBack.hidden = true;
           sfx("death");
           mode = "over";
+          game.classList.remove("playing");
+          saveSlotClock();
           achievementsEl.hidden = true;
           bestiaryEl.hidden = true;
           resetJoy();
@@ -2593,7 +3628,7 @@
           if (record) {
             best = kills;
             try {
-              localStorage.setItem("ember-crypt-best", best);
+              localStorage.setItem(bestKey, best);
             } catch {}
           }
           kickerEl.textContent = record ? "NEW KILL RECORD" : "THE CRYPT CLAIMS YOU";
@@ -2636,10 +3671,15 @@
             nextUnlock() +
             "</span>";
           choicesEl.replaceChildren();
+          let homeButton = document.createElement("button");
+          homeButton.className = "choice";
+          homeButton.textContent = "MAIN MENU";
+          homeButton.onclick = showTitleMenu;
+          choicesEl.append(homeButton);
           start.textContent = "TRY AGAIN";
           start.hidden = false;
           panel.classList.remove("hidden");
-          if (navigator.vibrate) navigator.vibrate(100);
+          if (vibrationEnabled && navigator.vibrate) navigator.vibrate(100);
         }
         function showVictory() {
           if (!hero?.victoryPaid || hero.endless) return;
@@ -2654,10 +3694,12 @@
           if (kills > best) {
             best = kills;
             try {
-              localStorage.setItem("ember-crypt-best", best);
+              localStorage.setItem(bestKey, best);
             } catch {}
           }
           mode = "victory";
+          game.classList.remove("playing");
+          saveSlotClock();
           resetJoy();
           sfx("bossDown");
           updateMeta();
@@ -2702,6 +3744,7 @@
           waveClock = 570;
           mode = "play";
           panel.classList.add("hidden");
+          game.classList.add("playing");
           choicesEl.replaceChildren();
           last = performance.now();
           saveRun(true);
@@ -4340,7 +5383,7 @@
             if (Math.hypot(e.x - hero.x, e.y - hero.y) < range)
               damageEnemy(e, e.type === "boss" ? Math.max(80, e.max * 0.12) : e.hp + 1);
           showToast("CRYPT BLAST");
-          if (navigator.vibrate) navigator.vibrate(60);
+          if (vibrationEnabled && navigator.vibrate) navigator.vibrate(60);
         }
         function update(dt) {
           toastTimer -= dt;
@@ -4370,6 +5413,7 @@
           if (mode !== "play") return;
           deathReactionBudget = 0;
           clock += dt;
+          if (activeSlot >= 0) slotPlayUnstored += dt;
           shake = Math.max(0, shake - dt * 20);
           flash = Math.max(0, flash - dt * 1.5);
           magnetTimer = Math.max(0, magnetTimer - dt);
@@ -5114,7 +6158,7 @@
               shake = 5;
               flash = 0.55;
               burst(hero.x, hero.y, "#f46b4b", 9);
-              if (navigator.vibrate) navigator.vibrate(35);
+              if (vibrationEnabled && navigator.vibrate) navigator.vibrate(35);
               if (hero.hp <= 0) {
                 hero.hp = 0;
                 updateHud();
@@ -6337,10 +7381,14 @@
         }
         requestAnimationFrame(frame);
         document.addEventListener("visibilitychange", () => {
-          if (document.hidden) saveRun(true);
+          if (document.hidden && mode === "play") pauseRun(true);
+          else if (document.hidden) saveRun(true);
           last = performance.now();
         });
-        addEventListener("pagehide", () => saveRun(true));
+        addEventListener("pagehide", () => {
+          saveRun(true);
+          saveSlotClock();
+        });
       })();
     </script>
   </body>
