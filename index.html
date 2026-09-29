@@ -826,7 +826,11 @@
           } catch {}
         }
         function awardEmbers(n) {
-          n = Math.round(n * (1 + 0.25 * (hero?.depth || 0)));
+          if (hero) {
+            let scaled = n * (1 + 0.25 * (hero.depth || 0)) + (hero.emberFraction || 0);
+            n = Math.floor(scaled + 1e-8);
+            hero.emberFraction = scaled - n;
+          }
           runEmbers += n;
           profile.embers += n;
           profile.total += n;
@@ -1290,8 +1294,9 @@
         });
         game.addEventListener("pointerdown", ensureAudio, { passive: true });
         updateSoundButton();
-        const saveKey = "ember-crypt-save-v7";
+        const saveKey = "ember-crypt-save-v8";
         const legacySaveKeys = [
+          "ember-crypt-save-v7",
           "ember-crypt-save-v6",
           "ember-crypt-save-v5",
           "ember-crypt-save-v4",
@@ -1352,7 +1357,7 @@
           try {
             let saved = JSON.parse(localStorage.getItem(saveKey) || "null");
             if (saved) {
-              if (saved.version === 7 && compatibleRun(saved, 7)) return saved;
+              if (saved.version === 8 && compatibleRun(saved, 8)) return saved;
               localStorage.removeItem(saveKey);
             }
             for (const key of legacySaveKeys) {
@@ -1360,15 +1365,17 @@
               if (!legacy) continue;
               localStorage.removeItem(key);
               if (
+                (legacy.version === 7 && compatibleRun(legacy, 7)) ||
                 (legacy.version === 6 && compatibleRun(legacy, 6)) ||
                 (legacy.version === 5 && compatibleRun(legacy, 5)) ||
                 (legacy.version === 4 && compatibleRun(legacy, 4)) ||
                 (legacy.version === 3 && compatibleRun(legacy, 3)) ||
                 ((legacy.version === 1 || legacy.version === 2) && migrateRun(legacy))
               ) {
-                legacy.version = 7;
-                legacy.balanceVersion = 7;
+                legacy.version = 8;
+                legacy.balanceVersion = 8;
                 legacy.hero.depth ||= 0;
+                legacy.hero.emberFraction ||= 0;
                 legacy.zoneHazards ||= [];
                 legacy.zoneHazardNext ||= legacy.clock + 10;
                 legacy.resistedTypes ||= [];
@@ -1396,8 +1403,8 @@
             localStorage.setItem(
               saveKey,
               JSON.stringify({
-                version: 7,
-                balanceVersion: 7,
+                version: 8,
+                balanceVersion: 8,
                 hero,
                 enemies,
                 drops,
@@ -1494,6 +1501,7 @@
           zoneHazards = saved.zoneHazards || [];
           zoneHazardNext = saved.zoneHazardNext || clock + 10;
           hero.depth ||= 0;
+          hero.emberFraction ||= 0;
           xpReserve = saved.xpReserve || 0;
           clearWall(hero);
           for (const e of enemies) clearWall(e);
@@ -1626,6 +1634,7 @@
             fairies: [],
             class: selectedHero,
             depth: selectedDepth,
+            emberFraction: 0,
             rerolls: profile.upgrades.reroll || 0,
             pickupBonus: 18 * (profile.upgrades.magnet || 0),
             shieldUntil: 0,
@@ -1676,6 +1685,8 @@
           xpBonus = 0;
           lastSavedClock = -99;
           wave = 1;
+          if (hero.depth >= 2)
+            for (let k = 0; k < Math.min(3, depthStacks(2)); k++) if (makeRoomFor(1)) spawnDepthElite();
           kills = 0;
           level = 1;
           xp = 0;
@@ -1719,7 +1730,8 @@
             hero.critMultiplier.toFixed(2);
           zoneEl.textContent = zoneNames[Math.floor((wave - 1) / 5) % zoneNames.length];
           killsEl.textContent = kills + " KILLS";
-          levelEl.textContent = "LEVEL " + level + " · WAVE " + wave;
+          levelEl.textContent =
+            "LEVEL " + level + " · WAVE " + wave + (hero.depth ? " · D" + hero.depth : "");
           bonusEl.textContent =
             (hero.endless ? "ENDLESS TIER " + endlessTier() : "") +
             (hero.relics?.length ? (hero.endless ? " · " : "") + "RELICS " + hero.relics.length : "");
@@ -2664,7 +2676,7 @@
             "</strong></span></div>Depth " +
             hero.depth +
             " cleared. Depth " +
-            (hero.depth + 1) +
+            Math.min(20, hero.depth + 1) +
             " unlocked. Endless grows stronger every three waves: tougher monsters, heavier hits, fiercer bosses, and bonus embers.";
           metaEl.hidden = true;
           shrineBtn.hidden = true;
@@ -4003,6 +4015,33 @@
           }
           if (e.hp > 0) return;
           enemies.splice(enemies.indexOf(e), 1);
+          if (e.type === "cinderImp" && !e.treasure && spreadDepth < 2) {
+            rings.push({ x: e.x, y: e.y, r: 8, life: 0.28, speed: 100, color: "#ff965a" });
+            for (const other of [...enemies])
+              if (Math.hypot(other.x - e.x, other.y - e.y) < 42 + other.r) {
+                afflict(other, "burn", 5);
+                damageEnemy(other, Math.max(2, hero.damage * 0.08), "fire", 2);
+              }
+            if (Math.hypot(hero.x - e.x, hero.y - e.y) < 42 + hero.r && hero.inv <= 0) {
+              takeHit(6);
+              hero.inv = 0.4;
+              hero.burnUntil = Math.max(hero.burnUntil || 0, clock + 1.5);
+              if (hero.hp <= 0) {
+                gameOver();
+                return;
+              }
+            }
+          }
+          if (e.type === "frostGolem") {
+            rings.push({ x: e.x, y: e.y, r: 12, life: 0.45, speed: 145, color: "#b7eaff" });
+            for (const other of enemies)
+              if (Math.hypot(other.x - e.x, other.y - e.y) < 105) other.shieldedByGolem = false;
+            if (Math.hypot(hero.x - e.x, hero.y - e.y) < 82)
+              hero.eventSlowUntil = Math.max(hero.eventSlowUntil || 0, clock + 2);
+          }
+          if (e.type === "sporeSpitter") {
+            pools.push({ x: e.x, y: e.y, r: 48, life: 2, tick: 0.2, power: 4, kind: "enemyPoison" });
+          }
           if (e.eventElite) {
             drops.push({ x: e.x + 18, y: e.y, type: "shield", expires: clock + 22 });
             drops.push({ x: e.x - 16, y: e.y, type: "xp", value: 8 + Math.floor(wave / 5) * 2 });
