@@ -12,9 +12,11 @@ Open `index.html` in a browser, or serve the folder:
 python3 -m http.server 8000
 ```
 
-Everything is in `index.html` except the sprites in `assets/`.
+Everything is in `index.html` except the art in `assets/` (the original WebP sprites plus the newer sprite sheets in `assets/cinematic/`).
 
 ## What's in this version
+
+- **New art:** painted sprite sheets for the three heroes (each with its own look), monsters, bosses, props (sarcophagi, chests) and zone floors.
 
 - **Menus:** start screen, three named save slots (each with its own progress), main menu hub with separate Play / Shrine / Bestiary / Achievements / Settings screens, hero select with depth picker, pause menu, and a copyable save code to move a character between devices.
 

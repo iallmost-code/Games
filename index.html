@@ -967,6 +967,190 @@
           floorPattern = null,
           walkFrames = new WeakMap();
         const glowCache = new Map();
+        const spriteMasks = new WeakMap(),
+          zoneFloorTiles = [],
+          zoneFloorPatterns = [];
+        let vignetteCache = null,
+          groundShadowTile = null;
+        function surface(width, height) {
+          let c = document.createElement("canvas");
+          c.width = width;
+          c.height = height;
+          return c;
+        }
+        function registerSprite(img, key, sx, sy, sw, sh) {
+          let raw = surface(Math.ceil(sw), Math.ceil(sh)),
+            g = raw.getContext("2d");
+          g.drawImage(img, sx, sy, sw, sh, 0, 0, raw.width, raw.height);
+          let pixels = g.getImageData(0, 0, raw.width, raw.height).data;
+          let x0 = raw.width,
+            y0 = raw.height,
+            x1 = 0,
+            y1 = 0;
+          for (let y = 0; y < raw.height; y++)
+            for (let x = 0; x < raw.width; x++)
+              if (pixels[(y * raw.width + x) * 4 + 3] > 28) {
+                x0 = Math.min(x0, x);
+                y0 = Math.min(y0, y);
+                x1 = Math.max(x1, x);
+                y1 = Math.max(y1, y);
+              }
+          if (x1 < x0) return;
+          x0 = Math.max(0, x0 - 2);
+          y0 = Math.max(0, y0 - 2);
+          x1 = Math.min(raw.width - 1, x1 + 2);
+          y1 = Math.min(raw.height - 1, y1 + 2);
+          let width = x1 - x0 + 1,
+            height = y1 - y0 + 1,
+            scale = Math.min(1, 340 / height),
+            tile = surface(Math.ceil(width * scale), Math.ceil(height * scale));
+          tile.getContext("2d").drawImage(raw, x0, y0, width, height, 0, 0, tile.width, tile.height);
+          tile.complete = true;
+          tile.naturalWidth = tile.width;
+          tile.naturalHeight = tile.height;
+          tile.cinematic = true;
+          art[key] = tile;
+          if (!key.startsWith("prop-")) prepareWalkFrames(tile);
+          let mask = surface(tile.width, tile.height),
+            m = mask.getContext("2d");
+          m.drawImage(tile, 0, 0);
+          m.globalCompositeOperation = "source-in";
+          m.fillStyle = "#fff4d8";
+          m.fillRect(0, 0, mask.width, mask.height);
+          mask.naturalWidth = mask.width;
+          mask.naturalHeight = mask.height;
+          spriteMasks.set(tile, mask);
+        }
+        function loadAtlas(file, cols, rows, keys) {
+          let img = new Image();
+          img.onload = () => {
+            const cw = img.naturalWidth / cols,
+              ch = img.naturalHeight / rows;
+            keys.forEach((key, i) =>
+              registerSprite(img, key, (i % cols) * cw, Math.floor(i / cols) * ch, cw, ch),
+            );
+            if (file === "heroes")
+              document
+                .querySelectorAll?.("canvas.hero-art")
+                .forEach((c) => paintHeroPortrait(c, c.dataset.hero));
+          };
+          img.src = "assets/cinematic/" + file + ".png";
+        }
+        function loadCinematicArt() {
+          if (typeof Image === "undefined") return;
+          loadAtlas("heroes", 4, 3, [
+            "mage",
+            "mage-side",
+            "mage-back",
+            "mage-cast",
+            "storm",
+            "storm-side",
+            "storm-back",
+            "storm-cast",
+            "ember",
+            "ember-side",
+            "ember-back",
+            "ember-cast",
+          ]);
+          loadAtlas("monsters", 4, 4, [
+            "ghoul",
+            "ghoul-back",
+            "runner",
+            "runner-back",
+            "brute",
+            "brute-back",
+            "caster",
+            "caster-back",
+            "skeleton",
+            "skeleton-back",
+            "sentinel",
+            "sentinel-back",
+            "burrower",
+            "burrower-back",
+            "wraith",
+            "wraith-back",
+          ]);
+          loadAtlas("bosses", 4, 4, [
+            "warden",
+            "warden-back",
+            "tyrant",
+            "tyrant-back",
+            "colossus",
+            "colossus-back",
+            "oracle",
+            "oracle-back",
+            "heart",
+            "heart-back",
+            "cinderImp",
+            "cinderImp-back",
+            "frostGolem",
+            "frostGolem-back",
+            "sporeSpitter",
+            "sporeSpitter-back",
+          ]);
+          loadAtlas("props", 4, 2, [
+            "prop-tomb-0",
+            "prop-tomb-1",
+            "prop-tomb-2",
+            "prop-statue",
+            "prop-brazier",
+            "prop-well",
+            "prop-chest",
+            "prop-pillar",
+          ]);
+          let floors = new Image();
+          floors.onload = () => {
+            for (let z = 0; z < 3; z++) {
+              let tile = surface(384, 384);
+              tile
+                .getContext("2d")
+                .drawImage(
+                  floors,
+                  (z * floors.naturalWidth) / 3,
+                  0,
+                  floors.naturalWidth / 3,
+                  floors.naturalHeight,
+                  0,
+                  0,
+                  384,
+                  384,
+                );
+              zoneFloorTiles[z] = tile;
+              zoneFloorPatterns[z] = null;
+            }
+          };
+          floors.src = "assets/cinematic/floors.png";
+        }
+        function paintHeroPortrait(canvas, kind) {
+          let img = art[kind] || art.mage;
+          if (!img) return;
+          let g = canvas.getContext("2d");
+          g.clearRect(0, 0, canvas.width, canvas.height);
+          let ih = img.naturalHeight || img.height,
+            iw = img.naturalWidth || img.width,
+            hh = canvas.height - 12,
+            ww = (hh * iw) / ih;
+          g.drawImage(img, (canvas.width - ww) / 2, 6, ww, hh);
+        }
+        function groundShadow(x, y, rx, ry) {
+          if (!groundShadowTile) {
+            groundShadowTile = surface(96, 96);
+            let g = groundShadowTile.getContext("2d"),
+              fade = g.createRadialGradient(48, 48, 3, 48, 48, 48);
+            fade.addColorStop(0, "#0206099c");
+            fade.addColorStop(0.45, "#02060970");
+            fade.addColorStop(1, "#02060900");
+            g.fillStyle = fade;
+            g.fillRect(0, 0, 96, 96);
+          }
+          ctx.drawImage(groundShadowTile, x - rx * 1.35, y - ry * 1.55, rx * 2.7, ry * 3.1);
+        }
+        function drawProp(key, x, foot, width, height) {
+          if (!spriteReady(key)) return false;
+          ctx.drawImage(art[key], x - width / 2, foot - height, width, height);
+          return true;
+        }
+
         function drawGlow(x, y, radius, color) {
           let key = color + ":" + radius,
             tile = glowCache.get(key);
@@ -1019,6 +1203,7 @@
             art[name === "ash-floor" ? "floor" : name] = img;
           }
         }
+        loadCinematicArt();
         const zoneNames = ["ASH CATACOMBS", "FROST VAULT", "VENOM HOLLOW"];
         let w = 0,
           h = 0,
@@ -1305,7 +1490,7 @@
               if (e.target === menuPage || e.target === title) renderMenu("slots");
             };
           }
-          menuPage.append(menuText("span", "v57", "menu-version"));
+          menuPage.append(menuText("span", "v58 · CINEMATIC ART", "menu-version"));
           if (!menuEmbers.children.length)
             for (let i = 0; i < 22; i++) {
               let ember = document.createElement("i");
@@ -1768,11 +1953,14 @@
           );
           const heroes = ["mage", "storm", "ember"];
           let index = heroes.indexOf(selectedHero);
-          let art = document.createElement("img");
-          art.src = "assets/mage.webp";
-          art.className = "hero-art " + selectedHero;
-          art.alt = heroNames[selectedHero];
-          body.append(art);
+          let portrait = document.createElement("canvas");
+          portrait.width = 360;
+          portrait.height = 380;
+          portrait.className = "hero-art";
+          portrait.dataset.hero = selectedHero;
+          portrait.setAttribute("aria-label", heroNames[selectedHero]);
+          body.append(portrait);
+          paintHeroPortrait(portrait, selectedHero);
           let row = menuText("div", "", "hero-arrows"),
             left = menuText("button", "‹"),
             right = menuText("button", "›");
@@ -1801,14 +1989,14 @@
             menuText("p", "BEST DEPTH " + (profile.bestDepth[selectedHero] || 0), "menu-sub"),
           );
           let touch = 0;
-          art.addEventListener(
+          portrait.addEventListener(
             "touchstart",
             (e) => {
               touch = e.touches[0].clientX;
             },
             { passive: true },
           );
-          art.addEventListener(
+          portrait.addEventListener(
             "touchend",
             (e) => {
               let shift = e.changedTouches[0].clientX - touch;
@@ -4469,7 +4657,7 @@
         function drawPaths(left, top) {
           let zone = Math.floor((wave - 1) / 5) % 3,
             palette = ["#b88e5b", "#83bacd", "#8da868"][zone],
-            base = ["#342e27a8", "#243944a8", "#28382aaa"][zone];
+            base = ["#92795a12", "#86bec918", "#87aa6714"][zone];
           for (let gx = Math.floor(left / chamberSize) * chamberSize; gx < left + w + 150; gx += chamberSize)
             for (
               let gy = Math.floor(top / chamberSize) * chamberSize;
@@ -4479,12 +4667,12 @@
               ctx.fillStyle = base;
               ctx.fillRect(gx, gy + 152, chamberSize, 103);
               ctx.fillRect(gx + 162, gy, 85, chamberSize);
-              ctx.fillStyle = palette + "55";
+              ctx.fillStyle = palette + "25";
               ctx.fillRect(gx, gy + 151, chamberSize, 2);
               ctx.fillRect(gx, gy + 254, chamberSize, 2);
               ctx.fillRect(gx + 161, gy, 2, chamberSize);
               ctx.fillRect(gx + 246, gy, 2, chamberSize);
-              ctx.fillStyle = palette + "30";
+              ctx.fillStyle = palette + "18";
               for (let k = 0; k < 4; k++) ctx.fillRect(gx + 24 + k * 96, gy + 202, 36, 2);
               for (let k = 0; k < 4; k++) ctx.fillRect(gx + 202, gy + 20 + k * 96, 2, 34);
             }
@@ -4513,6 +4701,11 @@
                       [gx + 252, gy + 263, 111, 98],
                     ];
               for (const [x, y, bw, bh] of blocks) {
+                if (spriteReady("prop-tomb-" + zone)) {
+                  groundShadow(x + bw / 2, y + bh * 0.78, bw * 0.55, bh * 0.32);
+                  drawProp("prop-tomb-" + zone, x + bw / 2, y + bh + 9, bw + 13, bh + 47);
+                  continue;
+                }
                 ctx.fillStyle = "#03070ac0";
                 ctx.fillRect(x + 9, y + 13, bw + 6, bh + 9);
                 ctx.fillStyle = base;
@@ -4558,6 +4751,12 @@
                 kind = Math.floor(seed * 4),
                 x = gx + 220 + Math.sin(gy * 0.03) * 60,
                 y = gy + 185 + Math.sin(gx * 0.03) * 55;
+              if (spriteReady("prop-statue") && kind !== 2) {
+                let key = kind === 0 ? "prop-pillar" : "prop-statue";
+                groundShadow(x, y + 9, 24, 9);
+                drawProp(key, x, y + 15, kind === 0 ? 45 : 60, kind === 0 ? 72 : 94);
+                continue;
+              }
               if (kind === 0) {
                 ctx.fillStyle = "#10182099";
                 ctx.fillRect(x - 50, y - 22, 100, 48);
@@ -4615,6 +4814,25 @@
               y = site.y,
               color = siteColors[site.kind],
               pulse = 2 * Math.sin(clock * 3);
+            if (spriteReady("prop-well")) {
+              groundShadow(x, y + 13, 31, 10);
+              ctx.save();
+              ctx.globalAlpha = 0.25;
+              drawGlow(x, y, 23, color);
+              ctx.restore();
+              drawProp(
+                site.kind === "well" ? "prop-well" : site.kind === "forge" ? "prop-brazier" : "prop-chest",
+                x,
+                y + 22,
+                67,
+                68,
+              );
+              ctx.fillStyle = color;
+              ctx.font = "bold 11px system-ui";
+              ctx.textAlign = "center";
+              ctx.fillText(siteNames[site.kind], x, y - 55);
+              continue;
+            }
             ctx.fillStyle = "#090f1699";
             ctx.beginPath();
             ctx.ellipse(x, y + 14, 37, 12, 0, 0, 7);
@@ -6335,8 +6553,18 @@
         function dungeonFloor(left, top) {
           ctx.fillStyle = "#171b1f";
           ctx.fillRect(left, top, w + 140, h + 140);
-          let textured = !!(art.floor && art.floor.complete && art.floor.naturalWidth);
+          let floorZone = Math.floor((wave - 1) / 5) % 3;
+          let textured = !!zoneFloorTiles[floorZone];
           if (textured) {
+            zoneFloorPatterns[floorZone] ||= ctx.createPattern(zoneFloorTiles[floorZone], "repeat");
+            ctx.fillStyle = zoneFloorPatterns[floorZone];
+            ctx.fillRect(left, top, w + 140, h + 140);
+            ctx.fillStyle = "#060d1428";
+            ctx.fillRect(left, top, w + 140, h + 140);
+          }
+          let legacyTexture = !textured && !!(art.floor && art.floor.complete && art.floor.naturalWidth);
+          if (legacyTexture) {
+            textured = true;
             if (!floorPattern) floorPattern = ctx.createPattern(art.floor, "repeat");
             if (floorPattern) {
               ctx.fillStyle = floorPattern;
@@ -6419,6 +6647,16 @@
             for (let iy = Math.floor(top / 432) * 432; iy < top + h + 110; iy += 432) {
               const x = ix + 90,
                 y = iy + 80;
+              if (spriteReady("prop-brazier")) {
+                let col = zone === 1 ? "#8dcfff" : zone === 2 ? "#a8cc70" : "#ffab55";
+                ctx.save();
+                ctx.globalAlpha = 0.15 + Math.sin(clock * 5 + ix) * 0.015;
+                drawGlow(x, y, 45, col);
+                ctx.restore();
+                groundShadow(x, y + 7, 18, 6);
+                drawProp("prop-brazier", x, y + 11, 35, 54);
+                continue;
+              }
               let glow = ctx.createRadialGradient(x, y, 4, x, y, 125);
               glow.addColorStop(0, "#d8792552");
               glow.addColorStop(1, "#d8792500");
@@ -6459,11 +6697,13 @@
           return img && img.complete && img.naturalWidth > 0;
         }
         function facingArt(name, x, y, casting) {
-          let base = name === "skeleton" ? "ghoul" : name,
-            side = base === "mage" && Math.abs(x) > Math.abs(y) * 0.72,
+          let base = name,
+            side = ["mage", "storm", "ember"].includes(base) && Math.abs(x) > Math.abs(y) * 0.72,
             back = !side && y < -0.15,
             key = base + (side ? "-side" : back ? "-back" : "") + (casting ? "-cast" : "");
-          return spriteReady(key) ? art[key] : art[base];
+          let direction = base + (side ? "-side" : back ? "-back" : "");
+          if (art[base]?.cinematic && spriteReady(key) && !art[key].cinematic) key = direction;
+          return spriteReady(key) ? art[key] : spriteReady(direction) ? art[direction] : art[base];
         }
         function prepareWalkFrames(img) {
           if (walkFrames.has(img) || !img.naturalWidth || !img.naturalHeight || img === art.floor) return;
@@ -6489,6 +6729,7 @@
         function drawGrounded(img, x, foot, w, h, phase, walking, flip, casting) {
           ctx.save();
           ctx.translate(x, foot);
+          if (walking && !casting) ctx.rotate(Math.sin(phase || 0) * 0.018);
           if (flip) ctx.scale(-1, 1);
           let frames = walking && !casting ? walkFrames.get(img) : null;
           if (frames)
@@ -6505,16 +6746,14 @@
         function drawArtEnemy(e) {
           let name =
               e.type === "boss"
-                ? e.variant === "heart"
-                  ? "tyrant"
-                  : e.variant
+                ? e.variant
                 : e.type === "champion"
                   ? "brute"
                   : e.type === "charger"
                     ? "runner"
                     : e.type,
-            base = name === "skeleton" ? "ghoul" : name;
-          if (e.type === "skeleton" || !spriteReady(base)) return false;
+            base = name;
+          if (!spriteReady(base)) return false;
           let x = e.x,
             y = e.y,
             r = e.r,
@@ -6528,10 +6767,10 @@
                   : e.type === "burrower"
                     ? r * 2.3
                     : r * 3.25;
-          ctx.fillStyle = "#05090bd0";
-          ctx.beginPath();
-          ctx.ellipse(x, y + r * 0.88, r + 5, 7, 0, 0, 7);
-          ctx.fill();
+          if (img.cinematic) {
+            width = Math.min(height * 1.4, (height * img.naturalWidth) / img.naturalHeight);
+          }
+          groundShadow(x, y + r * 0.88, r + 3, 6);
           if (e.type === "burrower" && e.burrow > 0) {
             ctx.strokeStyle = "#9be96a";
             ctx.lineWidth = 2;
@@ -6560,11 +6799,21 @@
             false,
           );
           ctx.restore();
-          if (e.hitFlash > 0) {
-            ctx.fillStyle = "#fff6d255";
-            ctx.beginPath();
-            ctx.ellipse(x, y - r * 0.25, width * 0.37, height * 0.36, 0, 0, 7);
-            ctx.fill();
+          if (e.hitFlash > 0 && spriteMasks.has(img)) {
+            ctx.save();
+            ctx.globalAlpha = Math.min(0.55, e.hitFlash * 5);
+            drawGrounded(
+              spriteMasks.get(img),
+              x,
+              y + r,
+              width,
+              height,
+              e.stepPhase || 0,
+              e.walking || 0,
+              (e.faceX || 0) < -0.25,
+              false,
+            );
+            ctx.restore();
           }
           if (e.frostTime > 0 || e.poisonTime > 0 || e.burnTime > 0) {
             ctx.strokeStyle = e.frostTime > 0 ? "#92deff" : e.poisonTime > 0 ? "#91f584" : "#ff9e5d";
@@ -6582,7 +6831,8 @@
           return true;
         }
         function drawArtHero() {
-          if (!spriteReady("mage")) return false;
+          let heroArt = spriteReady(hero.class) ? hero.class : "mage";
+          if (!spriteReady(heroArt)) return false;
           let x = hero.x,
             y = hero.y,
             w = 46,
@@ -6590,12 +6840,10 @@
             fx = hero.faceX || 0,
             fy = hero.faceY === undefined ? 1 : hero.faceY,
             casting = hero.cast > 0.025,
-            img = facingArt("mage", fx, fy, casting),
+            img = facingArt(heroArt, fx, fy, casting),
             side = Math.abs(fx) > Math.abs(fy) * 0.72;
-          ctx.fillStyle = "#040a0dbb";
-          ctx.beginPath();
-          ctx.ellipse(x, y + 18, 19, 7, 0, 0, 7);
-          ctx.fill();
+          if (img.cinematic) w = Math.min(76, (h * img.naturalWidth) / img.naturalHeight);
+          groundShadow(x, y + 18, 20, 7);
           ctx.strokeStyle = hero.class === "storm" ? "#ffe47abb" : hero.armor > 0 ? "#85d7e899" : "#bb9b6288";
           ctx.lineWidth = 2;
           ctx.beginPath();
@@ -6617,12 +6865,17 @@
                   ? "#ffe77f"
                   : "#92f1ff";
             ctx.lineWidth = 2;
-            ctx.shadowBlur = 14;
-            ctx.shadowColor = ctx.strokeStyle;
+            ctx.save();
+            ctx.globalAlpha = 0.65;
+            drawGlow(staffX, staffY, 10, ctx.strokeStyle);
+            ctx.restore();
             ctx.beginPath();
             ctx.arc(staffX, staffY, 6 + pulse * 11, 0, 7);
             ctx.stroke();
-            ctx.shadowBlur = 0;
+            ctx.fillStyle = "#fff6d8";
+            ctx.beginPath();
+            ctx.arc(staffX, staffY, 3 + pulse * 2, 0, 7);
+            ctx.fill();
           }
           return true;
         }
@@ -7004,13 +7257,15 @@
             top = hero.y - h / 2 - 70;
           dungeonFloor(left, top);
           drawSpellEffects(left, top);
-          let heroLight = ctx.createRadialGradient(hero.x, hero.y, 8, hero.x, hero.y, 160);
-          heroLight.addColorStop(0, "#69cbd51b");
-          heroLight.addColorStop(1, "#69cbd500");
-          ctx.fillStyle = heroLight;
-          ctx.beginPath();
-          ctx.arc(hero.x, hero.y, 160, 0, 7);
-          ctx.fill();
+          ctx.save();
+          ctx.globalAlpha = 0.1;
+          drawGlow(
+            hero.x,
+            hero.y,
+            52,
+            hero.class === "ember" ? "#ffb174" : hero.class === "storm" ? "#99dfff" : "#b9a0ef",
+          );
+          ctx.restore();
           for (const e of enemies)
             if (e.type === "boss" && e.slam) {
               let t = Math.max(0, Math.min(1, e.slam.time / (e.slam.duration || 1.15)));
@@ -7327,18 +7582,27 @@
           ctx.restore();
           ctx.globalAlpha = 1;
           drawSiteCompass();
-          const vignette = ctx.createRadialGradient(
-            w / 2,
-            h / 2,
-            Math.min(w, h) * 0.2,
-            w / 2,
-            h / 2,
-            Math.max(w, h) * 0.72,
-          );
-          vignette.addColorStop(0, "#070b0e00");
-          vignette.addColorStop(1, "#070b0eb0");
-          ctx.fillStyle = vignette;
-          ctx.fillRect(0, 0, w, h);
+          if (
+            !vignetteCache ||
+            vignetteCache.width !== Math.ceil(w) ||
+            vignetteCache.height !== Math.ceil(h)
+          ) {
+            vignetteCache = surface(Math.ceil(w), Math.ceil(h));
+            let g = vignetteCache.getContext("2d");
+            let fade = g.createRadialGradient(
+              w / 2,
+              h / 2,
+              Math.min(w, h) * 0.2,
+              w / 2,
+              h / 2,
+              Math.max(w, h) * 0.72,
+            );
+            fade.addColorStop(0, "#070b0e00");
+            fade.addColorStop(1, "#070b0eb0");
+            g.fillStyle = fade;
+            g.fillRect(0, 0, w, h);
+          }
+          ctx.drawImage(vignetteCache, 0, 0, w, h);
           if (flash > 0) {
             ctx.fillStyle = "rgba(255,196,120," + flash * 0.15 + ")";
             ctx.fillRect(0, 0, w, h);
