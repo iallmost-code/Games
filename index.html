@@ -728,6 +728,9 @@
           sites = [],
           siteCycle = 0,
           siteNext = 42,
+          dungeonEvent = null,
+          zoneHazards = [],
+          zoneHazardNext = 12,
           xpReserve = 0,
           lastLevelClock = -99,
           trialChoicePending = 0,
@@ -755,8 +758,11 @@
             imps: 0,
             achievements: {},
             met: [],
+            unlockedDepth: 0,
+            bestDepth: { mage: 0, storm: 0, ember: 0 },
           },
           selectedHero = "mage",
+          selectedDepth = 0,
           runEmbers = 0,
           pickupBonus = 0;
         try {
@@ -767,6 +773,17 @@
             profile.storm = !!prior.storm;
             profile.ember = !!prior.ember || profile.total >= 600;
             profile.migrated = !!prior.migrated;
+            profile.unlockedDepth = Math.min(20, Math.max(0, Math.floor(Number(prior.unlockedDepth) || 0)));
+            profile.bestDepth = Object.fromEntries(
+              ["mage", "storm", "ember"].map((h) => [
+                h,
+                Math.min(20, Math.max(0, Math.floor(Number(prior.bestDepth?.[h]) || 0))),
+              ]),
+            );
+            selectedDepth = Math.min(
+              profile.unlockedDepth,
+              Math.max(0, Math.floor(Number(prior.selectedDepth) || 0)),
+            );
             for (const k of ["bestWave", "bosses", "bestEvolutions", "imps"])
               profile[k] = Math.max(k === "bestWave" ? 1 : 0, Math.floor(Number(prior[k]) || 0));
             for (const k of ["wave10", "boss3", "evolve2", "imp5"])
@@ -784,6 +801,9 @@
                     "wraith",
                     "caster",
                     "champion",
+                    "cinderImp",
+                    "frostGolem",
+                    "sporeSpitter",
                     "imp",
                     "warden",
                     "tyrant",
@@ -802,10 +822,11 @@
         } catch {}
         function saveProfile() {
           try {
-            localStorage.setItem(profileKey, JSON.stringify({ ...profile, selectedHero }));
+            localStorage.setItem(profileKey, JSON.stringify({ ...profile, selectedHero, selectedDepth }));
           } catch {}
         }
         function awardEmbers(n) {
+          n = Math.round(n * (1 + 0.25 * (hero?.depth || 0)));
           runEmbers += n;
           profile.embers += n;
           profile.total += n;
@@ -841,6 +862,9 @@
           burrower: { weak: "frost", resist: "lightning" },
           wraith: { weak: "arcane", resist: "poison" },
           caster: { weak: "shadow", resist: "arcane" },
+          cinderImp: { weak: "frost", resist: "fire" },
+          frostGolem: { weak: "fire", resist: "frost" },
+          sporeSpitter: { weak: "arcane", resist: "poison" },
           warden: { weak: "lightning", resist: "shadow" },
           tyrant: { weak: "fire", resist: "frost" },
           colossus: { weak: "frost", resist: "fire" },
@@ -856,6 +880,9 @@
           colossus: "CINDER COLOSSUS",
           oracle: "HOLLOW ORACLE",
           heart: "CRYPT HEART",
+          cinderImp: "CINDER IMP",
+          frostGolem: "FROST GOLEM",
+          sporeSpitter: "SPORE SPITTER",
         };
         let resistedTypes = new Set();
         function enemyKind(e) {
@@ -894,6 +921,9 @@
             "wraith",
             "caster",
             "champion",
+            "cinderImp",
+            "frostGolem",
+            "sporeSpitter",
             "imp",
             "warden",
             "tyrant",
@@ -1002,12 +1032,13 @@
             : "All heroes and shrine upgrades unlocked";
         }
         function updateMeta() {
-          metaEl.textContent = "✦ " + profile.embers + " EMBERS · " + heroNames[selectedHero];
+          metaEl.textContent =
+            "✦ " + profile.embers + " EMBERS · " + heroNames[selectedHero] + " · DEPTH " + selectedDepth;
           heroBtn.textContent =
             profile.storm || profile.ember
               ? "HERO: " + heroNames[selectedHero] + " · TAP TO SWITCH"
               : "STORMCALLER · DEFEAT A BOSS";
-          heroBtn.disabled = !profile.storm && !profile.ember;
+          heroBtn.disabled = false;
         }
         const shrinePowers = [
           { key: "power", name: "EMBER EDGE", detail: "+5% starting damage", cap: 5, cost: 28 },
@@ -1021,8 +1052,9 @@
           mode = "menu";
           kickerEl.textContent = "ONE-THUMB DUNGEON SURVIVAL";
           titleEl.innerHTML = "EMBER<br>CRYPT";
-          descEl.textContent = heroTraits[selectedHero] + ". Collect embers and grow stronger between runs.";
+          descEl.textContent = heroTraits[selectedHero] + ". Select a hero and Crypt Depth below.";
           choicesEl.replaceChildren();
+          renderHeroDepthChoices();
           updateMeta();
           metaEl.hidden = false;
           shrineBtn.hidden = false;
@@ -1095,10 +1127,79 @@
           selectedHero = available[(available.indexOf(selectedHero) + 1) % available.length];
           saveProfile();
           updateMeta();
-          if (mode === "menu")
-            descEl.textContent =
-              heroTraits[selectedHero] + ". Collect embers and grow stronger between runs.";
+          if (mode === "menu") {
+            descEl.textContent = heroTraits[selectedHero] + ". Select a hero and Crypt Depth below.";
+            renderHeroDepthChoices();
+          }
         });
+        function depthStacks(n) {
+          return hero?.depth >= n ? 1 + Math.floor((hero.depth - n) / 5) : 0;
+        }
+        const depthModifiers = [
+          "ENEMIES +15% SPEED",
+          "AN ELITE EVERY WAVE",
+          "MOON WELLS HEAL HALF",
+          "BOSSES +30% HP · FASTER SLAMS",
+          "LARGER ENEMIES · HARDER HITS",
+        ];
+        function renderHeroDepthChoices() {
+          if (mode !== "menu") return;
+          choicesEl.replaceChildren();
+          const heading = document.createElement("div");
+          heading.className = "bestiary-title";
+          heading.textContent =
+            "HERO · DEPTH " + selectedDepth + " · BEST " + (profile.bestDepth?.[selectedHero] || 0);
+          choicesEl.append(heading);
+          for (const key of ["mage", "storm", "ember"]) {
+            let unlocked = key === "mage" || !!profile[key];
+            let button = document.createElement("button");
+            button.className = "choice " + (selectedHero === key ? "evolution" : "shared");
+            button.disabled = !unlocked;
+            button.innerHTML =
+              heroNames[key] +
+              " · BEST DEPTH " +
+              (profile.bestDepth?.[key] || 0) +
+              "<small>" +
+              (unlocked
+                ? heroTraits[key]
+                : key === "storm"
+                  ? "Defeat a boss to unlock"
+                  : "Reach wave 10 or earn 600 embers") +
+              "</small>";
+            button.onclick = () => {
+              selectedHero = key;
+              saveProfile();
+              updateMeta();
+              renderHeroDepthChoices();
+            };
+            choicesEl.append(button);
+          }
+          let heading2 = document.createElement("div");
+          heading2.className = "bestiary-title";
+          heading2.textContent = "CRYPT DEPTHS · +25% EMBERS PER DEPTH";
+          choicesEl.append(heading2);
+          for (let n = 0; n <= profile.unlockedDepth; n++) {
+            let button = document.createElement("button");
+            button.className = "choice " + (selectedDepth === n ? "evolution" : "shared");
+            button.innerHTML =
+              "DEPTH " +
+              n +
+              (n === selectedDepth ? " · SELECTED" : "") +
+              "<small>" +
+              (n === 0
+                ? "Normal crypt"
+                : depthModifiers.slice(0, Math.min(n, 5)).join(" · ") +
+                  (n > 5 ? " · REPEATED PRESSURE ×" + (n - 4) : "")) +
+              "</small>";
+            button.onclick = () => {
+              selectedDepth = n;
+              saveProfile();
+              updateMeta();
+              renderHeroDepthChoices();
+            };
+            choicesEl.append(button);
+          }
+        }
         let deathReactionBudget = 0,
           frameErrors = 0,
           gameSpeed = 1;
@@ -1189,8 +1290,10 @@
         });
         game.addEventListener("pointerdown", ensureAudio, { passive: true });
         updateSoundButton();
-        const saveKey = "ember-crypt-save-v5";
+        const saveKey = "ember-crypt-save-v7";
         const legacySaveKeys = [
+          "ember-crypt-save-v6",
+          "ember-crypt-save-v5",
           "ember-crypt-save-v4",
           "ember-crypt-save-v3",
           "ember-crypt-save-v2",
@@ -1249,7 +1352,7 @@
           try {
             let saved = JSON.parse(localStorage.getItem(saveKey) || "null");
             if (saved) {
-              if (saved.version === 5 && compatibleRun(saved, 5)) return saved;
+              if (saved.version === 7 && compatibleRun(saved, 7)) return saved;
               localStorage.removeItem(saveKey);
             }
             for (const key of legacySaveKeys) {
@@ -1257,13 +1360,20 @@
               if (!legacy) continue;
               localStorage.removeItem(key);
               if (
+                (legacy.version === 6 && compatibleRun(legacy, 6)) ||
+                (legacy.version === 5 && compatibleRun(legacy, 5)) ||
                 (legacy.version === 4 && compatibleRun(legacy, 4)) ||
                 (legacy.version === 3 && compatibleRun(legacy, 3)) ||
                 ((legacy.version === 1 || legacy.version === 2) && migrateRun(legacy))
               ) {
-                legacy.version = 5;
-                legacy.balanceVersion = 5;
+                legacy.version = 7;
+                legacy.balanceVersion = 7;
+                legacy.hero.depth ||= 0;
+                legacy.zoneHazards ||= [];
+                legacy.zoneHazardNext ||= legacy.clock + 10;
                 legacy.resistedTypes ||= [];
+                legacy.hero.relics ||= [];
+                legacy.dungeonEvent ||= null;
                 localStorage.setItem(saveKey, JSON.stringify(legacy));
                 return legacy;
               }
@@ -1286,8 +1396,8 @@
             localStorage.setItem(
               saveKey,
               JSON.stringify({
-                version: 5,
-                balanceVersion: 5,
+                version: 7,
+                balanceVersion: 7,
                 hero,
                 enemies,
                 drops,
@@ -1312,6 +1422,9 @@
                 sites,
                 siteCycle,
                 siteNext,
+                dungeonEvent,
+                zoneHazards,
+                zoneHazardNext,
                 xpReserve,
                 lastLevelClock,
                 trialChoicePending,
@@ -1329,6 +1442,7 @@
             return;
           }
           hero = saved.hero;
+          hero.relics ||= [];
           resistedTypes = new Set(saved.resistedTypes || []);
           hero.evolutions = hero.evolutions || [];
           hero.pierceBonus ||= 0;
@@ -1376,6 +1490,10 @@
           sites = saved.sites || [];
           siteCycle = saved.siteCycle || 0;
           siteNext = saved.siteNext || clock + 30;
+          dungeonEvent = saved.dungeonEvent || null;
+          zoneHazards = saved.zoneHazards || [];
+          zoneHazardNext = saved.zoneHazardNext || clock + 10;
+          hero.depth ||= 0;
           xpReserve = saved.xpReserve || 0;
           clearWall(hero);
           for (const e of enemies) clearWall(e);
@@ -1400,6 +1518,7 @@
           lastSavedClock = clock;
           ensureAudio();
           if (trialChoicePending) offerTrialChoice();
+          else if (dungeonEvent?.phase === "reward") offerRelic();
           else if (hero.victoryPaid && !hero.endless) showVictory();
           else showToast("RUN RESUMED");
         }
@@ -1503,8 +1622,10 @@
             poison: false,
             fire: false,
             evolutions: [],
+            relics: [],
             fairies: [],
             class: selectedHero,
+            depth: selectedDepth,
             rerolls: profile.upgrades.reroll || 0,
             pickupBonus: 18 * (profile.upgrades.magnet || 0),
             shieldUntil: 0,
@@ -1525,6 +1646,9 @@
           floaters = [];
           meteors = [];
           sites = [];
+          dungeonEvent = null;
+          zoneHazards = [];
+          zoneHazardNext = 12;
           siteCycle = 0;
           siteNext = 42;
           xpReserve = 0;
@@ -1596,7 +1720,9 @@
           zoneEl.textContent = zoneNames[Math.floor((wave - 1) / 5) % zoneNames.length];
           killsEl.textContent = kills + " KILLS";
           levelEl.textContent = "LEVEL " + level + " · WAVE " + wave;
-          bonusEl.textContent = hero.endless ? "ENDLESS MODE" : "";
+          bonusEl.textContent =
+            (hero.endless ? "ENDLESS TIER " + endlessTier() : "") +
+            (hero.relics?.length ? (hero.endless ? " · " : "") + "RELICS " + hero.relics.length : "");
           effectsEl.textContent =
             (hero.shieldUntil > clock && hero.shieldCharges > 0
               ? "SHIELD " + hero.shieldCharges + " · " + Math.ceil(hero.shieldUntil - clock) + "s  "
@@ -2115,6 +2241,86 @@
           );
           panel.classList.remove("hidden");
         }
+        const relicChoices = [
+          {
+            key: "emberheart",
+            name: "EMBERHEART",
+            detail: "+18% elemental damage · -12% maximum HP",
+            apply: () => {
+              hero.maxHp = Math.max(25, Math.round(hero.maxHp * 0.88));
+              hero.hp = Math.min(hero.hp, hero.maxHp);
+            },
+          },
+          {
+            key: "guardian",
+            name: "GUARDIAN OATH",
+            detail: "+35 maximum armor and repair 35 · -8% move speed",
+            apply: () => {
+              hero.armorBonus += 35;
+              hero.maxArmor += 35;
+              hero.armor = Math.min(hero.maxArmor, hero.armor + 35);
+              hero.speed *= 0.92;
+            },
+          },
+          {
+            key: "bloodpact",
+            name: "BLOOD PACT",
+            detail: "+2 HP on each kill · -10% neutral staff damage",
+            apply: () => (hero.leech += 2),
+          },
+        ];
+        function offerRelic() {
+          const options = relicChoices.filter((r) => hero.relics.filter((key) => key === r.key).length < 2);
+          if (!options.length) {
+            awardEmbers(8);
+            dungeonEvent = null;
+            showToast("RELIC CACHE · +8 EMBERS");
+            saveRun(true);
+            return;
+          }
+          mode = "relic";
+          resetJoy();
+          achievementsEl.hidden = bestiaryEl.hidden = true;
+          metaEl.hidden =
+            shrineBtn.hidden =
+            heroBtn.hidden =
+            menuBack.hidden =
+            resumeBtn.hidden =
+            start.hidden =
+              true;
+          kickerEl.textContent = "DUNGEON EVENT CLEARED";
+          titleEl.innerHTML = "CLAIM A<br>RELIC";
+          descEl.textContent = "Choose lasting power with a cost, or take embers instead.";
+          choicesEl.replaceChildren();
+          function take(relic) {
+            if (relic) {
+              hero.relics.push(relic.key);
+              relic.apply();
+            } else awardEmbers(8);
+            dungeonEvent = null;
+            panel.classList.add("hidden");
+            mode = "play";
+            updateHud();
+            saveRun(true);
+            sfx("upgrade");
+            showToast(relic ? relic.name + " CLAIMED" : "+8 EMBERS BANKED");
+            last = performance.now();
+          }
+          for (const relic of options) {
+            let button = document.createElement("button"),
+              rank = hero.relics.filter((key) => key === relic.key).length;
+            button.className = "choice evolution";
+            button.innerHTML = relic.name + " · " + (rank + 1) + "/2<small>" + relic.detail + "</small>";
+            button.onclick = () => take(relic);
+            choicesEl.append(button);
+          }
+          let bank = document.createElement("button");
+          bank.className = "choice shared";
+          bank.innerHTML = "TAKE +8 EMBERS<small>Skip the relic and keep your current build.</small>";
+          bank.onclick = () => take(null);
+          choicesEl.append(bank);
+          panel.classList.remove("hidden");
+        }
         function offerLoot(drop) {
           mode = "loot";
           bestiaryEl.hidden = true;
@@ -2307,6 +2513,9 @@
           oracle: "HOLLOW ORACLE",
           heart: "CRYPT HEART",
         };
+        function endlessTier() {
+          return hero?.endless ? Math.max(0, Math.floor((wave - 20) / 3)) : 0;
+        }
         function spawnBoss(variantOverride) {
           sfx("boss");
           let existing = enemies.find((e) => e.type === "boss"),
@@ -2328,7 +2537,11 @@
           boss = {
             x: hero.x + Math.cos(a) * r,
             y: hero.y + Math.sin(a) * r,
-            hp: hpBase * (1 + wave * (variant === "heart" ? 0.025 : variant === "colossus" ? 0.25 : 0.21)),
+            hp:
+              hpBase *
+              (1 + wave * (variant === "heart" ? 0.025 : variant === "colossus" ? 0.25 : 0.21)) *
+              (1 + 0.15 * endlessTier()) *
+              (1 + 0.3 * depthStacks(4)),
             max: 0,
             type: "boss",
             variant,
@@ -2418,6 +2631,14 @@
         }
         function showVictory() {
           if (!hero?.victoryPaid || hero.endless) return;
+          if (!hero.depthRecorded) {
+            hero.depthRecorded = true;
+            profile.unlockedDepth = Math.max(profile.unlockedDepth || 0, Math.min(20, hero.depth + 1));
+            profile.bestDepth ||= { mage: 0, storm: 0, ember: 0 };
+            profile.bestDepth[hero.class] = Math.max(profile.bestDepth[hero.class] || 0, hero.depth);
+            saveProfile();
+            saveRun(true);
+          }
           if (kills > best) {
             best = kills;
             try {
@@ -2440,7 +2661,11 @@
             runEmbers +
             "</strong></span><span>TOTAL EMBERS<strong>" +
             profile.embers +
-            "</strong></span></div>Ten minutes survived. The Heart falls, but the crypt keeps growing.";
+            "</strong></span></div>Depth " +
+            hero.depth +
+            " cleared. Depth " +
+            (hero.depth + 1) +
+            " unlocked. Endless grows stronger every three waves: tougher monsters, heavier hits, fiercer bosses, and bonus embers.";
           metaEl.hidden = true;
           shrineBtn.hidden = true;
           heroBtn.hidden = true;
@@ -2563,6 +2788,7 @@
                               : roll < 0.58
                                 ? "runner"
                                 : "ghoul");
+          if (!forcedType && Math.random() < 0.13) type = ["cinderImp", "frostGolem", "sporeSpitter"][zone];
           if (!forcedType && wave >= 2) {
             let danger = Math.random();
             if (danger < 0.11) type = "charger";
@@ -2586,12 +2812,17 @@
                           : type === "runner"
                             ? 25
                             : 42) *
-            (1 + clock / 125);
+            (1 + clock / 125) *
+            (1 + 0.12 * endlessTier());
+          if (type === "cinderImp") hp = 30 * (1 + clock / 125);
+          if (type === "frostGolem") hp = 250 * (1 + clock / 125);
+          if (type === "sporeSpitter") hp = 105 * (1 + clock / 125);
           enemies.push({
             x,
             y,
             hp,
             max: hp,
+            shieldedByGolem: false,
             type,
             baseType: type === "champion" ? "ghoul" : undefined,
             speed:
@@ -2613,25 +2844,40 @@
                               ? 117
                               : 67) *
               (1 + clock / 350) *
-              1.12,
+              1.12 *
+              (1 + Math.min(0.2, 0.03 * endlessTier())) *
+              (type === "cinderImp"
+                ? 1.65
+                : type === "frostGolem"
+                  ? 0.65
+                  : type === "sporeSpitter"
+                    ? 0.8
+                    : 1) *
+              (1 + 0.15 * depthStacks(1)),
             r:
-              type === "sentinel"
-                ? 22
-                : type === "charger"
-                  ? 16
-                  : type === "burrower"
-                    ? 18
-                    : type === "wraith"
-                      ? 16
-                      : type === "champion"
-                        ? 26
-                        : type === "brute"
-                          ? 22
-                          : type === "caster"
-                            ? 14
-                            : type === "runner"
-                              ? 11
-                              : 15,
+              type === "cinderImp"
+                ? 9
+                : type === "frostGolem"
+                  ? 29
+                  : type === "sporeSpitter"
+                    ? 15
+                    : type === "sentinel"
+                      ? 22
+                      : type === "charger"
+                        ? 16
+                        : type === "burrower"
+                          ? 18
+                          : type === "wraith"
+                            ? 16
+                            : type === "champion"
+                              ? 26
+                              : type === "brute"
+                                ? 22
+                                : type === "caster"
+                                  ? 14
+                                  : type === "runner"
+                                    ? 11
+                                    : 15,
             attack: 0,
             cast: 2.1 + Math.random(),
             burrowCd: 2 + Math.random() * 3,
@@ -2641,8 +2887,295 @@
             windup: null,
             dash: null,
           });
+          if (hero.depth >= 5) enemies[enemies.length - 1].r *= 1 + 0.1 * depthStacks(5);
           clearWall(enemies[enemies.length - 1]);
           noteEnemy(type);
+        }
+        const eventColors = { chest: "#ffd58b", altar: "#ef7696", sprite: "#9be5ff" };
+        const eventNames = { chest: "SEALED CHEST", altar: "CURSED ALTAR", sprite: "TRAPPED SPRITE" };
+        function spawnDungeonEvent() {
+          if (dungeonEvent && dungeonEvent.phase !== "waiting") return;
+          let kind = ["chest", "altar", "sprite"][(wave / 2 - 1) % 3];
+          let angle = wave * 2.399 + 0.7;
+          dungeonEvent = {
+            id: wave,
+            kind,
+            zone: Math.floor((wave - 1) / 5) % 3,
+            x: hero.x + Math.cos(angle) * 270,
+            y: hero.y + Math.sin(angle) * 270,
+            phase: "waiting",
+            expires: clock + 50,
+            pulse: 3,
+            mark: null,
+            endAt: 0,
+          };
+          clearWall(dungeonEvent);
+          showToast(eventNames[kind] + " · FOLLOW THE ARROW");
+        }
+        function updateDungeonEvent(dt) {
+          let event = dungeonEvent;
+          if (!event) return;
+          if (event.phase === "waiting") {
+            clearWall(event);
+            if (clock > event.expires) {
+              dungeonEvent = null;
+              showToast("DUNGEON EVENT LOST");
+              return;
+            }
+            if (Math.hypot(hero.x - event.x, hero.y - event.y) > 43) return;
+            event.phase = "active";
+            event.endAt = clock + 12;
+            event.pulse = 2.2;
+            let types =
+              event.kind === "chest"
+                ? ["brute", "sentinel"]
+                : event.kind === "altar"
+                  ? ["charger", "runner"]
+                  : ["caster", "runner"];
+            let count = event.kind === "sprite" ? 5 : 6;
+            if (makeRoomFor(count))
+              for (let i = 0; i < count; i++) {
+                spawnEnemy(types[i % types.length]);
+                let foe = enemies[enemies.length - 1],
+                  a = (2 * Math.PI * i) / count;
+                foe.x = event.x + Math.cos(a) * 110;
+                foe.y = event.y + Math.sin(a) * 110;
+                foe.eventMark = event.id;
+                foe.hp *= 1.2;
+                foe.max = foe.hp;
+                clearWall(foe);
+              }
+            sfx("boss");
+            showToast(
+              event.kind === "altar"
+                ? "SURVIVE THE ALTAR · 12 SECONDS"
+                : "CLEAR THE " + (event.kind === "chest" ? "CHEST" : "SPRITE") + " GUARDIANS",
+            );
+            saveRun(true);
+          }
+          if (event.phase !== "active") return;
+          event.pulse -= dt;
+          if (event.mark) {
+            event.mark.time -= dt;
+            if (event.mark.time <= 0) {
+              let mark = event.mark;
+              event.mark = null;
+              rings.push({
+                x: mark.x,
+                y: mark.y,
+                r: 8,
+                life: 0.35,
+                speed: 145,
+                color: eventColors[event.kind],
+              });
+              if (Math.hypot(hero.x - mark.x, hero.y - mark.y) < mark.r) {
+                if (event.zone === 1) hero.eventSlowUntil = clock + 2;
+                takeHit(9 + Math.floor(clock / 60) + event.zone * 2);
+                floater(
+                  hero.x,
+                  hero.y - 32,
+                  event.zone === 1 ? "FROST TRAP" : "TRAP",
+                  eventColors[event.kind],
+                );
+                if (hero.hp <= 0) {
+                  gameOver();
+                  return;
+                }
+              }
+            }
+          }
+          if (event.pulse <= 0 && !event.mark) {
+            event.mark = { x: hero.x, y: hero.y, r: 55, time: 0.8, total: 0.8 };
+            event.pulse = event.zone === 2 ? 2.4 : 3;
+            sfx("boss");
+          }
+          if (
+            (event.kind === "altar" && clock >= event.endAt) ||
+            (event.kind !== "altar" && !enemies.some((e) => e.eventMark === event.id))
+          ) {
+            event.phase = "reward";
+            event.mark = null;
+            if (event.kind === "chest")
+              drops.push({ x: event.x, y: event.y, type: "loot", trial: true, wave });
+            else if (event.kind === "altar") awardEmbers(5);
+            else {
+              hero.hp = Math.min(hero.maxHp, hero.hp + 25);
+              xpReserve += Math.round(needed * 0.2);
+            }
+            saveRun(true);
+            offerRelic();
+          }
+        }
+        function drawDungeonEvent(left, top) {
+          let event = dungeonEvent;
+          if (!event || event.phase === "reward") return;
+          let color = eventColors[event.kind],
+            x = event.x,
+            y = event.y;
+          if (x > left - 70 && x < left + w + 70 && y > top - 70 && y < top + h + 70) {
+            ctx.fillStyle = "#15212cb8";
+            ctx.beginPath();
+            ctx.arc(x, y, 28, 0, 7);
+            ctx.fill();
+            ctx.strokeStyle = color;
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            ctx.arc(x, y, 27 + 2 * Math.sin(clock * 4), 0, 7);
+            ctx.stroke();
+            ctx.fillStyle = color;
+            ctx.font = "bold 22px system-ui";
+            ctx.textAlign = "center";
+            ctx.fillText(event.kind === "chest" ? "◆" : event.kind === "altar" ? "✦" : "✧", x, y + 8);
+            ctx.font = "bold 12px system-ui";
+            ctx.fillText(
+              event.phase === "waiting"
+                ? eventNames[event.kind]
+                : event.kind === "altar"
+                  ? "SURVIVE " + Math.ceil(Math.max(0, event.endAt - clock)) + "s"
+                  : "GUARDIANS " + enemies.filter((e) => e.eventMark === event.id).length,
+              x,
+              y - 40,
+            );
+          }
+          if (event.mark) {
+            let mark = event.mark;
+            ctx.fillStyle = "#ec53694b";
+            ctx.strokeStyle = "#ff8e94";
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.arc(mark.x, mark.y, mark.r, 0, 7);
+            ctx.fill();
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.moveTo(mark.x, mark.y);
+            ctx.arc(
+              mark.x,
+              mark.y,
+              mark.r,
+              -Math.PI / 2,
+              -Math.PI / 2 + Math.PI * 2 * (1 - mark.time / mark.total),
+            );
+            ctx.closePath();
+            ctx.fill();
+          }
+        }
+        function updateZoneHazards(dt) {
+          let zone = Math.floor((wave - 1) / 5) % 3;
+          if (clock >= zoneHazardNext) {
+            zoneHazardNext = clock + (zone === 0 ? 8 : 11);
+            zoneHazards = zoneHazards.filter((z) => z.zone === zone && z.life > 0).slice(-5);
+            let a = Math.random() * Math.PI * 2,
+              dist = 145 + Math.random() * 95;
+            let z = {
+              x: hero.x + Math.cos(a) * dist,
+              y: hero.y + Math.sin(a) * dist,
+              zone,
+              kind: ["lava", "ice", "spore"][zone],
+              r: zone === 1 ? 76 : 51,
+              life: zone === 1 ? 18 : 22,
+              state: "idle",
+              timer: 0,
+              cooldown: 0,
+            };
+            clearWall(z);
+            zoneHazards.push(z);
+          }
+          for (let i = zoneHazards.length - 1; i >= 0; i--) {
+            let z = zoneHazards[i];
+            if (z.zone !== zone || (z.life -= dt) <= 0) {
+              zoneHazards.splice(i, 1);
+              continue;
+            }
+            if (z.kind === "ice") continue;
+            z.cooldown -= dt;
+            if (
+              z.state === "idle" &&
+              z.cooldown <= 0 &&
+              (z.kind === "lava" || [hero, ...enemies].some((o) => Math.hypot(o.x - z.x, o.y - z.y) < z.r))
+            ) {
+              z.state = "warning";
+              z.timer = z.kind === "lava" ? 1 : 0.55;
+              sfx("warning");
+            }
+            if (z.state === "warning" && (z.timer -= dt) <= 0) {
+              z.state = "burst";
+              z.timer = 0.65;
+              rings.push({
+                x: z.x,
+                y: z.y,
+                r: 10,
+                life: 0.45,
+                speed: 120,
+                color: z.kind === "lava" ? "#ffa44b" : "#a4e66e",
+              });
+              for (const e of [...enemies])
+                if (Math.hypot(e.x - z.x, e.y - z.y) < z.r + e.r) {
+                  let element = z.kind === "lava" ? "fire" : "poison";
+                  afflict(e, element === "fire" ? "burn" : "poison", 12);
+                  damageEnemy(e, 12, element);
+                }
+              if (Math.hypot(hero.x - z.x, hero.y - z.y) < z.r + hero.r && hero.inv <= 0) {
+                takeHit(z.kind === "lava" ? 15 : 9);
+                hero.inv = 0.45;
+                if (z.kind === "lava") hero.burnUntil = Math.max(hero.burnUntil || 0, clock + 2);
+                else hero.poisonedUntil = Math.max(hero.poisonedUntil || 0, clock + 2);
+                if (hero.hp <= 0) {
+                  gameOver();
+                  return;
+                }
+              }
+            }
+            if (z.state === "burst" && (z.timer -= dt) <= 0) {
+              z.state = "idle";
+              z.cooldown = z.kind === "lava" ? 5 : 99;
+            }
+          }
+          if ((hero.burnUntil > clock || hero.poisonedUntil > clock) && clock >= (hero.statusTickAt || 0)) {
+            hero.statusTickAt = clock + 0.75;
+            takeHit(3);
+            if (hero.hp <= 0) gameOver();
+          }
+        }
+        function drawZoneHazards(left, top) {
+          for (const z of zoneHazards) {
+            if (z.x < left - 80 || z.x > left + w + 180 || z.y < top - 80 || z.y > top + h + 180) continue;
+            ctx.fillStyle =
+              z.kind === "lava"
+                ? z.state === "warning"
+                  ? "#ff934677"
+                  : "#b74c3440"
+                : z.kind === "ice"
+                  ? "#8bd8ff4a"
+                  : z.state === "warning"
+                    ? "#b7ed8a88"
+                    : "#69ab6655";
+            ctx.strokeStyle = z.kind === "lava" ? "#ff9b58" : z.kind === "ice" ? "#baefff" : "#b8ef83";
+            ctx.lineWidth = z.state === "warning" ? 3 : 2;
+            ctx.beginPath();
+            ctx.ellipse(z.x, z.y, z.r, z.r * 0.7, 0, 0, 7);
+            ctx.fill();
+            ctx.stroke();
+            if (z.state === "warning") {
+              ctx.beginPath();
+              ctx.arc(z.x, z.y, z.r * (1 - z.timer / (z.kind === "lava" ? 1 : 0.55)), 0, 7);
+              ctx.stroke();
+            }
+            if (z.kind === "spore") {
+              ctx.fillStyle = "#d5fa9b";
+              ctx.beginPath();
+              ctx.arc(z.x, z.y, 11, 0, 7);
+              ctx.fill();
+            }
+            if (z.kind === "ice") {
+              ctx.strokeStyle = "#e4fbff";
+              ctx.beginPath();
+              ctx.moveTo(z.x - 24, z.y);
+              ctx.lineTo(z.x + 25, z.y + 9);
+              ctx.moveTo(z.x, z.y - 22);
+              ctx.lineTo(z.x + 8, z.y + 18);
+              ctx.stroke();
+            }
+          }
         }
         const siteNames = { well: "MOON WELL", forge: "EMBER FORGE", cache: "RELIC VAULT" };
         const siteColors = { well: "#8adfff", forge: "#ffc47b", cache: "#d8abff" };
@@ -2669,7 +3202,10 @@
               burst(site.x, site.y, col, 28);
               sfx("upgrade");
               if (site.kind === "well") {
-                hero.hp = Math.min(hero.maxHp, hero.hp + Math.max(35, hero.maxHp * 0.3));
+                hero.hp = Math.min(
+                  hero.maxHp,
+                  hero.hp + Math.max(35, hero.maxHp * 0.3) * Math.pow(0.5, depthStacks(3)),
+                );
                 hero.armor = Math.min(hero.maxArmor, hero.armor + Math.max(20, hero.maxArmor * 0.35));
                 showToast("MOON WELL · HEALTH + ARMOR");
               } else if (site.kind === "forge") {
@@ -2702,6 +3238,15 @@
             enemies.splice(enemies.indexOf(farthest), 1);
           }
           return true;
+        }
+        function spawnDepthElite() {
+          let zone = Math.floor((wave - 1) / 5) % 3;
+          spawnEnemy(["cinderImp", "frostGolem", "sporeSpitter"][zone]);
+          let e = enemies[enemies.length - 1];
+          e.eventElite = ["swift", "armored", "splitting"][wave % 3];
+          e.hp *= 2.5;
+          e.max = e.hp;
+          showToast(matchupToast(e, "DEPTH ELITE"));
         }
         function spawnTreasureImp() {
           if (!makeRoomFor(1)) return;
@@ -3041,6 +3586,7 @@
         function drawSiteCompass() {
           let active =
             enemies.find((e) => e.treasure) ||
+            (dungeonEvent?.phase === "waiting" ? dungeonEvent : null) ||
             sites
               .filter((o) => !o.used)
               .sort(
@@ -3061,7 +3607,7 @@
           ctx.fill();
           ctx.translate(x, y);
           ctx.rotate(angle);
-          ctx.fillStyle = active.treasure ? "#ffd46e" : siteColors[active.kind];
+          ctx.fillStyle = active.treasure ? "#ffd46e" : eventColors[active.kind] || siteColors[active.kind];
           ctx.beginPath();
           ctx.moveTo(12, 0);
           ctx.lineTo(-6, -7);
@@ -3405,6 +3951,7 @@
             }
           }
           if (e.eventElite === "armored") amount *= 0.5;
+          if (e.shieldedByGolem) amount *= 0.72;
           if (e.frostTime > 0 && hero.evolutions?.includes("zero")) amount *= 1.35;
           if (
             kind === "lightning" &&
@@ -3420,6 +3967,10 @@
                 damageEnemy(other, hero.damage * 0.4, "frost", 2);
               }
           }
+          if (element !== "neutral")
+            amount *= Math.pow(1.18, hero.relics?.filter((r) => r === "emberheart").length || 0);
+          if (fromHeroBolt && element === "neutral")
+            amount *= Math.pow(0.9, hero.relics?.filter((r) => r === "bloodpact").length || 0);
           const matchupInfo = matchup(e);
           const weak = element !== "neutral" && matchupInfo.weak === element;
           const resisted = element !== "neutral" && matchupInfo.resist === element;
@@ -3720,6 +4271,8 @@
             return 0;
           }
           if (wave <= 3) amount *= 0.8;
+          amount *= 1 + 0.08 * endlessTier();
+          if (hero.depth >= 5) amount *= 1 + 0.12 * depthStacks(5);
           sfx("hurt");
           hero.lastHit = clock;
           let ratio = hero.armorStyle === "heavy" ? 0.8 : hero.armorStyle === "light" ? 0.45 : 0.65,
@@ -3807,14 +4360,35 @@
             hero.faceY = dy / l;
             hero.stepPhase = (hero.stepPhase || 0) + dt * 11 * (hero.hasteUntil > clock ? 1.25 : 1);
           }
+          let ice = zoneHazards.some((z) => z.kind === "ice" && Math.hypot(hero.x - z.x, hero.y - z.y) < z.r);
+          if (ice) {
+            hero.slideX = (hero.slideX || 0) * 0.94 + dx * 0.06;
+            hero.slideY = (hero.slideY || 0) * 0.94 + dy * 0.06;
+            dx = hero.slideX;
+            dy = hero.slideY;
+          } else {
+            hero.slideX = dx;
+            hero.slideY = dy;
+          }
           moveAroundWalls(
             hero,
-            dx * hero.speed * (hero.hasteUntil > clock ? 1.25 : 1) * dt,
-            dy * hero.speed * (hero.hasteUntil > clock ? 1.25 : 1) * dt,
+            dx *
+              hero.speed *
+              (hero.hasteUntil > clock ? 1.25 : 1) *
+              (hero.eventSlowUntil > clock ? 0.7 : 1) *
+              dt,
+            dy *
+              hero.speed *
+              (hero.hasteUntil > clock ? 1.25 : 1) *
+              (hero.eventSlowUntil > clock ? 0.7 : 1) *
+              dt,
             dt,
           );
           updateSpells(dt);
           updateSites(dt);
+          updateZoneHazards(dt);
+          updateDungeonEvent(dt);
+          if (mode !== "play") return;
           if (xpReserve > 0) {
             let transfer = Math.min(xpReserve, Math.max(5, needed * 0.18) * dt);
             xp += transfer;
@@ -3839,7 +4413,12 @@
             if (wave % 5 === 1) sfx("upgrade");
             flash = 0.25;
             hero.hp = Math.min(hero.maxHp, hero.hp + 10);
-            if (wave % 2 === 0 && wave !== 20) spawnEncounter();
+            if (wave % 2 === 0 && wave < 20) spawnEncounter();
+            if (wave % 2 === 0 && wave < 20) spawnDungeonEvent();
+            if (hero.endless && wave > 20 && (wave - 20) % 3 === 0) {
+              awardEmbers(10);
+              showToast("ENDLESS TIER " + endlessTier() + " · +10 EMBERS");
+            }
             if (wave % 3 === 0 && (wave < 20 || hero.endless)) {
               let livingBosses = enemies.filter((e) => e.type === "boss"),
                 twin = wave >= 12 || level >= 25,
@@ -3864,6 +4443,8 @@
                   );
               }
             }
+            if (hero.depth >= 2)
+              for (let k = 0; k < Math.min(3, depthStacks(2)); k++) if (makeRoomFor(1)) spawnDepthElite();
             if (wave === 2) spawnTreasureImp();
             if (wave >= 2 && makeRoomFor(1)) {
               spawnEnemy("charger");
@@ -3897,7 +4478,9 @@
           spawn -= dt;
           if (spawn <= 0 && enemies.length < 95) {
             spawnEnemy();
-            spawn = Math.max(0.16, 0.48 - clock * 0.005) * (Math.random() * 0.45 + 0.78);
+            spawn =
+              (Math.max(0.16, 0.48 - clock * 0.005) * (Math.random() * 0.45 + 0.78)) /
+              (1 + Math.min(0.35, 0.04 * endlessTier()));
           }
           attack -= dt;
           if (attack <= 0) {
@@ -4290,7 +4873,7 @@
               ? !!e.dash
               : e.burrow > 0
                 ? 0
-                : d > (e.type === "caster" ? 185 : e.r + hero.r)
+                : d > (["caster", "sporeSpitter"].includes(e.type) ? 185 : e.r + hero.r)
                   ? 1
                   : 0;
             if (e.walking)
@@ -4311,10 +4894,19 @@
                 dt;
               moveAroundWalls(e, (dx / d) * step, (dy / d) * step, dt, true);
             } else if (!chargerBusy) clearWall(e);
+            e.shieldedByGolem =
+              e.type !== "frostGolem" &&
+              enemies.some((g) => g.type === "frostGolem" && Math.hypot(e.x - g.x, e.y - g.y) < 110);
             e.attack -= dt;
-            if (e.type === "caster") {
+            if (e.type === "caster" || e.type === "sporeSpitter") {
               e.cast -= dt;
               if (d < (e.ambusher ? 480 : 340) && e.cast <= 0) {
+                if (e.type === "sporeSpitter") {
+                  let q = hostileBolt(e.x, e.y, dx, dy, 205, 13, "#9be773");
+                  q.spore = true;
+                  e.cast = 3.4;
+                  continue;
+                }
                 let aimX = dx + (hero.moving ? hero.faceX * hero.speed * 0.65 : 0),
                   aimY = dy + (hero.moving ? hero.faceY * hero.speed * 0.65 : 0),
                   aim = Math.atan2(aimY, aimX);
@@ -4379,18 +4971,18 @@
                         : slamStyle === "oracle"
                           ? 86
                           : 85,
-                  time: slamStyle === "colossus" ? 1.3 : 1.15,
-                  duration: slamStyle === "colossus" ? 1.3 : 1.15,
+                  time: (slamStyle === "colossus" ? 1.3 : 1.15) * Math.pow(0.8, depthStacks(4)),
+                  duration: (slamStyle === "colossus" ? 1.3 : 1.15) * Math.pow(0.8, depthStacks(4)),
                   damage: slamStyle === "colossus" ? 37 : slamStyle === "tyrant" ? 34 : 28,
                 };
                 e.slamClock =
-                  e.variant === "heart"
+                  (e.variant === "heart"
                     ? 4.2
                     : slamStyle === "colossus"
                       ? 5.7
                       : slamStyle === "oracle"
                         ? 5
-                        : 5.2;
+                        : 5.2) * Math.pow(0.8, depthStacks(4));
                 sfx("warning");
                 showToast(
                   slamStyle === "oracle"
@@ -4507,6 +5099,20 @@
             }
             if (pool.tick <= 0) {
               pool.tick = 0.5;
+              if (
+                pool.kind === "enemyPoison" &&
+                Math.hypot(hero.x - pool.x, hero.y - pool.y) < pool.r &&
+                hero.inv <= 0
+              ) {
+                takeHit(pool.power);
+                hero.inv = 0.5;
+                hero.poisonedUntil = clock + 2;
+                if (hero.hp <= 0) {
+                  gameOver();
+                  return;
+                }
+              }
+              if (pool.kind === "enemyPoison") continue;
               for (const e of [...enemies])
                 if (Math.hypot(e.x - pool.x, e.y - pool.y) < pool.r + e.r) {
                   if (pool.kind === "frozen") afflict(e, "frost", pool.power);
@@ -4553,12 +5159,16 @@
             q.x += q.vx * dt;
             q.y += q.vy * dt;
             q.life -= dt;
+            if (q.spore && q.life <= 0)
+              pools.push({ x: q.x, y: q.y, r: 55, life: 3, tick: 0.2, power: 6, kind: "enemyPoison" });
             if (Math.hypot(q.x - hero.x, q.y - hero.y) < hero.r + 7 && hero.inv <= 0) {
               takeHit(q.damage);
               hero.inv = 0.45;
               flash = 0.45;
               shake = 4;
               burst(hero.x, hero.y, q.color, 8);
+              if (q.spore)
+                pools.push({ x: q.x, y: q.y, r: 55, life: 3, tick: 0.2, power: 6, kind: "enemyPoison" });
               hazards.splice(i, 1);
               if (hero.hp <= 0) {
                 updateHud();
@@ -4713,8 +5323,12 @@
             }
           }
           let zone = Math.floor((wave - 1) / 5) % zoneNames.length;
+          if (!zone) {
+            ctx.fillStyle = "#dc754b1b";
+            ctx.fillRect(left, top, w + 140, h + 140);
+          }
           if (zone) {
-            ctx.fillStyle = zone === 1 ? "#79b9dd19" : "#67a36c1c";
+            ctx.fillStyle = zone === 1 ? "#70bde32a" : "#6cac602c";
             ctx.fillRect(left, top, w + 140, h + 140);
           }
           drawPaths(left, top);
@@ -4754,6 +5368,8 @@
           drawMapDetails(left, top);
           drawWalls(left, top);
           drawSites(left, top);
+          drawDungeonEvent(left, top);
+          drawZoneHazards(left, top);
         }
         function spriteReady(name) {
           let img = art[name];
@@ -4945,21 +5561,27 @@
             ctx.stroke();
           }
           let body =
-            e.type === "boss"
-              ? e.variant === "tyrant"
-                ? "#82909c"
-                : "#9d4635"
-              : e.type === "champion"
-                ? "#ad8950"
-                : e.type === "caster"
-                  ? "#6e498f"
-                  : e.type === "brute"
-                    ? "#9a5873"
-                    : e.type === "runner"
-                      ? "#4a9666"
-                      : e.type === "skeleton"
-                        ? "#b0b9b5"
-                        : "#675582";
+            e.type === "cinderImp"
+              ? "#ec7547"
+              : e.type === "frostGolem"
+                ? "#76b9cf"
+                : e.type === "sporeSpitter"
+                  ? "#85bd67"
+                  : e.type === "boss"
+                    ? e.variant === "tyrant"
+                      ? "#82909c"
+                      : "#9d4635"
+                    : e.type === "champion"
+                      ? "#ad8950"
+                      : e.type === "caster"
+                        ? "#6e498f"
+                        : e.type === "brute"
+                          ? "#9a5873"
+                          : e.type === "runner"
+                            ? "#4a9666"
+                            : e.type === "skeleton"
+                              ? "#b0b9b5"
+                              : "#675582";
           ctx.fillStyle = body;
           ctx.shadowBlur = e.type === "boss" ? 14 : 0;
           ctx.shadowColor = body;
@@ -5392,6 +6014,13 @@
                 ctx.stroke();
               }
               drawEnemy(e);
+              if (e.shieldedByGolem) {
+                ctx.strokeStyle = "#a8e8ff";
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.arc(e.x, e.y, e.r + 4, 0, 7);
+                ctx.stroke();
+              }
               if (e.eventElite || e.treasure) {
                 ctx.strokeStyle = "#ffd27c";
                 ctx.lineWidth = 3;
@@ -5406,6 +6035,13 @@
                   e.x,
                   e.y - e.r - 20,
                 );
+              }
+              if (e.eventMark) {
+                ctx.strokeStyle = "#f3ce8a";
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.arc(e.x, e.y, e.r + 6, 0, 7);
+                ctx.stroke();
               }
               if (e.trial) {
                 ctx.strokeStyle = "#e2a2ff";

@@ -16,9 +16,11 @@ Everything is in `index.html` except the sprites in `assets/`.
 
 ## What's in this version
 
-ChatGPT's seventh version, built on the merged file from this repo. Includes:
+ChatGPT's eighth version, built on the merged file from this repo. Includes:
 
 - **Heroes with their own elements:** Crypt Mage (Arcane + Shadow), Stormcaller (Frost + Lightning, unlock: defeat a boss) and Emberweaver (Fire + Poison, unlock: wave 10 or 600 lifetime embers). Each hero only sees its own element cards plus shared stat cards, and loot weapons roll that hero's effects.
+- **Crypt Depths:** beating the Crypt Heart unlocks deeper difficulty tiers with stacking modifiers and +25% embers per depth; best depth is tracked per hero.
+- **Zone identity:** lava vents and Cinder Imps in the Ash Catacombs, sliding ice and Frost Golems in the Frost Vault, spore pods and Spore Spitters in Venom Hollow, with a tinted floor per zone.
 - **Element matchups:** every enemy and boss has a weakness (1.5× damage) and most have a resistance (0.5×). Weak hits show a bigger number with "!", boss toasts show the matchup, and a Bestiary on the title screen lists discovered foes.
 - **Single-target staff bolt:** the basic attack no longer splashes; area damage comes from each hero's own skills.
 - **Hero evolutions:** Emberweaver: Inferno, Plague Heart, Wildfire Blight. Stormcaller: Storm Crown, Absolute Zero, Shatterstorm. Crypt Mage: Arcane Tempest, Soul Rift, Reaper's Veil. Everyone: Ember Barrage.
