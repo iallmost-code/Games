@@ -312,6 +312,31 @@
       .achievement.complete {
         color: #9bdea9;
       }
+      .bestiary {
+        margin: 9px 0 13px;
+        text-align: left;
+        font-size: 11px;
+        max-height: 155px;
+        overflow-y: auto;
+      }
+      .bestiary-title {
+        color: #ffd995;
+        font-weight: 900;
+        letter-spacing: 0.14em;
+        margin-bottom: 6px;
+      }
+      .bestiary-row {
+        display: flex;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 2px 8px;
+        padding: 4px 7px;
+        border-bottom: 1px solid #ffffff18;
+        color: #d4dadd;
+      }
+      .bestiary-row span {
+        white-space: nowrap;
+      }
       .panel {
         overflow-y: auto;
       }
@@ -498,6 +523,12 @@
       .toast.show {
         opacity: 1;
       }
+      .toast.matchup {
+        font-size: clamp(13px, 3.5vw, 18px);
+        line-height: 1.25;
+        padding: 0 10px;
+        box-sizing: border-box;
+      }
       @media (max-height: 580px) {
         .card {
           padding: 16px;
@@ -550,11 +581,12 @@
           <div class="kicker" id="kicker">ONE-THUMB DUNGEON SURVIVAL</div>
           <h1 id="title">EMBER<br />CRYPT</h1>
           <p id="description">
-            Survive the crypt. Your bolts burst on impact. Collect blue embers to level up, grab rare relics,
-            and follow the glowing markers to wells, forges, and vaults.
+            Survive the crypt. Your staff fires automatically. Collect blue embers to level up, grab rare
+            relics, and follow the glowing markers to wells, forges, and vaults.
           </p>
           <div class="meta-bar" id="metaBar"></div>
           <div class="achievements" id="achievements" hidden></div>
+          <div class="bestiary" id="bestiary" hidden></div>
           <div id="choices"></div>
           <button class="menu-secondary" id="shrineBtn">UPGRADE SHRINE</button
           ><button class="menu-secondary" id="heroBtn">HERO: CRYPT MAGE</button
@@ -597,6 +629,7 @@
           choicesEl = $("choices"),
           metaEl = $("metaBar"),
           achievementsEl = $("achievements"),
+          bestiaryEl = $("bestiary"),
           shrineBtn = $("shrineBtn"),
           heroBtn = $("heroBtn"),
           menuBack = $("menuBack"),
@@ -721,6 +754,7 @@
             bestEvolutions: 0,
             imps: 0,
             achievements: {},
+            met: [],
           },
           selectedHero = "mage",
           runEmbers = 0,
@@ -737,6 +771,28 @@
               profile[k] = Math.max(k === "bestWave" ? 1 : 0, Math.floor(Number(prior[k]) || 0));
             for (const k of ["wave10", "boss3", "evolve2", "imp5"])
               profile.achievements[k] = !!prior.achievements?.[k];
+            profile.met = Array.isArray(prior.met)
+              ? prior.met.filter((key) =>
+                  [
+                    "ghoul",
+                    "charger",
+                    "runner",
+                    "brute",
+                    "skeleton",
+                    "sentinel",
+                    "burrower",
+                    "wraith",
+                    "caster",
+                    "champion",
+                    "imp",
+                    "warden",
+                    "tyrant",
+                    "colossus",
+                    "oracle",
+                    "heart",
+                  ].includes(key),
+                )
+              : [];
             for (const k of ["power", "vigor", "fleet", "magnet", "armor", "reroll"])
               profile.upgrades[k] = Math.min(5, Math.max(0, Math.floor(Number(prior.upgrades?.[k]) || 0)));
             selectedHero = ["storm", "ember"].includes(prior.selectedHero) ? prior.selectedHero : "mage";
@@ -765,6 +821,112 @@
           storm: "FROST + LIGHTNING · Chaining bolts and ice magic",
           ember: "FIRE + POISON · Cinder patches and blight magic",
         };
+        const elementColors = {
+          fire: "#ff9a59",
+          poison: "#9bea7c",
+          frost: "#a6e9ff",
+          lightning: "#ffe783",
+          arcane: "#c89cff",
+          shadow: "#ae83df",
+          neutral: "#c4d6d5",
+        };
+        const enemyMatchups = {
+          ghoul: { weak: "fire" },
+          charger: { weak: "fire" },
+          runner: { weak: "shadow" },
+          champion: { weak: "fire" },
+          brute: { weak: "poison", resist: "frost" },
+          skeleton: { weak: "lightning", resist: "shadow" },
+          sentinel: { weak: "lightning", resist: "fire" },
+          burrower: { weak: "frost", resist: "lightning" },
+          wraith: { weak: "arcane", resist: "poison" },
+          caster: { weak: "shadow", resist: "arcane" },
+          warden: { weak: "lightning", resist: "shadow" },
+          tyrant: { weak: "fire", resist: "frost" },
+          colossus: { weak: "frost", resist: "fire" },
+          oracle: { weak: "shadow", resist: "poison" },
+          imp: {},
+          heart: {},
+        };
+        const bestiaryNames = {
+          caster: "HEXER",
+          imp: "TREASURE IMP",
+          warden: "CRYPT WARDEN",
+          tyrant: "BONE TYRANT",
+          colossus: "CINDER COLOSSUS",
+          oracle: "HOLLOW ORACLE",
+          heart: "CRYPT HEART",
+        };
+        let resistedTypes = new Set();
+        function enemyKind(e) {
+          if (e.treasure) return "imp";
+          if (e.type === "boss") return e.variant || "warden";
+          return e.type === "champion" ? e.baseType || "ghoul" : e.type;
+        }
+        function matchup(e) {
+          return enemyMatchups[enemyKind(e)] || {};
+        }
+        function noteEnemy(key) {
+          if (profile.met.includes(key)) return;
+          profile.met.push(key);
+          saveProfile();
+        }
+        function matchupToast(e, label) {
+          let m = matchup(e);
+          return (
+            label +
+            " · WEAK: " +
+            (m.weak || "NONE").toUpperCase() +
+            " · RESISTS: " +
+            (m.resist || "NONE").toUpperCase()
+          );
+        }
+        function showBestiary() {
+          bestiaryEl.hidden = false;
+          const keys = [
+            "ghoul",
+            "charger",
+            "runner",
+            "brute",
+            "skeleton",
+            "sentinel",
+            "burrower",
+            "wraith",
+            "caster",
+            "champion",
+            "imp",
+            "warden",
+            "tyrant",
+            "colossus",
+            "oracle",
+            "heart",
+          ];
+          bestiaryEl.innerHTML =
+            '<div class="bestiary-title">BESTIARY · DISCOVERED FOES</div>' +
+            (keys
+              .filter((key) => profile.met.includes(key))
+              .map((key) => {
+                let m = enemyMatchups[key];
+                return (
+                  '<div class="bestiary-row"><b>' +
+                  (bestiaryNames[key] || key.toUpperCase()) +
+                  "</b><span>" +
+                  (m
+                    ? 'WEAK: <strong style="color:' +
+                      (elementColors[m.weak] || elementColors.neutral) +
+                      '">' +
+                      (m.weak || "NONE").toUpperCase() +
+                      '</strong> · RESISTS: <strong style="color:' +
+                      (elementColors[m.resist] || elementColors.neutral) +
+                      '">' +
+                      (m.resist || "NONE").toUpperCase() +
+                      "</strong>"
+                    : "MATCHUP: BASE TYPE") +
+                  "</span></div>"
+                );
+              })
+              .join("") || '<div class="bestiary-row">Enter the crypt to discover foes.</div>');
+        }
         const achievementGoals = [
           {
             key: "wave10",
@@ -875,6 +1037,7 @@
           }
           checkAchievements();
           showAchievements();
+          showBestiary();
           resumeBtn.hidden = !saved;
           start.textContent = saved ? "NEW RUN" : "ENTER THE CRYPT";
           panel.classList.remove("hidden");
@@ -886,6 +1049,7 @@
           titleEl.innerHTML = "UPGRADE<br>SHRINE";
           descEl.textContent = "Spend embers on upgrades for future runs.";
           achievementsEl.hidden = true;
+          bestiaryEl.hidden = true;
           updateMeta();
           shrineBtn.hidden = true;
           heroBtn.hidden = true;
@@ -1025,8 +1189,13 @@
         });
         game.addEventListener("pointerdown", ensureAudio, { passive: true });
         updateSoundButton();
-        const saveKey = "ember-crypt-save-v4";
-        const legacySaveKeys = ["ember-crypt-save-v3", "ember-crypt-save-v2", "ember-crypt-save-v1"];
+        const saveKey = "ember-crypt-save-v5";
+        const legacySaveKeys = [
+          "ember-crypt-save-v4",
+          "ember-crypt-save-v3",
+          "ember-crypt-save-v2",
+          "ember-crypt-save-v1",
+        ];
         const xpNeeded = (rank) => Math.round(10 + 6 * rank + 2 * rank * rank);
         function compatibleRun(saved, balance) {
           return (
@@ -1080,7 +1249,7 @@
           try {
             let saved = JSON.parse(localStorage.getItem(saveKey) || "null");
             if (saved) {
-              if (saved.version === 4 && compatibleRun(saved, 4)) return saved;
+              if (saved.version === 5 && compatibleRun(saved, 5)) return saved;
               localStorage.removeItem(saveKey);
             }
             for (const key of legacySaveKeys) {
@@ -1088,11 +1257,13 @@
               if (!legacy) continue;
               localStorage.removeItem(key);
               if (
+                (legacy.version === 4 && compatibleRun(legacy, 4)) ||
                 (legacy.version === 3 && compatibleRun(legacy, 3)) ||
                 ((legacy.version === 1 || legacy.version === 2) && migrateRun(legacy))
               ) {
-                legacy.version = 4;
-                legacy.balanceVersion = 4;
+                legacy.version = 5;
+                legacy.balanceVersion = 5;
+                legacy.resistedTypes ||= [];
                 localStorage.setItem(saveKey, JSON.stringify(legacy));
                 return legacy;
               }
@@ -1115,8 +1286,8 @@
             localStorage.setItem(
               saveKey,
               JSON.stringify({
-                version: 4,
-                balanceVersion: 4,
+                version: 5,
+                balanceVersion: 5,
                 hero,
                 enemies,
                 drops,
@@ -1145,6 +1316,7 @@
                 lastLevelClock,
                 trialChoicePending,
                 runEmbers,
+                resistedTypes: [...resistedTypes],
               }),
             );
             lastSavedClock = clock;
@@ -1157,6 +1329,7 @@
             return;
           }
           hero = saved.hero;
+          resistedTypes = new Set(saved.resistedTypes || []);
           hero.evolutions = hero.evolutions || [];
           hero.pierceBonus ||= 0;
           hero.xpBurst ||= 0;
@@ -1219,6 +1392,7 @@
             (armor?.name || "Cloth Robe");
           mode = "play";
           panel.classList.add("hidden");
+          bestiaryEl.hidden = true;
           resumeBtn.hidden = true;
           resetJoy();
           updateHud();
@@ -1266,10 +1440,12 @@
         function showToast(s) {
           toastEl.textContent = s;
           toastEl.classList.add("show");
-          toastTimer = 1.5;
+          toastEl.classList.toggle("matchup", s.includes("WEAK:"));
+          toastTimer = s.includes("WEAK:") ? 3.1 : 1.5;
         }
         function begin() {
           clearRun();
+          resistedTypes.clear();
           ensureAudio();
           sfx("start");
           runEmbers = 0;
@@ -1388,6 +1564,7 @@
           stick.style.transform = "";
           panel.classList.add("hidden");
           achievementsEl.hidden = true;
+          bestiaryEl.hidden = true;
           start.hidden = false;
           resumeBtn.hidden = true;
           updateHud();
@@ -1443,6 +1620,7 @@
           sfx("upgrade");
           mode = "upgrade";
           achievementsEl.hidden = true;
+          bestiaryEl.hidden = true;
           resetJoy();
           metaEl.hidden = true;
           shrineBtn.hidden = true;
@@ -1659,7 +1837,7 @@
               rank: hero.iceRank || 0,
               element: "frost",
               name: "ICE SHARDS",
-              description: "Fan of piercing ice shards chills foes",
+              description: "Fan of piercing ice shards bursts into frost on impact",
               key: "iceRank",
             },
             {
@@ -1939,6 +2117,7 @@
         }
         function offerLoot(drop) {
           mode = "loot";
+          bestiaryEl.hidden = true;
           resetJoy();
           metaEl.hidden = true;
           shrineBtn.hidden = true;
@@ -2168,7 +2347,8 @@
           clearWall(boss);
           bossname.textContent = bossNames[variant];
           enemies.push(boss);
-          showToast(bossNames[variant] + " RISES");
+          noteEnemy(variant);
+          showToast(matchupToast(boss, bossNames[variant]));
           updateHud();
         }
         function gameOver() {
@@ -2182,6 +2362,7 @@
           sfx("death");
           mode = "over";
           achievementsEl.hidden = true;
+          bestiaryEl.hidden = true;
           resetJoy();
           let record = kills > best;
           if (record) {
@@ -2304,10 +2485,10 @@
             });
           }
         }
-        function floater(x, y, t, c) {
+        function floater(x, y, t, c, scale = 1) {
           if (floaters.length > 55) floaters.shift();
           if (Math.abs(x - hero.x) < w * 0.7 && Math.abs(y - hero.y) < h * 0.7)
-            floaters.push({ x, y, text: t, color: c, life: 0.8 });
+            floaters.push({ x, y, text: t, color: c, life: 0.8, scale });
         }
         function pos(e) {
           let r = canvas.getBoundingClientRect();
@@ -2412,6 +2593,7 @@
             hp,
             max: hp,
             type,
+            baseType: type === "champion" ? "ghoul" : undefined,
             speed:
               (type === "sentinel"
                 ? 48
@@ -2460,6 +2642,7 @@
             dash: null,
           });
           clearWall(enemies[enemies.length - 1]);
+          noteEnemy(type);
         }
         const siteNames = { well: "MOON WELL", forge: "EMBER FORGE", cache: "RELIC VAULT" };
         const siteColors = { well: "#8adfff", forge: "#ffc47b", cache: "#d8abff" };
@@ -2529,6 +2712,7 @@
           e.y = hero.y + Math.sin(a) * 230;
           clearWall(e);
           e.treasure = true;
+          noteEnemy("imp");
           e.hp = e.max = e.max * 5;
           e.speed = hero.speed * 0.78;
           e.escape = clock + 14;
@@ -2561,7 +2745,7 @@
             e.hp *= 1.6;
             e.max = e.hp;
             e.speed *= mod === "swift" ? 1.6 : 1.2;
-            showToast("ELITE HUNT · " + eliteMods[mod]);
+            showToast(matchupToast(e, "ELITE " + eliteMods[mod] + " CHAMPION"));
           }
         }
         function spawnEncounter() {
@@ -3086,22 +3270,23 @@
               let target = enemies.find((e) => Math.hypot(e.x - hero.x, e.y - hero.y) < 290);
               if (target) {
                 let angle = Math.atan2(target.y - hero.y, target.x - hero.x);
-                for (let j = -1; j <= 1; j++) {
-                  let a = angle + j * 0.24;
+                let count = 4 + hero.iceRank;
+                for (let j = 0; j < count; j++) {
+                  let a = angle + (j - (count - 1) / 2) * 0.18;
                   shots.push({
                     x: hero.x,
                     y: hero.y - 8,
                     vx: Math.cos(a) * 520,
                     vy: Math.sin(a) * 520,
                     life: 0.65,
-                    damage: hero.damage * (0.32 + hero.iceRank * 0.12),
+                    damage: hero.damage * (0.36 + hero.iceRank * 0.15),
                     pierceLeft: 2,
                     element: "frost",
                     color: "#a9eaff",
-                    splash: false,
+                    splash: true,
                   });
                 }
-                hero.iceCd = Math.max(2.6, 5.1 - hero.iceRank * 0.65);
+                hero.iceCd = Math.max(2.2, 3.7 - hero.iceRank * 0.45);
                 hero.cast = 0.2;
               }
             }
@@ -3191,13 +3376,25 @@
           hazards.push(projectile);
           return projectile;
         }
-        function damageEnemy(e, amount, kind = "physical", spreadDepth = 0, fromHeroBolt = false) {
+        function damageEnemy(
+          e,
+          amount,
+          kind = "neutral",
+          spreadDepth = 0,
+          fromHeroBolt = false,
+          isCrit = false,
+        ) {
           if (!enemies.includes(e)) return;
-          if (
-            e.type === "sentinel" &&
-            (kind === "physical" || kind === "crit" || kind === "blade") &&
-            !(e.recover > 0)
-          ) {
+          noteEnemy(e.type === "boss" ? e.variant || "warden" : e.treasure ? "imp" : e.type);
+          const element =
+            kind === "burn" || kind === "cinder" || kind === "flame"
+              ? "fire"
+              : kind === "venom" || kind === "blight"
+                ? "poison"
+                : kind === "physical" || kind === "crit" || kind === "blade"
+                  ? "neutral"
+                  : kind;
+          if (e.type === "sentinel" && element === "neutral" && !(e.recover > 0)) {
             e.guard = (e.guard || 0) + 1;
             amount *= 0.38;
             if (e.guard >= 4) {
@@ -3223,24 +3420,35 @@
                 damageEnemy(other, hero.damage * 0.4, "frost", 2);
               }
           }
-          if (kind === "crit") sfx("crit");
-          else if (kind === "physical") sfx("hit");
+          const matchupInfo = matchup(e);
+          const weak = element !== "neutral" && matchupInfo.weak === element;
+          const resisted = element !== "neutral" && matchupInfo.resist === element;
+          amount *= weak ? 1.5 : resisted ? 0.5 : 1;
+          if (resisted && !resistedTypes.has(enemyKind(e))) {
+            resistedTypes.add(enemyKind(e));
+            floater(e.x, e.y - 24, "RESIST", "#aab0b5", 0.85);
+          }
+          if (isCrit || kind === "crit") sfx("crit");
+          else if (element === "neutral") sfx("hit");
           runStats.damage += Math.min(e.hp, amount);
           e.hp -= amount;
           e.hitFlash = 0.1;
-          let color =
-            kind === "crit"
-              ? "#fff3a0"
-              : kind === "poison"
-                ? "#a5f77a"
-                : kind === "burn"
-                  ? "#ffad70"
-                  : kind === "frost"
-                    ? "#9ddfff"
-                    : "#ffd98e";
+          let color = resisted
+            ? "#aab0b5"
+            : weak
+              ? elementColors[element]
+              : isCrit || kind === "crit"
+                ? "#fff3a0"
+                : elementColors[element] || "#ffd98e";
           if (kind !== "blade" || e.hp <= 0) {
             burst(e.x, e.y, color, 3);
-            floater(e.x, e.y, (kind === "crit" ? "CRIT " : "-") + Math.round(amount), color);
+            floater(
+              e.x,
+              e.y,
+              (isCrit || kind === "crit" ? "CRIT " : "-") + Math.round(amount) + (weak ? "!" : ""),
+              color,
+              weak ? 1.25 : resisted ? 0.78 : 1,
+            );
           }
           if (e.hp > 0) return;
           enemies.splice(enemies.indexOf(e), 1);
@@ -3492,8 +3700,10 @@
             e.dotClock = (e.dotClock || 0) + dt;
             if (e.dotClock >= 0.5) {
               e.dotClock -= 0.5;
-              let amount = active.reduce((sum, kind) => sum + (e[kind + "Power"] || 0), 0);
-              damageEnemy(e, amount, active.length === 1 ? active[0] : "mixed");
+              for (const kind of active) {
+                if (!enemies.includes(e)) break;
+                damageEnemy(e, e[kind + "Power"] || 0, kind);
+              }
             }
           } else e.dotClock = 0;
           for (const kind of ["poison", "burn", "frost"])
@@ -3509,6 +3719,7 @@
             if (hero.shieldCharges === 0) hero.shieldUntil = 0;
             return 0;
           }
+          if (wave <= 3) amount *= 0.8;
           sfx("hurt");
           hero.lastHit = clock;
           let ratio = hero.armorStyle === "heavy" ? 0.8 : hero.armorStyle === "light" ? 0.45 : 0.65,
@@ -3536,7 +3747,7 @@
           for (const e of [...enemies])
             if (Math.hypot(e.x - hero.x, e.y - hero.y) < range)
               damageEnemy(e, e.type === "boss" ? Math.max(80, e.max * 0.12) : e.hp + 1);
-          showToast("ARCANE BLAST");
+          showToast("CRYPT BLAST");
           if (navigator.vibrate) navigator.vibrate(60);
         }
         function update(dt) {
@@ -3645,7 +3856,13 @@
                   first = (Math.floor(wave / 3) - 1) % 4;
                 spawnBoss(variants[(first + (twin && i === 1 ? 1 : 0)) % 4]);
               }
-              if (twin) showToast("TWIN GUARDIANS RISE");
+              if (twin) {
+                let pair = enemies.filter((e) => e.type === "boss").slice(-2);
+                if (pair.length === 2)
+                  showToast(
+                    "TWIN GUARDIANS · " + pair.map((e) => matchupToast(e, bossNames[e.variant])).join(" / "),
+                  );
+              }
             }
             if (wave === 2) spawnTreasureImp();
             if (wave >= 2 && makeRoomFor(1)) {
@@ -3704,7 +3921,7 @@
                 chain: hero.class === "storm" || !!hero.chain || hero.weaponEffect === "arc",
                 arcRank: hero.weaponEffect === "arc" ? hero.weaponRank : 0,
                 pierceLeft: (hero.weaponEffect === "pierce" ? hero.weaponRank : 0) + (hero.pierceBonus || 0),
-                splash: true,
+                splash: hero.evolutions?.includes("barrage") || false,
               });
             }
             if (targets.length) {
@@ -3870,7 +4087,9 @@
                   arcs.push({ x1: source.x, y1: source.y, x2: next.x, y2: next.y, life: 0.27 });
                   burst(next.x, next.y, "#7df1ff", 6);
                   let chainHit =
-                    shot.damage * (0.45 + (hero.chain + (shot.arcRank || 0)) * 0.1) * Math.pow(0.85, hop);
+                    shot.damage *
+                    (0.45 + (hero.class === "storm" ? 0.23 : 0) + (hero.chain + (shot.arcRank || 0)) * 0.1) *
+                    Math.pow(0.85, hop);
                   if (hero.poison) afflict(next, "poison", chainHit);
                   if (hero.fire) afflict(next, "burn", chainHit);
                   damageEnemy(next, chainHit, "lightning");
@@ -3890,12 +4109,23 @@
                 victim,
                 shot.damage * (victim.type === "boss" && victim.recover > 0 ? 1.35 : 1),
                 shot.baseDamage && shot.damage > shot.baseDamage
-                  ? "crit"
-                  : shot.chain
-                    ? "lightning"
-                    : "physical",
+                  ? "neutral"
+                  : shot.element === "flame"
+                    ? "fire"
+                    : shot.element === "venom"
+                      ? "poison"
+                      : shot.element
+                        ? shot.element
+                        : shot.fromHero && (hero.frostBolts || hero.weaponEffect === "frost")
+                          ? "frost"
+                          : shot.fromHero && hero.weaponEffect === "venom"
+                            ? "poison"
+                            : shot.fromHero && hero.weaponEffect === "shadow"
+                              ? "shadow"
+                              : "neutral",
                 0,
                 !!shot.fromHero,
+                !!(shot.baseDamage && shot.damage > shot.baseDamage),
               );
               if (shot.element === "shadow" || (shot.fromHero && hero.weaponEffect === "shadow"))
                 hero.hp = Math.min(hero.maxHp, hero.hp + Math.min(2, Math.max(0.5, shot.damage * 0.035)));
@@ -3926,8 +4156,8 @@
                 shot.element === "frost" ? "frost" : hero.fire || shot.element === "flame" ? "flame" : null,
               );
               if (shot.splash) {
-                let radius = shot.element === "flame" ? 60 : 46,
-                  splash = shot.element === "flame" ? 0.25 : 0.15,
+                let radius = shot.element === "flame" ? 60 : shot.element === "frost" ? 58 : 46,
+                  splash = shot.element === "flame" ? 0.25 : shot.element === "frost" ? 0.46 : 0.15,
                   amount = (shot.baseDamage || shot.damage) * splash;
                 rings.push({
                   x,
@@ -3935,13 +4165,19 @@
                   r: 12,
                   life: 0.28,
                   speed: radius * 3,
-                  color: shot.element === "flame" ? "#ffad75" : "#ffd1a1",
+                  color:
+                    shot.element === "flame" ? "#ffad75" : shot.element === "frost" ? "#a8e6ff" : "#ffd1a1",
                 });
-                burst(x, y, "#ffcf81", 5);
+                burst(x, y, shot.element === "frost" ? "#a8e6ff" : "#ffcf81", 5);
                 for (const e of [...enemies]) {
                   if (e !== victim && Math.hypot(e.x - x, e.y - y) < radius + e.r) {
                     if (hero.fire || shot.element === "flame") afflict(e, "burn", amount);
-                    damageEnemy(e, amount);
+                    if (shot.element === "frost") afflict(e, "frost", amount);
+                    damageEnemy(
+                      e,
+                      amount,
+                      shot.element === "flame" ? "fire" : shot.element === "frost" ? "frost" : "neutral",
+                    );
                   }
                 }
               }
@@ -5365,6 +5601,7 @@
           ctx.font = "bold 15px system-ui";
           for (const f of floaters) {
             ctx.globalAlpha = Math.min(1, f.life * 2);
+            ctx.font = "bold " + Math.round(15 * (f.scale || 1)) + "px system-ui";
             ctx.fillStyle = f.color;
             ctx.fillText(f.text, f.x, f.y);
           }

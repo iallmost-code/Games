@@ -16,9 +16,11 @@ Everything is in `index.html` except the sprites in `assets/`.
 
 ## What's in this version
 
-ChatGPT's sixth version, built on the merged file from this repo. Includes:
+ChatGPT's seventh version, built on the merged file from this repo. Includes:
 
 - **Heroes with their own elements:** Crypt Mage (Arcane + Shadow), Stormcaller (Frost + Lightning, unlock: defeat a boss) and Emberweaver (Fire + Poison, unlock: wave 10 or 600 lifetime embers). Each hero only sees its own element cards plus shared stat cards, and loot weapons roll that hero's effects.
+- **Element matchups:** every enemy and boss has a weakness (1.5× damage) and most have a resistance (0.5×). Weak hits show a bigger number with "!", boss toasts show the matchup, and a Bestiary on the title screen lists discovered foes.
+- **Single-target staff bolt:** the basic attack no longer splashes; area damage comes from each hero's own skills.
 - **Hero evolutions:** Emberweaver: Inferno, Plague Heart, Wildfire Blight. Stormcaller: Storm Crown, Absolute Zero, Shatterstorm. Crypt Mage: Arcane Tempest, Soul Rift, Reaper's Veil. Everyone: Ember Barrage.
 - **Embers and upgrade shrine** with 6 permanent upgrades; the death screen shows embers earned and the next unlock.
 - **Wave surprises:** runner rings, elite hunts (swift / splitting / armored) and a fleeing treasure imp.
