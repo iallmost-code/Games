@@ -17,7 +17,7 @@ Select this repository and its default branch, `main`, in a Codex Cloud environm
 - THE DESCENT (default): five authored floors with rooms, corridors, locked guardian chambers, stairs and an explored-room minimap.
 - ENDLESS: the original arena, wave 20 Crypt Heart and subsequent endless tiers. Both modes retain zone hazards, relics, evolutions, depth modifiers, treasure imps and elite events.
 - Three named local save slots, mode-specific depth/kill records, shrine, bestiary, achievements, and save-code export/import. First-run tips are tracked per character and can be reset in Settings.
-- One-thumb play: joystick at bottom center, automatic attacks, pause control. Sound and speed are in Settings.
+- Joystick + Dash + Ultimate controls: automatic attacks, pause control, sound and speed in Settings. Landscape fills the screen with a floating left joystick and 72px right skill buttons; portrait keeps the bottom-center joystick and smaller right buttons.
 - Cinematic art loads as WebP with PNG fallback. The frame limiter is 40 FPS.
 
 ## Files
@@ -60,3 +60,23 @@ Sunwarden rotates a broad light beam that briefly dazzles foes and uses periodic
 All abilities remain automatic. New heroes see only their own elements plus shared cards. This branch includes the authored-floor/arrival-cue work and excludes the separate 2.5D experiment. To try it locally, check out `codex/new-heroes` and serve the repository with `python3 -m http.server 8000`. See [tests/README.md](tests/README.md) for normal-stat survival results and the distinction between assisted progression and balance diagnostics.
 
 For immediate owner playtesting, [tests/new-heroes-playtest.ec1.txt](tests/new-heroes-playtest.ec1.txt) unlocks all five heroes in a fresh prototype slot with no embers or shrine upgrades. Import it via Settings → LOAD SAVE CODE. Normal unlock conditions are unchanged.
+
+## Landscape + skills prototype
+
+`codex/landscape-skills` builds on the five-hero prototype. Keep its PR unmerged for owner playtesting. In landscape, touch below the HUD within the left 40% of the screen to place the floating joystick; use the right thumb for Dash and Ultimate. Portrait keeps the fixed joystick. Desktop: WASD/arrows move, Space dashes, E uses the Ultimate. Attacks remain automatic.
+
+Dash travels for 0.25 seconds with invulnerability and cannot cross walls. Its four-second cooldown is shown on the circular button. The new Fleet Step shrine upgrade reduces cooldown by 0.3 seconds per rank, to 2.8 seconds. Existing Swift Boots ranks retain their movement bonus.
+
+Ultimates charge from actual damage and kills, with a combat-second charge cap to prevent instant refills in dense waves. No combat means no charge. The gold button fills and pulses when ready; using it produces a short flash, sound and an ability announcement:
+
+| Hero | Ultimate |
+|---|---|
+| Emberweaver | Firestorm: meteors rain over the visible arena for five seconds. |
+| Bloodknight | Earthsplitter: a large nearby Earth slam with two seconds of stun. |
+| Gravecaller | Army of the Dead: eight additional skeletons, lasting 15 seconds, separate from the ordinary minion cap. |
+| Storm Ranger | Arrow Storm: 32 lightning arrows in a full circle, chaining to nearby foes. |
+| Sunwarden | Solar Flare: full heal and four seconds of blindness/slow on visible, unobstructed foes. Bosses retain their telegraphed attack cadence. |
+
+Profiles v2, run keys v11 and EC1 codes remain compatible. Skill state is stored as optional hero fields; old runs default to ready Dash and zero Ultimate charge. Endless preserves charge/cooldown and temporary armies. Descent continues to resume from the current floor's entry checkpoint.
+
+Run `tests/landscape-skills.cjs` for both phone orientations, real multi-touch input, all five Ultimates, Dash versus boss slams, old-field defaults, save codes, slot isolation and normal-stat charge timing.

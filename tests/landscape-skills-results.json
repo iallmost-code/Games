@@ -1,0 +1,690 @@
+{
+  "orientations": [
+    {
+      "kind": "gravecaller",
+      "width": 390,
+      "height": 844,
+      "dash": {
+        "x": 258,
+        "y": 770,
+        "width": 56,
+        "height": 56,
+        "right": 314,
+        "bottom": 826
+      },
+      "ultimate": {
+        "x": 322,
+        "y": 770,
+        "width": 56,
+        "height": 56,
+        "right": 378,
+        "bottom": 826
+      },
+      "hud": {
+        "x": 0,
+        "y": 0,
+        "width": 390,
+        "height": 133.390625,
+        "right": 390,
+        "bottom": 133.390625
+      },
+      "minimap": {
+        "x": 277,
+        "y": 142,
+        "width": 101,
+        "height": 66,
+        "right": 378,
+        "bottom": 208
+      }
+    },
+    {
+      "kind": "ranger",
+      "width": 390,
+      "height": 844,
+      "dash": {
+        "x": 258,
+        "y": 770,
+        "width": 56,
+        "height": 56,
+        "right": 314,
+        "bottom": 826
+      },
+      "ultimate": {
+        "x": 322,
+        "y": 770,
+        "width": 56,
+        "height": 56,
+        "right": 378,
+        "bottom": 826
+      },
+      "hud": {
+        "x": 0,
+        "y": 0,
+        "width": 390,
+        "height": 133.390625,
+        "right": 390,
+        "bottom": 133.390625
+      },
+      "minimap": {
+        "x": 277,
+        "y": 142,
+        "width": 101,
+        "height": 66,
+        "right": 378,
+        "bottom": 208
+      }
+    },
+    {
+      "kind": "ember",
+      "width": 390,
+      "height": 844,
+      "dash": {
+        "x": 258,
+        "y": 770,
+        "width": 56,
+        "height": 56,
+        "right": 314,
+        "bottom": 826
+      },
+      "ultimate": {
+        "x": 322,
+        "y": 770,
+        "width": 56,
+        "height": 56,
+        "right": 378,
+        "bottom": 826
+      },
+      "hud": {
+        "x": 0,
+        "y": 0,
+        "width": 390,
+        "height": 133.390625,
+        "right": 390,
+        "bottom": 133.390625
+      },
+      "minimap": {
+        "x": 277,
+        "y": 142,
+        "width": 101,
+        "height": 66,
+        "right": 378,
+        "bottom": 208
+      }
+    },
+    {
+      "kind": "bloodknight",
+      "width": 390,
+      "height": 844,
+      "dash": {
+        "x": 258,
+        "y": 770,
+        "width": 56,
+        "height": 56,
+        "right": 314,
+        "bottom": 826
+      },
+      "ultimate": {
+        "x": 322,
+        "y": 770,
+        "width": 56,
+        "height": 56,
+        "right": 378,
+        "bottom": 826
+      },
+      "hud": {
+        "x": 0,
+        "y": 0,
+        "width": 390,
+        "height": 133.390625,
+        "right": 390,
+        "bottom": 133.390625
+      },
+      "minimap": {
+        "x": 277,
+        "y": 142,
+        "width": 101,
+        "height": 66,
+        "right": 378,
+        "bottom": 208
+      }
+    },
+    {
+      "kind": "sunwarden",
+      "width": 390,
+      "height": 844,
+      "dash": {
+        "x": 258,
+        "y": 770,
+        "width": 56,
+        "height": 56,
+        "right": 314,
+        "bottom": 826
+      },
+      "ultimate": {
+        "x": 322,
+        "y": 770,
+        "width": 56,
+        "height": 56,
+        "right": 378,
+        "bottom": 826
+      },
+      "hud": {
+        "x": 0,
+        "y": 0,
+        "width": 390,
+        "height": 133.390625,
+        "right": 390,
+        "bottom": 133.390625
+      },
+      "minimap": {
+        "x": 277,
+        "y": 142,
+        "width": 101,
+        "height": 66,
+        "right": 378,
+        "bottom": 208
+      }
+    },
+    {
+      "kind": "gravecaller",
+      "width": 844,
+      "height": 390,
+      "dash": {
+        "x": 668,
+        "y": 298,
+        "width": 72,
+        "height": 72,
+        "right": 740,
+        "bottom": 370
+      },
+      "ultimate": {
+        "x": 754,
+        "y": 298,
+        "width": 72,
+        "height": 72,
+        "right": 826,
+        "bottom": 370
+      },
+      "hud": {
+        "x": 0,
+        "y": 0,
+        "width": 689,
+        "height": 113.546875,
+        "right": 689,
+        "bottom": 113.546875
+      },
+      "minimap": {
+        "x": 731,
+        "y": 72,
+        "width": 101,
+        "height": 66,
+        "right": 832,
+        "bottom": 138
+      }
+    },
+    {
+      "kind": "ranger",
+      "width": 844,
+      "height": 390,
+      "dash": {
+        "x": 668,
+        "y": 298,
+        "width": 72,
+        "height": 72,
+        "right": 740,
+        "bottom": 370
+      },
+      "ultimate": {
+        "x": 754,
+        "y": 298,
+        "width": 72,
+        "height": 72,
+        "right": 826,
+        "bottom": 370
+      },
+      "hud": {
+        "x": 0,
+        "y": 0,
+        "width": 689,
+        "height": 113.546875,
+        "right": 689,
+        "bottom": 113.546875
+      },
+      "minimap": {
+        "x": 731,
+        "y": 72,
+        "width": 101,
+        "height": 66,
+        "right": 832,
+        "bottom": 138
+      }
+    },
+    {
+      "kind": "ember",
+      "width": 844,
+      "height": 390,
+      "dash": {
+        "x": 668,
+        "y": 298,
+        "width": 72,
+        "height": 72,
+        "right": 740,
+        "bottom": 370
+      },
+      "ultimate": {
+        "x": 754,
+        "y": 298,
+        "width": 72,
+        "height": 72,
+        "right": 826,
+        "bottom": 370
+      },
+      "hud": {
+        "x": 0,
+        "y": 0,
+        "width": 689,
+        "height": 113.546875,
+        "right": 689,
+        "bottom": 113.546875
+      },
+      "minimap": {
+        "x": 731,
+        "y": 72,
+        "width": 101,
+        "height": 66,
+        "right": 832,
+        "bottom": 138
+      }
+    },
+    {
+      "kind": "bloodknight",
+      "width": 844,
+      "height": 390,
+      "dash": {
+        "x": 668,
+        "y": 298,
+        "width": 72,
+        "height": 72,
+        "right": 740,
+        "bottom": 370
+      },
+      "ultimate": {
+        "x": 754,
+        "y": 298,
+        "width": 72,
+        "height": 72,
+        "right": 826,
+        "bottom": 370
+      },
+      "hud": {
+        "x": 0,
+        "y": 0,
+        "width": 689,
+        "height": 113.546875,
+        "right": 689,
+        "bottom": 113.546875
+      },
+      "minimap": {
+        "x": 731,
+        "y": 72,
+        "width": 101,
+        "height": 66,
+        "right": 832,
+        "bottom": 138
+      }
+    },
+    {
+      "kind": "sunwarden",
+      "width": 844,
+      "height": 390,
+      "dash": {
+        "x": 668,
+        "y": 298,
+        "width": 72,
+        "height": 72,
+        "right": 740,
+        "bottom": 370
+      },
+      "ultimate": {
+        "x": 754,
+        "y": 298,
+        "width": 72,
+        "height": 72,
+        "right": 826,
+        "bottom": 370
+      },
+      "hud": {
+        "x": 0,
+        "y": 0,
+        "width": 689,
+        "height": 113.546875,
+        "right": 689,
+        "bottom": 113.546875
+      },
+      "minimap": {
+        "x": 731,
+        "y": 72,
+        "width": 101,
+        "height": 66,
+        "right": 832,
+        "bottom": 138
+      }
+    }
+  ],
+  "combat": [
+    {
+      "hero": "gravecaller",
+      "dashSlams": "blocked during dash, damages after",
+      "dashWalls": "passed",
+      "ultimate": "passed"
+    },
+    {
+      "hero": "ranger",
+      "dashSlams": "blocked during dash, damages after",
+      "dashWalls": "passed",
+      "ultimate": "passed"
+    },
+    {
+      "hero": "ember",
+      "dashSlams": "blocked during dash, damages after",
+      "dashWalls": "passed",
+      "ultimate": "passed"
+    },
+    {
+      "hero": "bloodknight",
+      "dashSlams": "blocked during dash, damages after",
+      "dashWalls": "passed",
+      "ultimate": "passed"
+    },
+    {
+      "hero": "sunwarden",
+      "dashSlams": "blocked during dash, damages after",
+      "dashWalls": "passed",
+      "ultimate": "passed"
+    }
+  ],
+  "charge": [
+    {
+      "hero": "gravecaller",
+      "width": 390,
+      "height": 844,
+      "seed": 37,
+      "readySeconds": 79.4,
+      "seconds": 180,
+      "kills": 689,
+      "level": 13,
+      "charge": 100,
+      "mode": "trial",
+      "decisions": 14,
+      "initial": {
+        "hp": 100,
+        "damage": 24,
+        "armor": 30,
+        "depth": 0,
+        "shrine": {
+          "power": 0,
+          "vigor": 0,
+          "fleet": 0,
+          "magnet": 0,
+          "armor": 0,
+          "reroll": 0,
+          "fleetStep": 0
+        }
+      }
+    },
+    {
+      "hero": "ranger",
+      "width": 390,
+      "height": 844,
+      "seed": 37,
+      "readySeconds": 78.75,
+      "seconds": 180,
+      "kills": 694,
+      "level": 13,
+      "charge": 100,
+      "mode": "play",
+      "decisions": 14,
+      "initial": {
+        "hp": 100,
+        "damage": 30,
+        "armor": 35,
+        "depth": 0,
+        "shrine": {
+          "power": 0,
+          "vigor": 0,
+          "fleet": 0,
+          "magnet": 0,
+          "armor": 0,
+          "reroll": 0,
+          "fleetStep": 0
+        }
+      }
+    },
+    {
+      "hero": "ember",
+      "width": 390,
+      "height": 844,
+      "seed": 37,
+      "readySeconds": 78.38,
+      "seconds": 180,
+      "kills": 693,
+      "level": 13,
+      "charge": 100,
+      "mode": "trial",
+      "decisions": 14,
+      "initial": {
+        "hp": 110,
+        "damage": 25,
+        "armor": 36,
+        "depth": 0,
+        "shrine": {
+          "power": 0,
+          "vigor": 0,
+          "fleet": 0,
+          "magnet": 0,
+          "armor": 0,
+          "reroll": 0,
+          "fleetStep": 0
+        }
+      }
+    },
+    {
+      "hero": "bloodknight",
+      "width": 390,
+      "height": 844,
+      "seed": 37,
+      "readySeconds": 84.85,
+      "seconds": 180,
+      "kills": 688,
+      "level": 14,
+      "charge": 100,
+      "mode": "trial",
+      "decisions": 15,
+      "initial": {
+        "hp": 140,
+        "damage": 58,
+        "armor": 45,
+        "depth": 0,
+        "shrine": {
+          "power": 0,
+          "vigor": 0,
+          "fleet": 0,
+          "magnet": 0,
+          "armor": 0,
+          "reroll": 0,
+          "fleetStep": 0
+        }
+      }
+    },
+    {
+      "hero": "sunwarden",
+      "width": 390,
+      "height": 844,
+      "seed": 37,
+      "readySeconds": 83.83,
+      "seconds": 154.63,
+      "kills": 537,
+      "level": 11,
+      "charge": 100,
+      "mode": "over",
+      "decisions": 11,
+      "initial": {
+        "hp": 115,
+        "damage": 18,
+        "armor": 30,
+        "depth": 0,
+        "shrine": {
+          "power": 0,
+          "vigor": 0,
+          "fleet": 0,
+          "magnet": 0,
+          "armor": 0,
+          "reroll": 0,
+          "fleetStep": 0
+        }
+      }
+    },
+    {
+      "hero": "gravecaller",
+      "width": 844,
+      "height": 390,
+      "seed": 37,
+      "readySeconds": 78.33,
+      "seconds": 180,
+      "kills": 684,
+      "level": 13,
+      "charge": 100,
+      "mode": "trial",
+      "decisions": 13,
+      "initial": {
+        "hp": 100,
+        "damage": 24,
+        "armor": 30,
+        "depth": 0,
+        "shrine": {
+          "power": 0,
+          "vigor": 0,
+          "fleet": 0,
+          "magnet": 0,
+          "armor": 0,
+          "reroll": 0,
+          "fleetStep": 0
+        }
+      }
+    },
+    {
+      "hero": "ranger",
+      "width": 844,
+      "height": 390,
+      "seed": 37,
+      "readySeconds": 84.93,
+      "seconds": 100.13,
+      "kills": 249,
+      "level": 8,
+      "charge": 100,
+      "mode": "over",
+      "decisions": 8,
+      "initial": {
+        "hp": 100,
+        "damage": 30,
+        "armor": 35,
+        "depth": 0,
+        "shrine": {
+          "power": 0,
+          "vigor": 0,
+          "fleet": 0,
+          "magnet": 0,
+          "armor": 0,
+          "reroll": 0,
+          "fleetStep": 0
+        }
+      }
+    },
+    {
+      "hero": "ember",
+      "width": 844,
+      "height": 390,
+      "seed": 37,
+      "readySeconds": 87.75,
+      "seconds": 154.78,
+      "kills": 562,
+      "level": 12,
+      "charge": 100,
+      "mode": "over",
+      "decisions": 12,
+      "initial": {
+        "hp": 110,
+        "damage": 25,
+        "armor": 36,
+        "depth": 0,
+        "shrine": {
+          "power": 0,
+          "vigor": 0,
+          "fleet": 0,
+          "magnet": 0,
+          "armor": 0,
+          "reroll": 0,
+          "fleetStep": 0
+        }
+      }
+    },
+    {
+      "hero": "bloodknight",
+      "width": 844,
+      "height": 390,
+      "seed": 37,
+      "readySeconds": 85.83,
+      "seconds": 163.38,
+      "kills": 599,
+      "level": 13,
+      "charge": 100,
+      "mode": "over",
+      "decisions": 13,
+      "initial": {
+        "hp": 140,
+        "damage": 58,
+        "armor": 45,
+        "depth": 0,
+        "shrine": {
+          "power": 0,
+          "vigor": 0,
+          "fleet": 0,
+          "magnet": 0,
+          "armor": 0,
+          "reroll": 0,
+          "fleetStep": 0
+        }
+      }
+    },
+    {
+      "hero": "sunwarden",
+      "width": 844,
+      "height": 390,
+      "seed": 37,
+      "readySeconds": 82.08,
+      "seconds": 165.58,
+      "kills": 595,
+      "level": 12,
+      "charge": 100,
+      "mode": "over",
+      "decisions": 12,
+      "initial": {
+        "hp": 115,
+        "damage": 18,
+        "armor": 30,
+        "depth": 0,
+        "shrine": {
+          "power": 0,
+          "vigor": 0,
+          "fleet": 0,
+          "magnet": 0,
+          "armor": 0,
+          "reroll": 0,
+          "fleetStep": 0
+        }
+      }
+    }
+  ],
+  "saves": "v11 missing-field defaults, profile upgrades/progress, Endless cooldown/charge/Army, Descent checkpoint, EC1 codes and slot isolation",
+  "browserErrors": []
+}

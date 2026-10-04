@@ -7,7 +7,7 @@
       content="width=device-width,initial-scale=1,viewport-fit=cover,maximum-scale=1,user-scalable=no"
     />
     <meta name="theme-color" content="#10100e" />
-    <meta name="description" content="A one-thumb dungeon survival game." />
+    <meta name="description" content="A dungeon survival game with joystick, Dash and Ultimate controls." />
     <title>Ember Crypt</title>
     <link
       rel="icon"
@@ -611,6 +611,55 @@
       #dungeonMap{position:fixed;left:12px;top:142px;width:101px;height:66px;opacity:.75;z-index:4;pointer-events:none;border:1px solid #847157;border-radius:5px}
       #firstRunTip{position:fixed;top:108px;left:50%;transform:translateX(-50%);width:min(340px,88vw);padding:9px 12px;background:#171c26ed;border:1px solid #bea57c;border-radius:7px;color:#ffedca;text-align:center;font:12px system-ui;z-index:7;pointer-events:none}
       [hidden]{display:none!important}
+      .game { min-height:0; }
+      .tip { bottom:calc(env(safe-area-inset-bottom) + 166px); }
+      .skills { position:absolute; z-index:6; right:calc(env(safe-area-inset-right) + 12px);
+        bottom:calc(env(safe-area-inset-bottom) + 18px); display:flex; gap:8px; }
+      .game:not(.playing) .skills { display:none; }
+      .skill { --fill:0deg; --skill-color:#acd9ee; position:relative; isolation:isolate;
+        width:56px; height:56px; padding:4px; border:2px solid var(--skill-color); border-radius:50%;
+        background:conic-gradient(var(--skill-color) var(--fill),#252522dd 0); color:#fff3d5;
+        touch-action:none; user-select:none; font:900 9px system-ui; box-shadow:0 3px 12px #0008; }
+      .skill::before { content:''; position:absolute; inset:5px; border-radius:50%; background:#172025; z-index:-1; }
+      .skill-icon { display:block; font-size:21px; line-height:22px; }
+      .skill-value { display:block; font-size:9px; line-height:12px; }
+      .skill[aria-disabled="true"] { color:#c5c6be; }
+      .skill.ready { box-shadow:0 0 18px var(--skill-color); animation:skillPulse 1.3s ease-in-out infinite; }
+      @keyframes skillPulse { 50% { box-shadow:0 0 28px var(--skill-color); border-color:#fff3c8; } }
+      #ultimateButton { --skill-color:#ecc375; }
+      #dungeonMap { left:auto; right:calc(env(safe-area-inset-right) + 12px); top:calc(env(safe-area-inset-top) + 163px); }
+      @media (orientation:landscape) {
+        .hud { right:calc(env(safe-area-inset-right) + 155px); left:env(safe-area-inset-left); }
+        .hudleft { flex:1 1 55%; }
+        .game.playing .stats { padding-top:6px; flex:1 1 45%; }
+        .stats { font-size:12px; }
+        .stats small { display:inline; margin-left:7px; }
+        .stats .gear { display:block !important; max-width:none; }
+        .statlines { font-size:9px; margin-top:3px; }
+        .bar { margin-top:3px; height:7px; }
+        .armorbar,.xp { height:4px; }
+        .zone { height:auto; }
+        .joystick { left:0; top:0; bottom:auto; transform:none; visibility:hidden; pointer-events:none; }
+        .joystick.active { visibility:visible; }
+        .skills { gap:14px; right:calc(env(safe-area-inset-right) + 18px); bottom:calc(env(safe-area-inset-bottom) + 20px); }
+        .skill { width:72px; height:72px; font-size:10px; }
+        .skill-icon { font-size:27px; line-height:29px; }
+        .skill-value { font-size:10px; line-height:14px; }
+        #dungeonMap { top:calc(env(safe-area-inset-top) + 76px); }
+        #firstRunTip { top:calc(env(safe-area-inset-top) + 113px); width:min(440px,60vw); }
+        .bossbar { top:calc(env(safe-area-inset-top) + 96px); width:min(280px,40vw); }
+        .menu-page { width:min(720px,100%); padding-top:calc(env(safe-area-inset-top) + 10px); padding-bottom:calc(env(safe-area-inset-bottom) + 10px); }
+        .menu-top { min-height:42px; }
+        .menu-head { font-size:25px; margin:8px 0 4px; }
+        .menu-sub { font-size:13px; margin-bottom:7px; }
+        .menu-button { min-height:44px; margin-top:7px; padding:8px 12px; font-size:15px; }
+        .menu-title { font-size:clamp(35px,15vh,58px); }
+        .hero-art { height:90px; }
+        .card { max-height:calc(100dvh - 20px); overflow-y:auto; }
+        .tip { bottom:4px; left:40%; right:190px; font-size:10px; }
+      }
+      @media (orientation:portrait) and (max-width:375px) { .joystick { width:28vw; height:28vw; } .skill { width:14vw; height:14vw; } }
+      @media (prefers-reduced-motion:reduce) { .skill.ready { animation:none; } }
     </style>
   </head>
   <body>
@@ -640,11 +689,15 @@
       <div class="joystick" id="joystick" aria-label="Movement joystick">
         <div class="stick" id="stick"></div>
       </div>
+      <div class="skills" aria-label="Hero skills">
+        <button id="dashButton" class="skill" aria-label="Dash" aria-disabled="false"><span class="skill-icon" aria-hidden="true">➤</span>DASH<span class="skill-value">READY</span></button>
+        <button id="ultimateButton" class="skill" aria-label="Ultimate" aria-disabled="true"><span class="skill-icon" aria-hidden="true">✦</span>ULTIMATE<span class="skill-value">0%</span></button>
+      </div>
       <div class="tip" id="movementTip">DRAG THE JOYSTICK TO MOVE · ATTACKS ARE AUTOMATIC</div>
       <div class="toast" id="toast"></div>
       <div class="panel" id="panel">
         <div class="card">
-          <div class="kicker" id="kicker">ONE-THUMB DUNGEON SURVIVAL</div>
+          <div class="kicker" id="kicker">DUNGEON SURVIVAL</div>
           <h1 id="title">EMBER<br />CRYPT</h1>
           <p id="description">
             Survive the crypt. Your staff fires automatically. Collect blue embers to level up, grab rare relics,
@@ -708,7 +761,8 @@
           resumeBtn = $("resume"),
           start = $("start"),
           menuShell = $("menuShell"), menuPage = $("menuPage"),
-          pauseControl = $("pauseControl"), menuEmbers = $("menuEmbers");
+          pauseControl = $("pauseControl"), menuEmbers = $("menuEmbers"),
+          dashButton = $("dashButton"), ultimateButton = $("ultimateButton");
         let art = {},
           floorPattern = null,
           walkFrames = new WeakMap();
@@ -997,7 +1051,7 @@
           const allowed=["ghoul","charger","runner","brute","skeleton","sentinel","burrower","wraith",
             "caster","champion","cinderImp","frostGolem","sporeSpitter","imp","warden","tyrant","colossus","oracle","heart"];
           profile.met=Array.isArray(prior.met)?prior.met.filter(k=>allowed.includes(k)):[];
-          for(const k of ["power","vigor","fleet","magnet","armor","reroll"])
+          for(const k of ["power","vigor","fleet","magnet","armor","reroll","fleetStep"])
             profile.upgrades[k]=Math.min(5,Math.max(0,Math.floor(Number(prior.upgrades?.[k])||0)));
           profile.bloodknight=!!prior.bloodknight||profile.bosses>=3;
           selectedHero=["ranger","ember","bloodknight","sunwarden"].includes(prior.selectedHero)?prior.selectedHero:"gravecaller";
@@ -1279,6 +1333,7 @@
           let actions=menuText("div","","menu-actions"),enter=menuButton("ENTER THE CRYPT",()=>{
             if(!unlocked)return;begin();menuShell.classList.add("hidden");game.classList.add("playing");
           },null,"primary");enter.disabled=!unlocked;actions.append(enter);menuPage.append(actions);
+          body.append(menuText("p","Joystick moves · Dash dodges · Ultimate charges in combat. Keyboard: WASD/arrows · Space · E.","menu-note"));
         }
         function awardEmbers(n) {
           if (hero) {
@@ -1420,6 +1475,7 @@
           { key: "power", name: "EMBER EDGE", detail: "+5% starting damage", cap: 5, cost: 28 },
           { key: "vigor", name: "LIFE SIGIL", detail: "+10 starting health", cap: 5, cost: 24 },
           { key: "fleet", name: "SWIFT BOOTS", detail: "+5% starting move speed", cap: 4, cost: 28 },
+          { key: "fleetStep", name: "FLEET STEP", detail: "−0.3s Dash cooldown per rank (4s → 2.8s)", cap: 4, cost: 36 },
           { key: "magnet", name: "ORB CHARM", detail: "+18 pickup radius", cap: 5, cost: 20 },
           { key: "armor", name: "IRON OATH", detail: "+10 starting armor", cap: 5, cost: 24 },
           { key: "reroll", name: "FATE TOKEN", detail: "+1 free power reroll per run", cap: 2, cost: 76 },
@@ -1431,7 +1487,7 @@
           renderMenu("hub");
           return;
           mode = "menu";
-          kickerEl.textContent = "ONE-THUMB DUNGEON SURVIVAL";
+          kickerEl.textContent = "DUNGEON SURVIVAL";
           titleEl.innerHTML = "EMBER<br>CRYPT";
           descEl.textContent =
             heroTraits[selectedHero] + ". Select a hero and Crypt Depth below.";
@@ -1601,6 +1657,8 @@
             hurt: [190, 65, 0.2, 0.043, "sawtooth", 170],
             block: [530, 280, 0.13, 0.03, "triangle", 180],
             blast: [110, 45, 0.42, 0.048, "sawtooth", 350],
+            dash: [280, 660, 0.12, 0.025, "triangle", 0],
+            ultimate: [320, 1200, 0.45, 0.045, "sine", 0],
             death: [360, 95, 0.55, 0.045, "triangle", 1000],
           };
           let config = sounds[kind];
@@ -1776,7 +1834,8 @@
           bloodEffects = [];
           runMode=saved.runMode||"endless";best=profile.records?.[runMode]?.kills||0;dungeon=null;floorCheckpoint=saved.floorCheckpoint||null;
           hero = saved.hero;
-          companions=Array.isArray(saved.companions)?saved.companions.slice(0,16):[];heroTraps=Array.isArray(saved.heroTraps)?saved.heroTraps.slice(0,8):[];heroSpirits=Array.isArray(saved.heroSpirits)?saved.heroSpirits.slice(0,24):[];heroZones=Array.isArray(saved.heroZones)?saved.heroZones.slice(0,8):[];
+          ensureSkills(hero,saved.clock);hero.dashTime=0;
+          companions=Array.isArray(saved.companions)?saved.companions.slice(0,24):[];heroTraps=Array.isArray(saved.heroTraps)?saved.heroTraps.slice(0,8):[];heroSpirits=Array.isArray(saved.heroSpirits)?saved.heroSpirits.slice(0,24):[];heroZones=Array.isArray(saved.heroZones)?saved.heroZones.slice(0,8):[];
           if(hero.class === "bloodknight") {
             hero.swingCount ||= 0; hero.stoneSkin ||= 0; hero.earthSpikes ||= 0;
             hero.pactNext ??= saved.clock+20; hero.pactUntil ||= 0;
@@ -1866,6 +1925,8 @@
         resumeBtn.addEventListener("click", restoreRun);
         showStartScreen();
         function resize() {
+          resetJoy();
+          for(const key of Object.keys(keys))delete keys[key];
           const b = game.getBoundingClientRect();
           w = b.width;
           h = b.height;
@@ -1964,7 +2025,9 @@
             shieldCharges: 0,
             hasteUntil: 0,
             inv: 0,
+            ultimateUsedAt:0,
           };
+          ensureSkills(hero);
           resetHeroActors();
           runStats = { damage: 0, hpLost: 0, armorBlocked: 0, bosses: 0 };
           weaponDryStreak = 0;
@@ -2030,6 +2093,7 @@
           if(!isDescent())showToast("WAVE 1");
         }
         function updateHud() {
+          updateSkillButtons();
           healthEl.style.width = Math.max(0, (hero.hp / hero.maxHp) * 100) + "%";
           armorfillEl.style.width = Math.max(0, (hero.armor / hero.maxArmor) * 100) + "%";
           xpEl.style.width = Math.min(100, (xp / needed) * 100) + "%";
@@ -2949,6 +3013,8 @@
           joy.id = null;
           joy.dx = joy.dy = 0;
           stick.style.transform = "";
+          joystick.classList.remove("active");
+          joystick.style.left=joystick.style.top="";
         }
         function moveJoy(e) {
           const dx = e.clientX - joy.startX,
@@ -2959,33 +3025,44 @@
           joy.dy = l ? (dy / l) * strength : 0;
           stick.style.transform = "translate(" + joy.dx * 29 + "px," + joy.dy * 29 + "px)";
         }
-        joystick.addEventListener("pointerdown", (e) => {
-          if (mode !== "play" || joy.id !== null) return;
-          e.preventDefault();
-          joy.id = e.pointerId;
-          joy.startX = e.clientX;
-          joy.startY = e.clientY;
-          joystick.setPointerCapture(e.pointerId);
-          moveJoy(e);
+        function landscape(){return w>h;}
+        game.addEventListener("pointerdown", e => {
+          if(mode!=="play"||joy.id!==null||e.target.closest("button"))return;
+          const bounds=game.getBoundingClientRect();
+          if(landscape()){
+            if(e.clientX-bounds.left>bounds.width*.4)return;
+            const hud=document.querySelector(".hud").getBoundingClientRect();
+            if(e.clientY<hud.bottom)return;
+            joystick.style.left=(e.clientX-bounds.left-58)+"px";
+            joystick.style.top=(e.clientY-bounds.top-58)+"px";
+            joystick.classList.add("active");
+          }else if(!joystick.contains(e.target))return;
+          e.preventDefault();joy.id=e.pointerId;joy.startX=e.clientX;joy.startY=e.clientY;
+          game.setPointerCapture(e.pointerId);moveJoy(e);
         });
-        joystick.addEventListener("pointermove", (e) => {
-          if (mode === "play" && e.pointerId === joy.id) {
-            e.preventDefault();
-            moveJoy(e);
-          }
+        game.addEventListener("pointermove",e=>{
+          if(mode==="play"&&e.pointerId===joy.id){e.preventDefault();moveJoy(e);}
         });
-        function release(e) {
-          if (e.pointerId === joy.id) resetJoy();
-        }
-        joystick.addEventListener("pointerup", release);
-        joystick.addEventListener("pointercancel", release);
-        joystick.addEventListener("lostpointercapture", release);
-        addEventListener("keydown", (e) => {
-          keys[e.key.toLowerCase()] = true;
-          if (["arrowup", "arrowdown", "arrowleft", "arrowright"].includes(e.key.toLowerCase()))
-            e.preventDefault();
+        function release(e){if(e.pointerId===joy.id)resetJoy();}
+        game.addEventListener("pointerup",release);
+        game.addEventListener("pointercancel",release);
+        game.addEventListener("lostpointercapture",release);
+        // Distinct pointers keep the joystick held while the other thumb uses a skill.
+        dashButton.addEventListener("pointerdown",e=>{e.preventDefault();useDash();});
+        ultimateButton.addEventListener("pointerdown",e=>{e.preventDefault();useUltimate();});
+        dashButton.addEventListener("click",e=>{if(e.detail===0)useDash();});
+        ultimateButton.addEventListener("click",e=>{if(e.detail===0)useUltimate();});
+        addEventListener("keydown",e=>{
+          if(e.target.closest?.("input,textarea,button")&&mode!=="play")return;
+          const key=e.key.toLowerCase();
+          if(mode!=="play")return;
+          if(["arrowup","arrowdown","arrowleft","arrowright"," ","e"].includes(key))e.preventDefault();
+          keys[key]=true;
+          if(!e.repeat&&key===" ")useDash();
+          if(!e.repeat&&key==="e")useUltimate();
         });
-        addEventListener("keyup", (e) => (keys[e.key.toLowerCase()] = false));
+        addEventListener("keyup",e=>{delete keys[e.key.toLowerCase()];});
+        addEventListener("blur",()=>{resetJoy();for(const key of Object.keys(keys))delete keys[key];});
         function spawnEnemy(forcedType) {
           let side = Math.floor(Math.random() * 4),
             offset = Math.random() - 0.5,
@@ -3489,6 +3566,7 @@
             runStats=structuredClone(checkpoint.runStats);runEmbers=checkpoint.runEmbers;xpReserve=checkpoint.xpReserve;
           }
           if(runMode==="descent"){profile.bestFloor=Math.max(profile.bestFloor||0,number);if(number>=3&&!profile.sunwarden){profile.sunwarden=true;showToast("SUNWARDEN UNLOCKED");}saveProfile();}
+          ensureSkills(hero);hero.dashTime=0;hero.firestormTime=0;
           buildFloor(number);hero.x=400;hero.y=800;resetHeroActors();hero.inv=2;hero.finalBossSpawned=false;
           hero.pactNext=clock+20;hero.pactUntil=0;
           enemies=[];shots=[];hazards=[];pools=[];drops=[];zoneHazards=[];meteors=[];bloodEffects=[];boss=null;
@@ -3603,7 +3681,7 @@
         }
         function drawMinimap(){
           const canvas=$("dungeonMap");canvas.hidden=!isDescent()||mode!=="play";if(canvas.hidden)return;
-          canvas.style.top=Math.ceil(document.querySelector(".hud").getBoundingClientRect().bottom+8+(activeTip?80:0))+"px";
+          canvas.style.top=Math.ceil(landscape()?pauseControl.getBoundingClientRect().bottom+8:document.querySelector(".hud").getBoundingClientRect().bottom+8+(activeTip?80:0))+"px";
           const g=canvas.getContext("2d"),s=4;g.clearRect(0,0,144,94);g.fillStyle="#070b10d9";g.fillRect(0,0,144,94);
           for(const i of dungeon.explored){let [x,y,rw,rh]=floorSpec().rooms[i];g.fillStyle=i===3?"#6e4856":"#64777c";g.fillRect(x*s,y*s,rw*s,rh*s);}
           for(const [x,y,rw,rh] of floorSpec().links){g.fillStyle="#39484b";g.fillRect(x*s,y*s,rw*s,rh*s);}
@@ -4007,10 +4085,10 @@
           if(hero.class==="ranger")addWolf();
         }
         function skeletonCap(){return Math.min(16,(hero.minionCapacity||4)*(hero.evolutions.includes("legion")?2:1));}
-        function raiseMinion(x,y){
-          if(companions.filter(p=>p.kind==="skeleton").length>=skeletonCap())return false;
+        function raiseMinion(x,y,ultimateMinion=false){
+          if(ultimateMinion?companions.filter(p=>p.ultimateMinion).length>=8:companions.filter(p=>p.kind==="skeleton"&&!p.ultimateMinion).length>=skeletonCap())return false;
           const max=120*(1+.4*(hero.boneArmor||0));
-          const p={id:++companionId,kind:"skeleton",x,y,r:12,hp:max,max,life:25,cd:.3,speed:270,faceX:0,faceY:1,stepPhase:0};clearWall(p);companions.push(p);
+          const p={id:++companionId,kind:"skeleton",x,y,r:12,hp:max,max,life:ultimateMinion?15:25,ultimateMinion,cd:.3,speed:270,faceX:0,faceY:1,stepPhase:0};clearWall(p);companions.push(p);
           burst(x,y,"#cba4ff",6);return true;
         }
         function addWolf(){
@@ -4053,7 +4131,7 @@
             if(companions.filter(p=>p.kind==="wolf").length<needed&&hero.wolfCd<=0){addWolf();hero.wolfCd=3;}
           }
           if(hero.evolutions.includes("ossuary")){
-            const bones=companions.filter(p=>p.kind==="skeleton");
+            const bones=companions.filter(p=>p.kind==="skeleton"&&!p.ultimateMinion);
             if(bones.length>=5&&companions.filter(p=>p.kind==="giant").length<2){const selected=bones.slice(0,5),x=selected.reduce((v,p)=>v+p.x,0)/5,y=selected.reduce((v,p)=>v+p.y,0)/5;companions=companions.filter(p=>!selected.includes(p));const max=160*(1+.4*(hero.boneArmor||0)),p={id:++companionId,kind:"giant",x,y,r:24,hp:max,max,life:15,cd:0,speed:165,faceX:0,faceY:1,stepPhase:0};clearWall(p);companions.push(p);burst(p.x,p.y,"#cba4ff",16);}
           }
           for(const p of [...companions]){
@@ -4068,7 +4146,7 @@
               let power=hero.damage*(p.kind==="giant"?1.7:p.kind==="wolf"?.85:1.3);
               if(hero.soulLink&&Math.hypot(p.x-hero.x,p.y-hero.y)<150)power*=1+.2*hero.soulLink;
               if(p.kind==="wolf"&&hero.glacierWolf)afflict(target,"frost",power);
-              damageEnemy(target,power,p.kind==="wolf"?"frost":"shadow");
+              damageEnemy(target,power,p.kind==="wolf"?"frost":"shadow",0,false,false,!p.ultimateMinion);
               p.cast=.18;
               if(hero.siphon&&p.kind!=="wolf")hero.hp=Math.min(hero.maxHp,hero.hp+.35*hero.siphon);
               if(p.kind==="giant")prototypeArea(p.x,p.y,65,power*.35,"shadow");
@@ -4331,7 +4409,7 @@
                   Math.hypot(e.x - m.x, e.y - m.y) < m.r + e.r
                 ) {
                   afflict(e, "burn", m.damage);
-                  damageEnemy(e, m.damage, "burn");
+                  damageEnemy(e, m.damage, "burn",0,false,false,!m.ultimate);
                   hits++;
                 }
               }
@@ -4480,7 +4558,7 @@
           hazards.push(projectile);
           return projectile;
         }
-        function damageEnemy(e, amount, kind = "neutral", spreadDepth = 0, fromHeroBolt = false, isCrit = false) {
+        function damageEnemy(e, amount, kind = "neutral", spreadDepth = 0, fromHeroBolt = false, isCrit = false, earnsCharge = true) {
           if (!enemies.includes(e)) return;
           noteEnemy(e.type === "boss" ? e.variant || "warden" : e.treasure ? "imp" : e.type);
           const element = kind === "burn" || kind === "cinder" || kind === "flame" ? "fire" :
@@ -4527,7 +4605,9 @@
           }
           if (isCrit || kind === "crit") sfx("crit");
           else if (element === "neutral") sfx("hit");
-          runStats.damage += Math.min(e.hp, amount);
+          const dealt=Math.max(0,Math.min(e.hp,amount));
+          if(earnsCharge)addUltimateCharge(dealt/(Math.max(24,hero.damage)*50)+(e.hp<=amount?.42:0));
+          runStats.damage += dealt;
           e.hp -= amount;
           e.hitFlash = 0.1;
           let color = resisted ? "#aab0b5" : weak ? elementColors[element] :
@@ -4799,7 +4879,92 @@
           for (const kind of ["poison", "burn", "frost"])
             if (e[kind + "Time"] > 0) e[kind + "Time"] = Math.max(0, e[kind + "Time"] - dt);
         }
+        const ultimateNames={ember:"FIRESTORM",bloodknight:"EARTHSPLITTER",gravecaller:"ARMY OF THE DEAD",ranger:"ARROW STORM",sunwarden:"SOLAR FLARE"};
+        function ensureSkills(target,now=clock){
+          target.ultimateUsedAt=Number.isFinite(target.ultimateUsedAt)?Math.max(0,Math.min(now,target.ultimateUsedAt)):now;
+          target.ultimateWindow=Number.isInteger(target.ultimateWindow)?target.ultimateWindow:-1;
+          target.ultimateWindowEarned=Number.isFinite(target.ultimateWindowEarned)?Math.max(0,Math.min(8,target.ultimateWindowEarned)):0;
+          for(const [key,max]of [["dashCd",4],["dashTime",.25],["ultimateCharge",100],["firestormTime",5],["firestormCd",.4]])
+            target[key]=Number.isFinite(target[key])?Math.max(0,Math.min(max,target[key])):0;
+        }
+        function dashCooldown(){return Math.max(2.8,4-.3*Math.min(4,profile.upgrades.fleetStep||0));}
+        function addUltimateCharge(amount){
+          // Earn only through combat, capped per combat second to prevent instant refills in dense waves.
+          const second=Math.floor(clock);
+          if(hero.ultimateWindow!==second){hero.ultimateWindow=second;hero.ultimateWindowEarned=0;}
+          const earned=Math.max(0,Math.min(amount,8-(hero.ultimateWindowEarned||0)));
+          hero.ultimateWindowEarned=(hero.ultimateWindowEarned||0)+earned;
+          hero.ultimateCharge=Math.min(100,(hero.ultimateCharge||0)+earned,Math.max(hero.ultimateCharge||0,Math.max(0,clock-(hero.ultimateUsedAt??0))*100/60));
+        }
+        function updateSkillButtons(){
+          if(!hero)return;
+          const cd=hero.dashCd||0,charge=hero.ultimateCharge||0;
+          dashButton.style.setProperty("--fill",(360*Math.max(0,1-cd/dashCooldown()))+"deg");
+          dashButton.querySelector(".skill-value").textContent=cd>0?cd.toFixed(1)+"s":"READY";
+          dashButton.setAttribute("aria-disabled",String(cd>0));
+          dashButton.setAttribute("aria-label",cd>0?"Dash · "+cd.toFixed(1)+" seconds cooldown":"Dash · ready");
+          ultimateButton.title=ultimateNames[hero.class];
+          ultimateButton.style.setProperty("--fill",(charge*3.6)+"deg");
+          ultimateButton.querySelector(".skill-value").textContent=charge>=100?"READY":Math.floor(charge)+"%";
+          ultimateButton.classList.toggle("ready",charge>=100);
+          ultimateButton.setAttribute("aria-disabled",String(charge<100));
+          ultimateButton.setAttribute("aria-label",ultimateNames[hero.class]+(charge>=100?" · ready":" · "+Math.floor(charge)+" percent charged"));
+        }
+        function useDash(){
+          if(mode!=="play"||!hero||hero.dashCd>0||hero.dashTime>0)return false;
+          let dx=joy.dx+(keys.d||keys.arrowright?1:0)-(keys.a||keys.arrowleft?1:0),
+            dy=joy.dy+(keys.s||keys.arrowdown?1:0)-(keys.w||keys.arrowup?1:0),length=Math.hypot(dx,dy);
+          if(length<.1){dx=hero.faceX??0;dy=hero.faceY??1;length=Math.hypot(dx,dy);if(!length){dy=1;length=1;}}
+          hero.dashX=dx/length;hero.dashY=dy/length;hero.dashTime=.25;
+          hero.dashCd=dashCooldown();hero.inv=Math.max(hero.inv,.25);
+          hero.stunUntil=0;hero.slideX=hero.slideY=0;
+          rings.push({x:hero.x,y:hero.y,r:12,life:.25,speed:180,color:"#c0e7ff"});
+          ensureAudio();sfx("dash");updateSkillButtons();return true;
+        }
+        function useUltimate(){
+          if(mode!=="play"||!hero||hero.ultimateCharge<100)return false;
+          hero.ultimateCharge=0;hero.ultimateUsedAt=clock;hero.cast=.4;flash=.45;shake=5;
+          ensureAudio();sfx("ultimate");showToast(ultimateNames[hero.class]);
+          const color=hero.class==="gravecaller"?"#cba4ff":hero.class==="ranger"?"#a9e6ff":hero.class==="bloodknight"?"#b88446":"#ffe4a0";
+          rings.push({x:hero.x,y:hero.y,r:20,life:.65,speed:500,color});
+          if(hero.class==="ember"){hero.firestormTime=5;hero.firestormCd=0;}
+          if(hero.class==="bloodknight"){
+            bloodEffects.push({kind:"spikes",x:hero.x,y:hero.y,r:320,life:.6,color:"#c99655"});
+            for(const e of [...enemies])if(Math.hypot(e.x-hero.x,e.y-hero.y)<320+e.r&&!segmentBlocked(hero.x,hero.y,e.x,e.y)){
+              e.stunUntil=Math.max(e.stunUntil||0,clock+2);damageEnemy(e,hero.damage*6,"earth",0,false,false,false);
+            }
+          }
+          if(hero.class==="gravecaller")for(let i=0;i<8;i++){const angle=i*Math.PI/4;raiseMinion(hero.x+Math.cos(angle)*38,hero.y+Math.sin(angle)*38,true);}
+          if(hero.class==="ranger")for(let i=0;i<32;i++){const angle=i*Math.PI/16;shots.push({x:hero.x,y:hero.y,vx:Math.cos(angle)*600,vy:Math.sin(angle)*600,life:Math.hypot(w,h)/600,damage:hero.damage*3,baseDamage:hero.damage*3,fromHero:true,arrow:true,chain:true,arcRank:3,pierceLeft:0,splash:false,ultimate:true,color:"#a9e6ff"});}
+          if(hero.class==="sunwarden"){
+            hero.hp=hero.maxHp;
+            for(const e of enemies)if(onScreenEnemy(e)&&!segmentBlocked(hero.x,hero.y,e.x,e.y)){
+              e.solarBlindUntil=clock+4;e.dazzledUntil=Math.max(e.dazzledUntil||0,clock+4);
+              // Blind ordinary enemies completely; bosses keep their readable attack cadence.
+              if(e.type!=="boss"){e.attack=Math.max(e.attack||0,4);e.cast=Math.max(e.cast||0,4);e.burrowCd=Math.max(e.burrowCd||0,4);e.blinkCd=Math.max(e.blinkCd||0,4);e.chargeClock=Math.max(e.chargeClock||0,4);}
+            }
+          }
+          if(vibrationEnabled&&navigator.vibrate)navigator.vibrate(40);
+          updateSkillButtons();return true;
+        }
+        function onScreenEnemy(e){return Math.abs(e.x-hero.x)<w/2+e.r&&Math.abs(e.y-hero.y)<h/2+e.r;}
+        function updateSkills(dt){
+          hero.dashCd=Math.max(0,(hero.dashCd||0)-dt);
+          if(hero.firestormTime>0){
+            const active=Math.min(dt,hero.firestormTime);hero.firestormTime=Math.max(0,hero.firestormTime-dt);hero.firestormCd-=active;
+            if(hero.firestormCd<=0){
+              hero.firestormCd=.3;
+              const visible=enemies.filter(e=>onScreenEnemy(e)&&!wallAt(e.x,e.y,8));
+              for(let i=0;i<3&&meteors.length<50;i++){
+                const target=i===0&&visible.length?visible[Math.floor(Math.random()*visible.length)]:null,
+                  x=target?target.x:hero.x+(Math.random()-.5)*w*.9,y=target?target.y:hero.y+(Math.random()-.5)*h*.9;
+                if(!wallAt(x,y,8))meteors.push({x,y,time:.45,r:80,damage:hero.damage*2.4,ultimate:true});
+              }
+            }
+          }
+        }
         function takeHit(amount) {
+          if(hero.dashTime>0)return 0;
           if (hero.shieldUntil > clock && hero.shieldCharges > 0) {
             sfx("block");
             hero.shieldCharges--;
@@ -4877,6 +5042,7 @@
           shake = Math.max(0, shake - dt * 20);
           flash = Math.max(0, flash - dt * 1.5);
           magnetTimer = Math.max(0, magnetTimer - dt);
+          updateSkills(dt);
           hero.inv = Math.max(0, hero.inv - dt);
           hero.cast = Math.max(0, hero.cast - dt);
           let repairDelay = hero.armorStyle === "light" ? 3.5 : hero.armorStyle === "heavy" ? 7 : 5,
@@ -4916,7 +5082,11 @@
             hero.slideY = (hero.slideY || 0) * 0.94 + dy * 0.06;
             dx = hero.slideX; dy = hero.slideY;
           } else { hero.slideX = dx; hero.slideY = dy; }
-          moveAroundWalls(
+          if(hero.dashTime>0){
+            const step=Math.min(dt,hero.dashTime)*680,parts=Math.max(1,Math.ceil(step/8));
+            for(let i=0;i<parts;i++)moveAroundWalls(hero,hero.dashX*step/parts,hero.dashY*step/parts,dt/parts);
+            hero.dashTime=Math.max(0,hero.dashTime-dt);
+          }else moveAroundWalls(
             hero,
             dx * hero.speed * (hero.hasteUntil > clock ? 1.25 : 1) * (hero.eventSlowUntil > clock && !juggernautActive() ? 0.7 : 1) * dt,
             dy * hero.speed * (hero.hasteUntil > clock ? 1.25 : 1) * (hero.eventSlowUntil > clock && !juggernautActive() ? 0.7 : 1) * dt,
@@ -5221,7 +5391,7 @@
                       (hero.chain + (shot.arcRank || 0)) * 0.1) * Math.pow(0.85, hop);
                   if (hero.poison) afflict(next, "poison", chainHit);
                   if (hero.fire) afflict(next, "burn", chainHit);
-                  damageEnemy(next, chainHit, "lightning");
+                  damageEnemy(next, chainHit, "lightning",0,false,false,!shot.ultimate);
                   seen.add(next);
                   source = next;
                 }
@@ -5234,7 +5404,7 @@
               damageEnemy(
                 victim,
                 shot.damage * (victim.type === "boss" && victim.recover > 0 ? 1.35 : 1),
-                shot.arrow ? (hero.frostBolts?"frost":"lightning") : shot.baseDamage && shot.damage > shot.baseDamage ? "neutral" :
+                shot.ultimate ? "lightning" : shot.arrow ? (hero.frostBolts?"frost":"lightning") : shot.baseDamage && shot.damage > shot.baseDamage ? "neutral" :
                   shot.element === "flame" ? "fire" : shot.element === "venom" ? "poison" :
                   shot.element ? shot.element : shot.fromHero && (hero.frostBolts || hero.weaponEffect === "frost") ? "frost" :
                   shot.fromHero && hero.weaponEffect === "venom" ? "poison" :
@@ -5242,6 +5412,7 @@
                 0,
                 !!shot.fromHero,
                 !!(shot.baseDamage && shot.damage > shot.baseDamage),
+                !shot.ultimate,
               );
               if (shot.element === "shadow" || shot.fromHero && hero.weaponEffect === "shadow")
                 hero.hp = Math.min(hero.maxHp, hero.hp + Math.min(2, Math.max(0.5, shot.damage * 0.035)));
@@ -5381,7 +5552,7 @@
                 }
               } else if (e.dash) {
                 chargerBusy = true;
-                let dashSpeed = wave >= 6 ? 520 : 410;
+                let dashSpeed = (wave >= 6 ? 520 : 410)*(e.solarBlindUntil>clock?.25:1);
                 moveAroundWalls(e, e.dash.dx * dashSpeed * dt, e.dash.dy * dashSpeed * dt, dt, true);
                 e.dash.time -= dt;
                 if (e.dash.time <= 0) e.dash = null;
@@ -5401,7 +5572,7 @@
                 dt * (e.type === "runner" ? 13 : e.type === "boss" ? 6 : 9) * Math.max(0.5, e.speed / 100);
             if (e.walking && !chargerBusy) {
               let step =
-                e.speed * (e.dazzledUntil>clock?(e.type==="boss"?.9:.5):1) *
+                e.speed * (e.solarBlindUntil>clock?.25:1) * (e.dazzledUntil>clock?(e.type==="boss"?.9:.5):1) *
                 (e.recover > 0 ? 0.4 : 1) *
                 (e.frostTime > 0
                   ? hero.evolutions?.includes("zero")
@@ -6497,6 +6668,8 @@
                 ctx.stroke();
               }
               drawEnemy(e);
+              if(e.solarBlindUntil>clock){ctx.strokeStyle="#ffe4a0";ctx.lineWidth=2;ctx.beginPath();ctx.arc(e.x,e.y-e.r-8,8,0,Math.PI*2);ctx.stroke();}
+
               if (e.shieldedByGolem) { ctx.strokeStyle = "#a8e8ff"; ctx.lineWidth = 2;
                 ctx.beginPath(); ctx.arc(e.x,e.y,e.r+4,0,7); ctx.stroke(); }
               if (e.eventElite || e.treasure) {
