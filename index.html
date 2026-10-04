@@ -604,6 +604,8 @@
         box-shadow:0 0 17px #e7b66c83,inset 0 -5px 8px #53351a88; }
       .toast { color:#ffe1a0; }
       @media (prefers-reduced-motion:reduce) { .menu-embers i,.start-prompt { animation:none; } }
+      .choice.light {border-color:#e5c46d;background:linear-gradient(135deg,#342a1b,#171b22);}
+      .choice.wind {border-color:#6fc1b4;background:linear-gradient(135deg,#1c3432,#171b22);}
     </style>
     <style>
       #dungeonMap{position:fixed;left:12px;top:142px;width:101px;height:66px;opacity:.75;z-index:4;pointer-events:none;border:1px solid #847157;border-radius:5px}
@@ -626,7 +628,7 @@
         <div class="stats">
           <span id="kills">0 KILLS</span><small id="level">LEVEL 1 · WAVE 1</small><small id="bonus"></small
           ><small id="effects"></small><small id="time">0:00</small
-          ><small class="gear" id="gear">Apprentice Staff · Cloth Robe</small>
+          ><small class="gear" id="gear">Grave Staff · Cloth Robe</small>
         </div>
       </div>
       <div class="bossbar" id="bossbar" hidden>
@@ -653,7 +655,7 @@
           <div class="bestiary" id="bestiary" hidden></div>
           <div id="choices"></div>
           <button class="menu-secondary" id="shrineBtn">UPGRADE SHRINE</button
-          ><button class="menu-secondary" id="heroBtn">HERO: CRYPT MAGE</button
+          ><button class="menu-secondary" id="heroBtn">HERO: GRAVECALLER</button
           ><button class="menu-secondary" id="menuBack" hidden>BACK TO TITLE</button
           ><button class="primary resume" id="resume" hidden>CONTINUE RUN</button
           ><button class="primary" id="start">ENTER THE CRYPT</button>
@@ -740,17 +742,22 @@
             const cw=img.naturalWidth/cols,ch=img.naturalHeight/rows;
             // The greatsword attack needs a wider final cell; cuts lie in transparent gutters.
             const cuts=file === "bloodknight" ? [0,.25,.5,.72,1] : null;
-            keys.forEach((key,i)=>registerSprite(img,key,cuts?cuts[i]*img.naturalWidth:(i%cols)*cw,
-              cuts?0:Math.floor(i/cols)*ch,cuts?(cuts[i+1]-cuts[i])*img.naturalWidth:cw,ch));
-            if(file==="heroes"||file==="bloodknight")document.querySelectorAll?.("canvas.hero-art").forEach(c=>paintHeroPortrait(c,c.dataset.hero));
+            keys.forEach((key,i)=>{
+              // Running wolves need wider cells; these cuts follow the transparent gutters.
+              const wolfCuts=file==="new-heroes"&&i>=8?[0,.23,.52,.735,1]:null,index=i%cols;
+              registerSprite(img,key,cuts?cuts[i]*img.naturalWidth:wolfCuts?wolfCuts[index]*img.naturalWidth:index*cw,
+                cuts?0:Math.floor(i/cols)*ch,cuts?(cuts[i+1]-cuts[i])*img.naturalWidth:wolfCuts?(wolfCuts[index+1]-wolfCuts[index])*img.naturalWidth:cw,ch);
+            });
+            if(file==="heroes"||file==="bloodknight"||file==="new-heroes")document.querySelectorAll?.("canvas.hero-art").forEach(c=>paintHeroPortrait(c,c.dataset.hero));
           };
           img.onerror=()=>{img.onerror=null;img.src="assets/cinematic/"+file+".png";};
           img.src="assets/cinematic/"+file+".webp";
         }
         function loadCinematicArt() {
           if(typeof Image==="undefined")return;
-          loadAtlas("heroes",4,3,["mage","mage-side","mage-back","mage-cast",
+          loadAtlas("heroes",4,3,["gravecaller","gravecaller-side","gravecaller-back","gravecaller-cast",
             "storm","storm-side","storm-back","storm-cast","ember","ember-side","ember-back","ember-cast"]);
+          loadAtlas("new-heroes",4,3,["ranger","ranger-side","ranger-back","ranger-cast","sunwarden","sunwarden-side","sunwarden-back","sunwarden-cast","wolf","wolf-side","wolf-back","wolf-cast"]);
           loadAtlas("bloodknight",4,1,["bloodknight","bloodknight-side","bloodknight-back","bloodknight-cast"]);
           loadAtlas("monsters",4,4,["ghoul","ghoul-back","runner","runner-back","brute","brute-back","caster","caster-back",
             "skeleton","skeleton-back","sentinel","sentinel-back","burrower","burrower-back","wraith","wraith-back"]);
@@ -776,7 +783,7 @@
           floors.src="assets/cinematic/floors.webp";
         }
         function paintHeroPortrait(canvas,kind) {
-          let img=art[kind]||art.mage;if(!img)return;
+          let img=art[kind]||art.gravecaller;if(!img)return;
           let g=canvas.getContext("2d");g.clearRect(0,0,canvas.width,canvas.height);
           let ih=img.naturalHeight||img.height,iw=img.naturalWidth||img.width,hh=canvas.height-12,ww=hh*iw/ih;
           g.drawImage(img,(canvas.width-ww)/2,6,ww,hh);
@@ -805,7 +812,7 @@
         function drawHeroRing(x,foot,kind) {
           let ring=heroRingCache.get(kind);
           if(!ring){
-            const colors={mage:["#b999ff","#7553be"],storm:["#9be9ff","#ffe17a"],ember:["#ffab6b","#9eec86"],bloodknight:["#c94459","#c49455"]}[kind]||["#b999ff","#7553be"];
+            const colors={gravecaller:["#b999ff","#7553be"],sunwarden:["#ffefac","#c5eee5"],ranger:["#9be9ff","#ffe17a"],ember:["#ffab6b","#9eec86"],bloodknight:["#c94459","#c49455"]}[kind]||["#b999ff","#7553be"];
             ring=surface(128,80);let g=ring.getContext("2d");
             g.translate(64,40);g.scale(1,.5);
             let glow=g.createRadialGradient(0,0,25,0,0,61);
@@ -927,15 +934,15 @@
           armor = null;
         const slotsKey = "ember-crypt-character-slots-v1";
         const activeSlotKey = "ember-crypt-active-slot-v1";
-        const blankProfile = () => ({ embers:0,total:0,upgrades:{},storm:false,ember:false,migrated:true,
+        const blankProfile = () => ({ version:2,embers:0,total:0,upgrades:{},ranger:false,sunwarden:false,bestFloor:0,ember:false,migrated:true,
           bestWave:1,bosses:0,bestEvolutions:0,imps:0,achievements:{},met:[],unlockedDepth:0,
-          bestDepth:{mage:0,storm:0,ember:0,bloodknight:0},bloodknight:false });
+          bestDepth:{gravecaller:0,ranger:0,ember:0,bloodknight:0,sunwarden:0},bloodknight:false });
         let slots = [null,null,null], activeSlot = -1, profileKey = "", saveKey = "", bestKey = "",
           slotPlayUnstored = 0, menuScreen = "start", settingsReturn = "hub", vibrationEnabled = true,
-          profile = blankProfile(), selectedHero = "mage", selectedDepth = 0, runEmbers = 0, pickupBonus = 0,
+          profile = blankProfile(), selectedHero = "gravecaller", selectedDepth = 0, runEmbers = 0, pickupBonus = 0,
           best = 0;
         const slotProfileKey = (n) => "ember-crypt-slot-" + (n+1) + "-profile";
-        const slotRunKey = (n) => "ember-crypt-slot-" + (n+1) + "-run-v10";
+        const slotRunKey = (n) => "ember-crypt-slot-" + (n+1) + "-run-v11";
         const slotBestKey = (n) => "ember-crypt-slot-" + (n+1) + "-best";
         function persistSlots() { try { localStorage.setItem(slotsKey,JSON.stringify(slots)); } catch {} }
         function migrateSingleSave() {
@@ -956,19 +963,31 @@
           } catch {}
         }
         migrateSingleSave();
+        function replacementHero(kind){return kind==="mage"?"gravecaller":kind==="storm"?"ranger":kind;}
+        function migrateHeroProfile(prior){
+          if(!prior||typeof prior!=="object")return prior;
+          prior=structuredClone(prior);prior.version=2;prior.selectedHero=replacementHero(prior.selectedHero);
+          function renameDepth(map){map={...map};for(const [old,next]of [["mage","gravecaller"],["storm","ranger"]]){map[next]=Math.max(Number(map[next])||0,Number(map[old])||0);delete map[old];}return map;}
+          prior.bestDepth=renameDepth(prior.bestDepth);
+          for(const mode of ["descent","endless"])if(prior.records?.[mode])prior.records[mode].bestDepth=renameDepth(prior.records[mode].bestDepth);
+          prior.ranger=!!(prior.ranger||prior.storm);delete prior.storm;
+          return prior;
+        }
         function applyProfile(prior) {
-          profile=blankProfile(); selectedHero="mage"; selectedDepth=0;
+          prior=migrateHeroProfile(prior);
+          profile=blankProfile(); selectedHero="gravecaller"; selectedDepth=0;
           profile.tips={};profile.records={descent:{kills:0,bestDepth:{}},endless:{kills:0,bestDepth:{}}};
           if (!prior || typeof prior!=="object") return;
           profile.tips=prior.tips&&typeof prior.tips==="object"?{...prior.tips}:{};
           for(const key of ["descent","endless"]){const record=prior.records?.[key];profile.records[key]={kills:Math.max(0,Number(record?.kills)||0),bestDepth:{...(key==="endless"?prior.bestDepth:record?.bestDepth)||{}}};if(record?.bestDepth)profile.records[key].bestDepth={...record.bestDepth};}
           profile.embers=Math.max(0,Math.floor(Number(prior.embers)||0));
           profile.total=Math.max(profile.embers,Math.floor(Number(prior.total)||0));
-          profile.storm=!!prior.storm;
+          profile.ranger=!!(prior.ranger||prior.storm)||(Number(prior.bosses)||0)>0;
+          profile.bestFloor=Math.max(0,Math.min(5,Number(prior.bestFloor)||0));profile.sunwarden=!!prior.sunwarden||profile.bestFloor>=3;
           profile.ember=!!prior.ember||profile.total>=600;
           profile.migrated=!!prior.migrated;
           profile.unlockedDepth=Math.min(20,Math.max(0,Math.floor(Number(prior.unlockedDepth)||0)));
-          for(const h of ["mage","storm","ember","bloodknight"])
+          for(const h of ["gravecaller","ranger","ember","bloodknight","sunwarden"])
             profile.bestDepth[h]=Math.min(20,Math.max(0,Math.floor(Number(prior.bestDepth?.[h])||0)));
           selectedDepth=Math.min(profile.unlockedDepth,Math.max(0,Math.floor(Number(prior.selectedDepth)||0)));
           for(const k of ["bestWave","bosses","bestEvolutions","imps"])
@@ -981,8 +1000,8 @@
           for(const k of ["power","vigor","fleet","magnet","armor","reroll"])
             profile.upgrades[k]=Math.min(5,Math.max(0,Math.floor(Number(prior.upgrades?.[k])||0)));
           profile.bloodknight=!!prior.bloodknight||profile.bosses>=3;
-          selectedHero=["storm","ember","bloodknight"].includes(prior.selectedHero)?prior.selectedHero:"mage";
-          if(selectedHero==="storm"&&!profile.storm||selectedHero==="ember"&&!profile.ember||selectedHero==="bloodknight"&&!profile.bloodknight)selectedHero="mage";
+          selectedHero=["ranger","ember","bloodknight","sunwarden"].includes(prior.selectedHero)?prior.selectedHero:"gravecaller";
+          if(selectedHero==="ranger"&&!profile.ranger||selectedHero==="ember"&&!profile.ember||selectedHero==="bloodknight"&&!profile.bloodknight||selectedHero==="sunwarden"&&!profile.sunwarden)selectedHero="gravecaller";
         }
         function selectSlot(n) {
           if (!slots[n]) return false;
@@ -995,6 +1014,7 @@
           slots[n].lastPlayed=Date.now(); persistSlots();
           try { vibrationEnabled=localStorage.getItem("ember-crypt-vibrate-"+n)!=="0"; } catch {}
           slotPlayUnstored=0; hero=null;
+          saveProfile();
           if(!profile.migrated){let previous=readRun();
             let veteran=Math.min(90,Math.floor(Math.max(best,previous?.kills||0)/30)+
               (previous?.runStats?.bosses||0)*3);
@@ -1047,7 +1067,7 @@
             prompt.onclick=()=>renderMenu("slots");menuPage.append(prompt);
             menuPage.onclick=(e)=>{if(e.target===menuPage||e.target===title)renderMenu("slots");};
           }
-          menuPage.append(menuText("span","v63 · INTO THE DEPTHS","menu-version"));
+          menuPage.append(menuText("span","v64 · HERO PROTOTYPE","menu-version"));
           if(!menuEmbers.children.length)for(let i=0;i<22;i++){
             let ember=document.createElement("i");
             ember.style.setProperty("--x",(i*47%100)+"%");
@@ -1066,21 +1086,21 @@
               let card=menuText("section","","slot-card");
               if(!slots[i])card.append(menuButton("SLOT "+(i+1)+" · + NEW CHARACTER",()=>renderNameEntry(i)));
               else {
-                let savedProfile={};try{savedProfile=JSON.parse(localStorage.getItem(slotProfileKey(i))||"{}");}catch{}
+                let savedProfile={};try{savedProfile=migrateHeroProfile(JSON.parse(localStorage.getItem(slotProfileKey(i))||"{}"));}catch{}
                 let stats=menuText("div", "✦ "+(savedProfile.embers||0)+" embers · BEST DEPTH "+(savedProfile.unlockedDepth||0)+
                   " · "+Math.floor((slots[i].playTime||0)/3600)+"h "+Math.floor(((slots[i].playTime||0)%3600)/60)+"m"+
                   " · "+new Date(slots[i].lastPlayed||Date.now()).toLocaleDateString(),"slot-stats");
-                let icon=menuText("span",savedProfile.selectedHero==="bloodknight"?"⚔":savedProfile.selectedHero==="storm"?"⚡":savedProfile.selectedHero==="ember"?"✹":"✧");
-                icon.style.color=savedProfile.selectedHero==="bloodknight"?"#c94459":savedProfile.selectedHero==="storm"?"#ffe783":savedProfile.selectedHero==="ember"?"#ff9a59":"#c89cff";
+                let icon=menuText("span",savedProfile.selectedHero==="bloodknight"?"⚔":savedProfile.selectedHero==="ranger"?"⚡":savedProfile.selectedHero==="ember"?"✹":"✧");
+                icon.style.color=savedProfile.selectedHero==="bloodknight"?"#c94459":savedProfile.selectedHero==="ranger"?"#ffe783":savedProfile.selectedHero==="ember"?"#ff9a59":"#c89cff";
                 icon.style.fontSize="24px";
                 card.append(icon,menuText("b", " SLOT "+(i+1)+" · "+slots[i].name),
-                  menuText("div", "FAVORITE · "+(heroNames[savedProfile.selectedHero]||"CRYPT MAGE"),"slot-stats"),stats,
+                  menuText("div", "FAVORITE · "+(heroNames[savedProfile.selectedHero]||"GRAVECALLER"),"slot-stats"),stats,
                   menuButton("PLAY AS "+slots[i].name,()=>{selectSlot(i);showTitleMenu();},null,"primary"));
                 let del=menuText("button","DELETE","menu-link");
                 del.onclick=()=>{del.textContent="DELETE FOREVER";
                   let warning=menuText("p","Delete "+slots[i].name+"? This can't be undone.","menu-error");
                   card.append(warning);
-                  del.onclick=()=>{for(const key of [slotProfileKey(i),slotRunKey(i),slotRunKey(i).replace(/-v10$/, "-v9"),slotBestKey(i)])localStorage.removeItem(key);
+                  del.onclick=()=>{for(const key of [slotProfileKey(i),slotRunKey(i),slotRunKey(i).replace(/-v11$/, "-v10"),slotRunKey(i).replace(/-v11$/, "-v9"),slotBestKey(i)])localStorage.removeItem(key);
                     slots[i]=null; persistSlots();if(activeSlot===i){activeSlot=-1;hero=null;localStorage.removeItem(activeSlotKey);}
                     renderMenu("slots");};};card.append(del);
               }body.append(card);
@@ -1133,7 +1153,7 @@
         function validName(value) {let v=value.trim().replace(/\s+/g," ");return /^[A-Za-z0-9 ]{1,14}$/.test(v)?v:null;}
         function renderNameEntry(slot,rename=false) {
           let body=menuBase(rename?"RENAME CHARACTER":"NEW CHARACTER",rename?"settings":"slots",
-            rename ? "1–14 letters, numbers, or spaces." : "Name your save, then enter as the Crypt Mage. More heroes unlock as you play.");
+            rename ? "1–14 letters, numbers, or spaces." : "Name your save, then enter as the Gravecaller. More heroes unlock as you play.");
           let input=document.createElement("input");input.className="menu-input";input.maxLength=14;
           input.autocomplete="off";input.placeholder="Character name";input.value=rename?slots[activeSlot].name:"";
           let error=menuText("p","","menu-error");
@@ -1184,14 +1204,15 @@
           }
           if(data.version!==1||!validName(data.name)||!data.profile||typeof data.profile!=="object"||
             !Number.isFinite(Number(data.profile.embers))||
-            data.run&&!([9,10].includes(data.run.version)&&compatibleRun(data.run,data.run.version)&&(data.run.version===9||validRunMode(data.run))&&
+            data.run&&!([9,10,11].includes(data.run.version)&&compatibleRun(data.run,data.run.version)&&(data.run.version===9||validRunMode(data.run))&&
               Number.isFinite(data.run.hero.maxHp)&&data.run.hero.maxHp>0&&
               Number.isFinite(data.run.hero.maxArmor)&&data.run.hero.maxArmor>=0&&
               data.run.enemies.every(e=>Number.isFinite(e.x)&&Number.isFinite(e.y)&&
                 Number.isFinite(e.hp)&&Number.isFinite(e.r)&&e.r>=0)&&
               data.run.drops.every(d=>Number.isFinite(d.x)&&Number.isFinite(d.y))))
             throw Error("This save code is incompatible.");
-          if(data.run?.version===9){data.run.version=10;data.run.balanceVersion=10;data.run.runMode="endless";data.run.floor=0;}
+          data.profile=migrateHeroProfile(data.profile);
+          if(data.run&&(data.run.version!==11||["mage","storm"].includes(data.run.hero.class)))data.run=migrateLineupRun(data.run);
           return data;
         }
         function renderSettings(){
@@ -1222,7 +1243,7 @@
             feedback.textContent="This replaces this slot's progress and saved run. Tap again to confirm.";
             load.onclick=()=>{
               localStorage.setItem(profileKey,JSON.stringify(data.profile));
-              if(data.run)localStorage.setItem(saveKey,JSON.stringify(data.run));else localStorage.removeItem(saveKey);
+              clearRun();if(data.run)localStorage.setItem(saveKey,JSON.stringify(data.run));
               localStorage.setItem(bestKey,String(Math.max(0,Math.floor(Number(data.best)||0))));
               slots[activeSlot].name=validName(data.name);
               slots[activeSlot].playTime=Math.max(0,Math.floor(Number(data.playTime)||0));
@@ -1232,7 +1253,7 @@
         }
         function renderHeroScreen(){
           let body=menuBase("CHOOSE YOUR HERO","hub","Swipe or tap the arrows. Depths you've unlocked are below.");
-          const heroes=["mage","storm","ember","bloodknight"];let index=heroes.indexOf(selectedHero);
+          const heroes=["gravecaller","ranger","ember","bloodknight","sunwarden"];let index=heroes.indexOf(selectedHero);
           let portrait=document.createElement("canvas");portrait.width=360;portrait.height=380;
           portrait.className="hero-art";portrait.dataset.hero=selectedHero;
           portrait.setAttribute("aria-label",heroNames[selectedHero]);body.append(portrait);paintHeroPortrait(portrait,selectedHero);
@@ -1241,9 +1262,9 @@
           const cycle=(step)=>{selectedHero=heroes[(heroes.indexOf(selectedHero)+step+heroes.length)%heroes.length];
             saveProfile();renderHeroScreen();};
           left.onclick=()=>cycle(-1);right.onclick=()=>cycle(1);row.append(left,label,right);body.append(row);
-          let unlocked=selectedHero==="mage"||!!profile[selectedHero];
+          let unlocked=selectedHero==="gravecaller"||!!profile[selectedHero];
           body.append(menuText("p",unlocked?heroTraits[selectedHero]:
-            "LOCKED · "+(selectedHero==="bloodknight"?"Defeat 3 bosses total · "+Math.min(3,profile.bosses)+"/3":selectedHero==="storm"?"Defeat a boss":"Reach wave 10 or earn 600 lifetime embers"),"menu-sub"),
+            "LOCKED · "+(selectedHero==="sunwarden"?"Reach floor 3 in The Descent":selectedHero==="bloodknight"?"Defeat 3 bosses total · "+Math.min(3,profile.bosses)+"/3":selectedHero==="ranger"?"Defeat a boss":"Reach wave 10 or earn 600 lifetime embers"),"menu-sub"),
             menuText("p",selectedMode.toUpperCase()+" · BEST DEPTH "+(profile.records?.[selectedMode]?.bestDepth[selectedHero]||0)+" · BEST KILLS "+(profile.records?.[selectedMode]?.kills||0),"menu-sub"));
           let touch=0;portrait.addEventListener("touchstart",e=>{touch=e.touches[0].clientX;},{passive:true});
           portrait.addEventListener("touchend",e=>{let shift=e.changedTouches[0].clientX-touch;if(Math.abs(shift)>35)cycle(shift<0?1:-1);},{passive:true});
@@ -1274,15 +1295,16 @@
           }
           saveProfile();
         }
-        const heroNames = { mage: "CRYPT MAGE", storm: "STORMCALLER", ember: "EMBERWEAVER", bloodknight: "BLOODKNIGHT" };
+        const heroNames = { gravecaller: "GRAVECALLER", ranger: "STORM RANGER", ember: "EMBERWEAVER", bloodknight: "BLOODKNIGHT", sunwarden:"SUNWARDEN" };
         const heroTraits = {
           bloodknight: "BLOOD + EARTH · Greatsword sweeps, bleeding wounds and stone magic",
-          mage: "ARCANE + SHADOW · Piercing staff and soul magic",
-          storm: "FROST + LIGHTNING · Chaining bolts and ice magic",
+          gravecaller: "SHADOW + ARCANE · Raise a skeleton legion from fallen foes",
+          ranger: "FROST + LIGHTNING · Longbow, hunting wolf and automatic traps",
+          sunwarden:"LIGHT + WIND · Sweeping light, healing sanctuaries and crowd control",
           ember: "FIRE + POISON · Cinder patches and blight magic",
         };
         const elementColors = { fire: "#ff9a59", poison: "#9bea7c", frost: "#a6e9ff",
-          blood: "#c94459", earth: "#c49455", lightning: "#ffe783", arcane: "#c89cff", shadow: "#ae83df", neutral: "#c4d6d5" };
+          blood: "#c94459", earth: "#c49455", light:"#ffe5a1",wind:"#a6e4d7", lightning: "#ffe783", arcane: "#c89cff", shadow: "#ae83df", neutral: "#c4d6d5" };
         const enemyMatchups = {
           ghoul: { weak: "fire" }, charger: { weak: "fire" }, runner: { weak: "shadow" },
           champion: { weak: "fire" },
@@ -1305,6 +1327,10 @@
         for(const key of ["skeleton","wraith"]) enemyMatchups[key].resist=[enemyMatchups[key].resist,"blood"];
         for(const key of ["wraith","cinderImp","charger"]) enemyMatchups[key].weak=[].concat(enemyMatchups[key].weak,"earth");
         for(const key of ["sentinel","frostGolem","burrower"]) enemyMatchups[key].resist=[].concat(enemyMatchups[key].resist,"earth");
+        for(const key of ["skeleton","wraith","heart"])enemyMatchups[key].weak=[].concat(enemyMatchups[key].weak||[],"light");
+        for(const key of ["caster","oracle"])enemyMatchups[key].resist=[].concat(enemyMatchups[key].resist||[],"light");
+        for(const key of ["runner","cinderImp","sporeSpitter"])enemyMatchups[key].weak=[].concat(enemyMatchups[key].weak||[],"wind");
+        for(const key of ["brute","sentinel","frostGolem"])enemyMatchups[key].resist=[].concat(enemyMatchups[key].resist||[],"wind");
         function matchupElements(value){return value ? [].concat(value) : [];}
         function matchupLabel(value){return matchupElements(value).join(" / ").toUpperCase()||"NONE";}
         function matchupMarkup(value){return matchupElements(value).map(element=>'<strong style="color:'+elementColors[element]+'">'+element.toUpperCase()+'</strong>').join(" / ")||"NONE";}
@@ -1367,9 +1393,10 @@
               '</strong></div>').join('');
         }
         function nextUnlock() {
-          if (!profile.storm) return "Stormcaller: defeat a boss";
-          if (!profile.bloodknight && profile.storm && profile.ember) return "Bloodknight: defeat " + Math.max(0,3-profile.bosses) + " more bosses";
+          if (!profile.ranger) return "Storm Ranger: defeat a boss";
+          if (!profile.bloodknight && profile.ranger && profile.ember) return "Bloodknight: defeat " + Math.max(0,3-profile.bosses) + " more bosses";
           if (!profile.ember) return "Emberweaver: reach wave 10 or earn " + (600 - profile.total) + " more lifetime embers";
+          if(!profile.sunwarden)return "Sunwarden: reach floor 3 in The Descent";
           let costs = shrinePowers
             .filter((u) => (profile.upgrades[u.key] || 0) < u.cap)
             .map((u) => u.cost * (1 + (profile.upgrades[u.key] || 0)));
@@ -1384,9 +1411,9 @@
           metaEl.textContent =
             "✦ " + profile.embers + " EMBERS · " + heroNames[selectedHero] +
             " · DEPTH " + selectedDepth;
-          heroBtn.textContent = profile.storm || profile.ember
+          heroBtn.textContent = profile.ranger || profile.ember
             ? "HERO: " + heroNames[selectedHero] + " · TAP TO SWITCH"
-            : "STORMCALLER · DEFEAT A BOSS";
+            : "STORM RANGER · DEFEAT A BOSS";
           heroBtn.disabled = false;
         }
         const shrinePowers = [
@@ -1474,7 +1501,7 @@
         shrineBtn.addEventListener("click", showShrine);
         menuBack.addEventListener("click", showTitleMenu);
         heroBtn.addEventListener("click", () => {
-          const available = ["mage", ...(profile.storm ? ["storm"] : []), ...(profile.ember ? ["ember"] : [])];
+          const available = ["gravecaller",...["ranger","ember","bloodknight","sunwarden"].filter(h=>profile[h])];
           selectedHero = available[(available.indexOf(selectedHero) + 1) % available.length];
           saveProfile();
           updateMeta();
@@ -1494,13 +1521,13 @@
           heading.textContent = "HERO · DEPTH " + selectedDepth + " · BEST " +
             (profile.bestDepth?.[selectedHero] || 0);
           choicesEl.append(heading);
-          for (const key of ["mage", "storm", "ember", "bloodknight"]) {
-            let unlocked = key === "mage" || !!profile[key];
+          for (const key of ["gravecaller", "ranger", "ember", "bloodknight", "sunwarden"]) {
+            let unlocked = key === "gravecaller" || !!profile[key];
             let button = document.createElement("button");
             button.className = "choice " + (selectedHero === key ? "evolution" : "shared");
             button.disabled = !unlocked;
             button.innerHTML = heroNames[key] + " · BEST DEPTH " + (profile.bestDepth?.[key] || 0) +
-              "<small>" + (unlocked ? heroTraits[key] : key === "bloodknight" ? "Defeat 3 bosses total · "+Math.min(3,profile.bosses)+"/3" : key === "storm" ? "Defeat a boss to unlock" : "Reach wave 10 or earn 600 embers") + "</small>";
+              "<small>" + (unlocked ? heroTraits[key] : key === "sunwarden" ? "Reach floor 3 in The Descent" : key === "bloodknight" ? "Defeat 3 bosses total · "+Math.min(3,profile.bosses)+"/3" : key === "ranger" ? "Defeat a boss to unlock" : "Reach wave 10 or earn 600 embers") + "</small>";
             button.onclick = () => { selectedHero = key; saveProfile(); updateMeta(); renderHeroDepthChoices(); };
             choicesEl.append(button);
           }
@@ -1609,7 +1636,7 @@
         });
         game.addEventListener("pointerdown", ensureAudio, { passive: true });
         updateSoundButton();
-        const currentRunVersion = 10;
+        const currentRunVersion = 11;
         const legacySaveKeys = [];
         const xpNeeded = (rank) => Math.round(10 + 6 * rank + 2 * rank * rank);
         function compatibleRun(saved, balance) {
@@ -1652,58 +1679,47 @@
           saved.balanceVersion = 3;
           return saved;
         }
+        function migrateLineupRun(saved){
+          if(saved.version===9){saved.runMode="endless";saved.floor=0;}
+          if(!saved.hero.class&&saved.version<11)saved.hero.class="mage";
+          const removed=["mage","storm"].includes(saved.hero.class);
+          if(removed){
+            function convert(old){
+              const h=structuredClone(old);h.class=replacementHero(h.class);
+              h.pierceBonus=0;h.blades=h.orbitRank=h.novaRank=h.iceRank=h.xpBurst=h.critSpark=0;
+              h.evolutions=(h.evolutions||[]).filter(e=>e==="shatter"&&h.class==="ranger");
+              h.minionCapacity=4;h.boneArmor=0;h.graveBurst=0;h.siphon=0;h.spiritWisps=0;h.soulLink=0;
+              h.iceTrap=0;h.shockTrap=0;h.glacierWolf=0;h.thunderVolley=false;h.shotCount=0;
+              h.baseRate=h.class==="ranger"?.20:.18;h.rate=h.baseRate/(1+(h.attackHaste||0));
+              h.hp=h.maxHp;h.armor=h.maxArmor;h.inv=2;h.cast=0;
+              return h;
+            }
+            saved.hero=convert(saved.hero);if(saved.floorCheckpoint)saved.floorCheckpoint.hero=convert(saved.floorCheckpoint.hero);
+            saved.enemies=[];saved.shots=[];saved.hazards=[];saved.pools=[];saved.drops=[];saved.zoneHazards=[];saved.dungeonEvent=null;saved.attack=0;saved.spawn=1;
+            saved.hero.finalBossSpawned=false;saved.restartReplacement=true;
+          }
+          saved.version=11;saved.balanceVersion=11;saved.companions=[];saved.heroTraps=[];saved.heroSpirits=[];saved.heroZones=[];
+          return saved;
+        }
         function readRun() {
           try {
-            let saved = JSON.parse(localStorage.getItem(saveKey) || "null");
-            const oldKey=saveKey.replace(/-v10$/, "-v9");
-            if(!saved&&oldKey!==saveKey)saved=JSON.parse(localStorage.getItem(oldKey)||"null");
-            if(saved?.version===9&&compatibleRun(saved,9)){saved.version=10;saved.balanceVersion=10;saved.runMode="endless";saved.floor=0;localStorage.setItem(saveKey,JSON.stringify(saved));localStorage.removeItem(oldKey);}
-            if(saved?.version===10&&compatibleRun(saved,10)&&validRunMode(saved))return saved;
-            if (saved) {
-              if (saved.version === 9 && compatibleRun(saved, 9)) return saved;
-              if (saved.version <= 8 && (saved.version >= 3 && compatibleRun(saved,saved.version) ||
-                  (saved.version === 1 || saved.version === 2) && migrateRun(saved))) {
-                saved.version=10; saved.balanceVersion=10; saved.runMode="endless"; saved.floor=0; saved.hero.depth ||= 0;
-                saved.hero.emberFraction ||= 0; saved.hero.relics ||= [];
-                saved.zoneHazards ||= []; saved.zoneHazardNext ||= saved.clock+10;
-                localStorage.setItem(saveKey,JSON.stringify(saved)); return saved;
-              }
-              localStorage.removeItem(saveKey);
+            let saved=null,usedKey=saveKey;
+            for(const key of [saveKey,saveKey.replace(/-v11$/,"-v10"),saveKey.replace(/-v11$/,"-v9"),...legacySaveKeys]){
+              const raw=localStorage.getItem(key);if(!raw)continue;
+              let candidate=JSON.parse(raw);
+              if([9,10,11].includes(candidate.version)&&compatibleRun(candidate,candidate.version)&&(candidate.version===9||validRunMode(candidate))){saved=candidate;usedKey=key;break;}
+              if(candidate.version<=8&&(candidate.version>=3&&compatibleRun(candidate,candidate.version)||(candidate.version===1||candidate.version===2)&&migrateRun(candidate))){candidate.runMode="endless";candidate.floor=0;candidate.hero.depth ||=0;candidate.hero.relics ||= [];saved=candidate;usedKey=key;break;}
             }
-            for (const key of legacySaveKeys) {
-              let legacy = JSON.parse(localStorage.getItem(key) || "null");
-              if (!legacy) continue;
-              localStorage.removeItem(key);
-              if ((legacy.version === 7 && compatibleRun(legacy, 7) ||
-                  legacy.version === 6 && compatibleRun(legacy, 6) ||
-                  legacy.version === 5 && compatibleRun(legacy, 5) ||
-                  legacy.version === 4 && compatibleRun(legacy, 4) ||
-                  legacy.version === 3 && compatibleRun(legacy, 3) ||
-                  (legacy.version === 1 || legacy.version === 2) && migrateRun(legacy))) {
-                legacy.version = 8;
-                legacy.balanceVersion = 8;
-                legacy.hero.depth ||= 0;
-                legacy.hero.emberFraction ||= 0;
-                legacy.zoneHazards ||= [];
-                legacy.zoneHazardNext ||= legacy.clock + 10;
-                legacy.resistedTypes ||= [];
-                legacy.hero.relics ||= [];
-                legacy.dungeonEvent ||= null;
-                localStorage.setItem(saveKey, JSON.stringify(legacy));
-                return legacy;
-              }
-            }
-            return null;
-          } catch {
-            return null;
-          }
+            if(!saved)return null;
+            if(saved.version!==11||["mage","storm"].includes(saved.hero.class))saved=migrateLineupRun(saved);
+            if(!["gravecaller","ranger","ember","bloodknight","sunwarden"].includes(saved.hero.class))return null;
+            if(saved.runMode==="descent"&&saved.floor>=3&&!profile.sunwarden){profile.bestFloor=Math.max(profile.bestFloor||0,saved.floor);profile.sunwarden=true;saveProfile();}
+            localStorage.setItem(saveKey,JSON.stringify(saved));if(usedKey!==saveKey)localStorage.removeItem(usedKey);
+            return saved;
+          }catch{return null;}
         }
         function clearRun() {
-          try {
-            localStorage.removeItem(saveKey);
-            localStorage.removeItem(saveKey.replace(/-v10$/, "-v9"));
-            for (const key of legacySaveKeys) localStorage.removeItem(key);
-          } catch {}
+          try {for(const key of [saveKey,saveKey.replace(/-v11$/,"-v10"),saveKey.replace(/-v11$/,"-v9"),...legacySaveKeys])localStorage.removeItem(key);}catch{}
         }
         function saveRun(force = false) {
           if (mode !== "play" || !hero || !Number.isFinite(clock) || (!force && clock - lastSavedClock < 4))
@@ -1712,8 +1728,9 @@
             localStorage.setItem(
               saveKey,
               JSON.stringify({
-                version: 10,
-                balanceVersion: 10,
+                version: 11,
+                balanceVersion: 11,
+                companions,heroTraps,heroSpirits,heroZones,
                 runMode, floor: dungeon?.floor || 0, floorCheckpoint,
                 hero,
                 enemies,
@@ -1759,6 +1776,7 @@
           bloodEffects = [];
           runMode=saved.runMode||"endless";best=profile.records?.[runMode]?.kills||0;dungeon=null;floorCheckpoint=saved.floorCheckpoint||null;
           hero = saved.hero;
+          companions=Array.isArray(saved.companions)?saved.companions.slice(0,16):[];heroTraps=Array.isArray(saved.heroTraps)?saved.heroTraps.slice(0,8):[];heroSpirits=Array.isArray(saved.heroSpirits)?saved.heroSpirits.slice(0,24):[];heroZones=Array.isArray(saved.heroZones)?saved.heroZones.slice(0,8):[];
           if(hero.class === "bloodknight") {
             hero.swingCount ||= 0; hero.stoneSkin ||= 0; hero.earthSpikes ||= 0;
             hero.pactNext ??= saved.clock+20; hero.pactUntil ||= 0;
@@ -1772,8 +1790,8 @@
           pickupBonus = hero.pickupBonus || 0;
           runEmbers = saved.runEmbers || 0;
           if ((saved.runStats?.bosses || 0) > 0 || saved.wave >= 10) {
-            if (!profile.storm) {
-              profile.storm = true;
+            if (!profile.ranger) {
+              profile.ranger = true;
               saveProfile();
             }
           }
@@ -1820,12 +1838,13 @@
           hero.emberFraction ||= 0;
           xpReserve = saved.xpReserve || 0;
           if(runMode==="descent")floorEntry(saved.floor||1,floorCheckpoint);
+          if(hero.class==="ranger"&&!companions.length)addWolf();
           clearWall(hero);
           for (const e of enemies) clearWall(e);
           trialChoicePending = isDescent()?0:saved.trialChoicePending || 0;
           boss = enemies.find((e) => e.type === "boss") || null;
           gearEl.textContent =
-            (weapon?.name || (hero.class === "bloodknight" ? "Notched Greatsword" : hero.class === "storm" ? "Storm Staff" : hero.class === "ember" ? "Cinder Staff" : "Apprentice Staff")) +
+            (weapon?.name || (hero.class === "bloodknight" ? "Notched Greatsword" : hero.class === "sunwarden" ? "Sun-disc Staff" : hero.class === "ranger" ? "Frost Longbow" : hero.class === "ember" ? "Cinder Staff" : "Grave Staff")) +
             " · " +
             (armor?.name || (hero.class === "bloodknight" ? "Crimson Plate" : "Cloth Robe"));
           mode = "play";
@@ -1841,6 +1860,7 @@
           if (trialChoicePending) offerTrialChoice();
           else if (dungeonEvent?.phase === "reward") offerRelic();
           else if (hero.victoryPaid && !hero.endless) showVictory();
+          else if(saved.restartReplacement)showToast("RUN RESTARTED · "+heroNames[hero.class]);
           else if(!isDescent())showToast("RUN RESUMED");
         }
         resumeBtn.addEventListener("click", restoreRun);
@@ -1866,7 +1886,7 @@
         let openingGuide = false;
         function updateOpeningGuide() {
           const message = openingGuide && clock < 30
-            ? clock < 8 ? (hero.class === "bloodknight" ? "DRAG TO FACE YOUR FOES · YOUR BLADE SWINGS AUTOMATICALLY" : "DRAG THE JOYSTICK TO MOVE · YOUR STAFF ATTACKS AUTOMATICALLY")
+            ? clock < 8 ? (hero.class === "bloodknight" ? "DRAG TO FACE YOUR FOES · YOUR BLADE SWINGS AUTOMATICALLY" : "DRAG THE JOYSTICK TO MOVE · ATTACKS ARE AUTOMATIC")
               : clock < 18 ? "COLLECT BLUE XP ORBS TO LEVEL UP AND CHOOSE POWERS"
               : "KEEP MOVING TO DODGE · PAUSE ANY TIME WITH Ⅱ"
             : "DRAG THE JOYSTICK TO MOVE · ATTACKS ARE AUTOMATIC";
@@ -1884,23 +1904,23 @@
             x: 0,
             y: 0,
             r: 14,
-            hp: (selectedHero === "bloodknight" ? 140 : selectedHero === "ember" ? 110 : 100) + 10 * (profile.upgrades.vigor || 0),
-            maxHp: (selectedHero === "bloodknight" ? 140 : selectedHero === "ember" ? 110 : 100) + 10 * (profile.upgrades.vigor || 0),
+            hp: (selectedHero === "bloodknight" ? 140 : selectedHero === "sunwarden" ? 115 : selectedHero === "ember" ? 110 : 100) + 10 * (profile.upgrades.vigor || 0),
+            maxHp: (selectedHero === "bloodknight" ? 140 : selectedHero === "sunwarden" ? 115 : selectedHero === "ember" ? 110 : 100) + 10 * (profile.upgrades.vigor || 0),
             speed: Math.round(
-              (selectedHero === "bloodknight" ? 207 : selectedHero === "storm" ? 245 : selectedHero === "ember" ? 238 : 230) * (1 + (profile.upgrades.fleet || 0) * 0.05),
+              (selectedHero === "bloodknight" ? 207 : selectedHero === "ranger" ? 305 : selectedHero === "sunwarden" ? 230 : selectedHero === "ember" ? 238 : 230) * (1 + (profile.upgrades.fleet || 0) * 0.05),
             ),
             damage: Math.round(
-              (selectedHero === "bloodknight" ? 58 : selectedHero === "storm" ? 23 : selectedHero === "ember" ? 25 : 24) * (1 + (profile.upgrades.power || 0) * 0.05),
+              (selectedHero === "bloodknight" ? 58 : selectedHero === "sunwarden" ? 18 : selectedHero === "ranger" ? 30 : selectedHero === "ember" ? 25 : 24) * (1 + (profile.upgrades.power || 0) * 0.05),
             ),
-            armor: (selectedHero === "bloodknight" ? 45 : selectedHero === "storm" ? 35 : selectedHero === "ember" ? 36 : 30) + 10 * (profile.upgrades.armor || 0),
-            maxArmor: (selectedHero === "bloodknight" ? 45 : selectedHero === "storm" ? 35 : selectedHero === "ember" ? 36 : 30) + 10 * (profile.upgrades.armor || 0),
+            armor: (selectedHero === "bloodknight" ? 45 : selectedHero === "ranger" ? 35 : selectedHero === "ember" ? 36 : 30) + 10 * (profile.upgrades.armor || 0),
+            maxArmor: (selectedHero === "bloodknight" ? 45 : selectedHero === "ranger" ? 35 : selectedHero === "ember" ? 36 : 30) + 10 * (profile.upgrades.armor || 0),
             armorBonus: 0,
             armorStyle: "cloth",
             lastHit: -99,
-            range: selectedHero === "bloodknight" ? 95 : 265,
-            baseRate: selectedHero === "bloodknight" ? 0.55 : selectedHero === "storm" ? 0.29 : selectedHero === "ember" ? 0.27 : 0.28,
+            range: selectedHero === "bloodknight" ? 95 : selectedHero === "ranger" ? 310 : 265,
+            baseRate: selectedHero === "bloodknight" ? 0.55 : selectedHero === "ranger" ? 0.20 : selectedHero === "ember" ? 0.27 : 0.18,
             attackHaste: 0,
-            rate: selectedHero === "bloodknight" ? 0.55 : selectedHero === "storm" ? 0.29 : selectedHero === "ember" ? 0.27 : 0.28,
+            rate: selectedHero === "bloodknight" ? 0.55 : selectedHero === "ranger" ? 0.20 : selectedHero === "ember" ? 0.27 : 0.18,
             critChance: 0.05,
             critMultiplier: 1.5,
             cast: 0,
@@ -1912,6 +1932,9 @@
             iceRank: 0,
             orbitRank: 0,
             frostBolts: false,
+            minionCapacity:4,boneArmor:0,graveBurst:0,siphon:0,spiritWisps:0,soulLink:0,
+            iceTrap:0,shockTrap:0,glacierWolf:0,thunderVolley:false,shotCount:0,
+            radiance:0,sanctuary:0,judgment:0,gale:0,cyclone:0,tailwind:0,beamAngle:0,
             bloodletting:0,crimsonThirst:0,berserk:false,bloodPact:false,pactNext:20,pactUntil:0,
             stoneSkin:0,shockwave:false,earthSpikes:0,quakeStep:0,swingCount:0,
             meteorCd: 0,
@@ -1920,7 +1943,7 @@
             faceY: 1,
             stepPhase: 0,
             projectiles: 1,
-            pierceBonus: selectedHero === "mage" ? 1 : 0,
+            pierceBonus: 0,
             xpBurst: 0,
             critSpark: 0,
             chain: 0,
@@ -1942,6 +1965,7 @@
             hasteUntil: 0,
             inv: 0,
           };
+          resetHeroActors();
           runStats = { damage: 0, hpLost: 0, armorBlocked: 0, bosses: 0 };
           weaponDryStreak = 0;
           enemies = [];
@@ -1970,7 +1994,7 @@
           armor = null;
           bossbar.hidden = true;
           gearEl.textContent =
-            (selectedHero === "bloodknight" ? "Notched Greatsword" : selectedHero === "storm" ? "Storm Staff" : selectedHero === "ember" ? "Cinder Staff" : "Apprentice Staff") + (selectedHero === "bloodknight" ? " · Crimson Plate" : " · Cloth Robe");
+            (selectedHero === "bloodknight" ? "Notched Greatsword" : selectedHero === "sunwarden" ? "Sun-disc Staff" : selectedHero === "ranger" ? "Frost Longbow" : selectedHero === "ember" ? "Cinder Staff" : "Grave Staff") + (selectedHero === "bloodknight" ? " · Crimson Plate" : " · Cloth Robe");
           clock = 0;
           waveClock = 0;
           spawn = 0;
@@ -2054,9 +2078,17 @@
         }
         start.addEventListener("click", () => mode === "victory" ? continueEndless() : begin());
         function allowedHeroElements(kind) {
-          return kind === "bloodknight" ? "Blood + Earth" : kind === "ember" ? "Fire + Poison" : kind === "storm" ? "Frost + Lightning" : "Arcane + Shadow";
+          return kind === "sunwarden" ? "Light + Wind" : kind === "bloodknight" ? "Blood + Earth" : kind === "ember" ? "Fire + Poison" : kind === "ranger" ? "Frost + Lightning" : "Arcane + Shadow";
         }
         const evolutionRequirements = {
+          legion:[["Raise Legion","minionCapacity",6],["Bone Armor","boneArmor",2]],
+          ossuary:[["Raise Legion","minionCapacity",5],["Soul Link","soulLink",2]],
+          soulstorm:[["Grave Burst","graveBurst",2],["Shadow Fairy","fairy:shadow",1]],
+          alpha:[["Glacier Wolf","glacierWolf",2],["Chain Shot","chain",2]],
+          blizzard:[["Ice Trap","iceTrap",2],["Frost Fairy","fairy:frost",1]],
+          dawn:[["Radiance","radiance",2],["Light Fairy","fairy:light",1]],
+          eye:[["Gale","gale",2],["Cyclone","cyclone",2]],
+          halo:[["Sanctuary","sanctuary",2],["Wind Fairy","fairy:wind",1]],
           crimson: [["Bloodletting","bloodletting",1],["Blood Fairy","fairy:blood",1]],
           tremor: [["Shockwave","shockwave",1],["Earth Spikes","earthSpikes",2]],
           juggernaut: [["Stone Skin","stoneSkin",3],["Berserk","berserk",1]],
@@ -2067,7 +2099,7 @@
           zero: [["Grave Nova", "novaRank", 2], ["Frost Fairy", "fairy:frost", 1]],
           tempest: [["Arcane Lance", "blades", 2], ["Arcane Fairy", "fairy:arcane", 1]],
           wildfire: [["Meteor Sigil", "meteorRank", 3], ["Blight Cloud", "blightRank", 2]],
-          shatter: [["Frostbite Bolts", "frostBolts", 1], ["Chain Spark", "chain", 3]],
+          shatter: [["Frost Arrows", "frostBolts", 1], ["Chain Shot", "chain", 3]],
           rift: [["Soul Harvest", "xpBurst", 1], ["Shadow Fairy", "fairy:shadow", 1]],
           veil: [["Wraith Orbit", "orbitRank", 3], ["Blood Ember", "leech", 1]],
         };
@@ -2104,8 +2136,8 @@
           descEl.textContent = heroNames[hero.class] + " · " + allowedHeroElements(hero.class) + ". Pick a power; evolution paths show your current progress.";
           start.hidden = true;
           choicesEl.replaceChildren();
-          const allowedElements = hero.class === "bloodknight" ? ["blood","earth","shared"] : hero.class === "ember" ? ["fire", "poison", "shared"] :
-            hero.class === "storm" ? ["frost", "lightning", "shared"] : ["arcane", "shadow", "shared"];
+          const allowedElements = hero.class === "sunwarden" ? ["light","wind","shared"] : hero.class === "bloodknight" ? ["blood","earth","shared"] : hero.class === "ember" ? ["fire", "poison", "shared"] :
+            hero.class === "ranger" ? ["frost", "lightning", "shared"] : ["arcane", "shadow", "shared"];
           const options = [
             {
               name: "PHASE BOLTS", element: "arcane",
@@ -2165,7 +2197,7 @@
             },
             {
               name: "Twin Flame",
-              text: hero.class === "bloodknight" ? "Add one rear swing per attack · rank " + hero.projectiles + "/5" : "Fire one extra bolt · rank " + hero.projectiles + "/5 · Ember Barrage after 3 extra bolts",
+              text: hero.class === "bloodknight" ? "Add one rear swing per attack · rank " + hero.projectiles + "/5" : (hero.class==="sunwarden"?"Widen the light beam · rank ":hero.class==="ranger"?"Fire one extra arrow · rank ":"Fire one extra bolt · rank ") + hero.projectiles + "/5 · Ember Barrage after 3 extra bolts",
               available: () => hero.projectiles < 6,
               apply: () => (hero.projectiles = Math.min(6, hero.projectiles + 1)),
             },
@@ -2183,28 +2215,13 @@
               available: () => hero.critMultiplier < 2.5,
               apply: () => (hero.critMultiplier = Math.min(2.5, hero.critMultiplier + 0.25)),
             },
-            { name: "Heavy Strikes", element: "shared", text: (hero.class === "bloodknight" ? "+8% blade damage · rank " : "+8% staff damage · rank ") + ((hero.heavyRank || 0) + 1) + "/3", available: () => (hero.heavyRank || 0) < 3,
+            { name: "Heavy Strikes", element: "shared", text: (hero.class === "bloodknight" ? "+8% blade damage · rank " : "+8% attack and companion damage · rank ") + ((hero.heavyRank || 0) + 1) + "/3", available: () => (hero.heavyRank || 0) < 3,
               apply: () => { hero.heavyRank = (hero.heavyRank || 0) + 1; hero.damage = Math.round(hero.damage * 1.08); } },
             { name: "Fleet Foot", element: "shared", text: "+10 movement speed · rank " + ((hero.fleetRank || 0) + 1) + "/3", available: () => (hero.fleetRank || 0) < 3,
               apply: () => { hero.fleetRank = (hero.fleetRank || 0) + 1; hero.speed += 10; } },
-            { name: "Long Reach", element: "shared", text: (hero.class === "bloodknight" ? "+25 swing radius · rank " : "+25 bolt range · rank ") + ((hero.reachRank || 0) + 1) + "/3", available: () => (hero.reachRank || 0) < 3,
+            { name: "Long Reach", element: "shared", text: (hero.class === "bloodknight" ? "+25 swing radius · rank " : "+25 attack range · rank ") + ((hero.reachRank || 0) + 1) + "/3", available: () => (hero.reachRank || 0) < 3,
               apply: () => { hero.reachRank = (hero.reachRank || 0) + 1; hero.range += 25; } },
-          ].filter((o) => (!o.available || o.available()) && (!o.element || allowedElements.includes(o.element)));
-          if (hero.class === "storm" && hero.chain < 4) {
-            let rank = hero.chain + 1,
-              jumps = rank + 1,
-              pct = 45 + rank * 10;
-            options.push({
-              element: "lightning", name: "Chain Spark " + ["I", "II", "III", "IV"][rank - 1],
-              text:
-                jumps +
-                " extra enemies · " +
-                pct +
-                "% first-jump damage" +
-                (rank === 4 ? " · pairs with Lightning Fairy" : ""),
-              apply: () => (hero.chain = rank),
-            });
-          }
+          ].filter((o) => (!o.available || o.available()) && (!o.element || allowedElements.includes(o.element)) && prototypeCardAllowed(o));
           if (hero.class === "ember" && !hero.poison)
             options.push({
               name: "Venom Bolts", element: "poison",
@@ -2217,16 +2234,13 @@
               text: "Hits ignite enemies · pairs with Flame Fairy for Inferno",
               apply: () => (hero.fire = true),
             });
-          if (hero.class === "storm" && !hero.frostBolts)
-            options.push({ name: "FROSTBITE BOLTS", element: "frost", text: "Staff bolts chill foes · pairs with Chain Spark III for Shatterstorm",
-              apply: () => (hero.frostBolts = true) });
           const spellChoices = [
             {rank:hero.earthSpikes||0,element:"earth",name:"Earth Spikes",
               description:"Spikes erupt under clustered foes every 3.5s",key:"earthSpikes"},
             {
               rank: hero.blades || 0, element: "arcane",
               name: "ARCANE LANCE",
-              description: "Violet piercing beam · rank II pairs with Arcane Fairy",
+              description: "Violet piercing beam strikes enemies in a line",
               key: "blades",
             },
             {
@@ -2248,7 +2262,7 @@
               key: "novaRank",
             },
           ]
-            .filter((o) => o.rank < 3 && allowedElements.includes(o.element))
+            .filter((o) => o.rank < 3 && allowedElements.includes(o.element) && prototypeCardAllowed(o))
             .map((o) => ({
               name: o.name + " " + ["I", "II", "III"][o.rank], element: o.element,
               text: o.description + " · rank " + (o.rank + 1) + "/3",
@@ -2267,10 +2281,12 @@
             {name:"Shockwave",element:"earth",text:"Every 4th swing sends a ground wave forward",available:()=>!hero.shockwave,apply:()=>hero.shockwave=true},
             {name:"Quake Step",element:"earth",text:"While moving, tremors hit nearby foes every 0.8s · rank "+((hero.quakeStep||0)+1)+"/3",available:()=> (hero.quakeStep||0)<3,apply:()=>hero.quakeStep=(hero.quakeStep||0)+1},
           ].filter(o=>o.available()));
-          options.push(...spellChoices);
+          options.push(...prototypeCards(),...spellChoices);
           const fairyChoices =
             level >= 5
               ? [
+                  {kind:"light",element:"light",name:"Light Fairy",text:"Holy pulses strike foes"},
+                  {kind:"wind",element:"wind",name:"Wind Fairy",text:"Wind pulses damage and push foes"},
                   {kind:"blood",element:"blood",name:"Blood Fairy",text:"Blood pulses strike a nearby foe · pairs with Bloodletting for Crimson Tide"},
                   {kind:"earth",element:"earth",name:"Earth Fairy",text:"Stone pulses damage and briefly stun a nearby foe"},
                   {
@@ -2281,7 +2297,7 @@
                   {
                     kind: "frost", element: "frost",
                     name: "Frost Fairy",
-                    text: "Icy bolts · pairs with Grave Nova II for Absolute Zero",
+                    text: hero.class==="ranger"?"Icy bolts · pairs with Ice Trap II for Blizzard Line":"Icy bolts · pairs with Grave Nova II for Absolute Zero",
                   },
                   {
                     kind: "venom", element: "poison",
@@ -2291,14 +2307,14 @@
                   {
                     kind: "arcane", element: "arcane",
                     name: "Arcane Fairy",
-                    text: "Piercing beams · pairs with Arcane Lance II for Arcane Tempest",
+                    text: hero.class==="gravecaller"?"Piercing beams support your skeleton legion":"Piercing beams · pairs with Arcane Lance II for Arcane Tempest",
                   },
                   { kind: "shadow", element: "shadow", name: "Shadow Fairy",
-                    text: "Dark bolts heal you on hit · pairs with Soul Harvest for Soul Rift" },
+                    text: hero.class==="gravecaller"?"Dark bolts heal on hit · pairs with Grave Burst II for Soul Storm":"Dark bolts heal you on hit · pairs with Soul Harvest for Soul Rift" },
                   {
                     kind: "lightning", element: "lightning",
                     name: "Lightning Fairy",
-                    text: "Electric strikes · pairs with Chain Spark IV for Storm Crown",
+                    text: hero.class==="ranger"?"Electric strikes jump between nearby foes":"Electric strikes · pairs with Chain Spark IV for Storm Crown",
                   },
                 ]
                   .filter((f) => allowedElements.includes(f.element) && !hero.fairies.includes(f.kind))
@@ -2314,6 +2330,7 @@
           options.push(...fairyChoices);
           const owned = hero.evolutions || [],
             evolutionPaths = [
+              ...prototypeEvolutions(),
               {key:"crimson",element:"blood",name:"CRIMSON TIDE",text:"Kills burst into blood waves that damage nearby foes and heal you",ready:evolutionReady("crimson")},
               {key:"tremor",element:"earth",name:"TREMOR",text:"Every 5th swing shakes the earth, damaging and briefly stunning nearby foes",ready:evolutionReady("tremor")},
               {key:"juggernaut",element:"earth",name:"JUGGERNAUT",text:"Below 50% HP: immune to slows and stuns · armor repairs 3× faster",ready:evolutionReady("juggernaut")},
@@ -2366,7 +2383,7 @@
                 text: "Orbiting skulls restore health on kills",
                 ready: evolutionReady("veil") },
             ]
-              .filter((o) => allowedElements.includes(o.element) && (hero.class !== "bloodknight" || o.key !== "barrage") && !owned.includes(o.key));
+              .filter((o) => allowedElements.includes(o.element) && (hero.class !== "bloodknight" || o.key !== "barrage") && prototypeEvolutionAllowed(o.key) && !owned.includes(o.key));
           const evolutionChoices = evolutionPaths.filter((o) => o.ready)
               .map((o) => ({
                 name: "EVOLUTION · " + o.name, element: o.element,
@@ -2619,12 +2636,12 @@
             let bonus = Math.round(
                 (slot === "weapon" ? weaponBase : armorBase * (style === "heavy" ? 1.3 : 0.85)) * rarity.mult,
               ),
-              effect = slot === "weapon" ? ({ mage: ["pierce", "shadow"], storm: ["arc", "frost"],
+              effect = slot === "weapon" ? ({ gravecaller: ["pierce", "shadow"], ranger: ["arc", "frost"], sunwarden:["light","wind"],
                 ember: ["ember", "venom"], bloodknight: ["blood", "earth"] }[hero.class] || ["pierce"])[Math.floor(Math.random() * 2)] : null,
               effectRank = slot === "weapon" ? Math.max(1, rarities.indexOf(rarity) - 1) : 0,
               baseName =
                 slot === "weapon"
-                  ? hero.class === "bloodknight" ? ["Notched Greatsword", "Crimson Cleaver", "Stonebreaker"][i] : drop.variant === "colossus"
+                  ? hero.class === "ranger" ? ["Ash Longbow","Froststring Bow","Thunderwood Bow"][i] : hero.class === "sunwarden" ? ["Sun-disc Staff","Dawn Scepter","Gale Crook"][i] : hero.class === "bloodknight" ? ["Notched Greatsword", "Crimson Cleaver", "Stonebreaker"][i] : drop.variant === "colossus"
                     ? ["Cinder Maul", "Lava Staff", "Magma Scepter"][i]
                     : drop.variant === "oracle"
                       ? ["Rift Staff", "Oracle Wand", "Void Scepter"][i]
@@ -2680,6 +2697,8 @@
                   Math.round(hero.damage + delta) +
                   "<br>" +
                   {
+                    light:"RADIANT FOCUS " + effectRank + " · wider beam",
+                    wind:"GUST FORCE " + effectRank + " · stronger knockback",
                     blood: "BLEEDING EDGE " + effectRank,
                     earth: "STONE IMPACT " + effectRank,
                     pierce: "PIERCE " + effectRank + " extra",
@@ -2705,7 +2724,7 @@
                 armor = item;
               }
               gearEl.textContent =
-                (weapon?.name || (hero.class === "bloodknight" ? "Notched Greatsword" : "Apprentice Staff")) + " · " + (armor?.name || (hero.class === "bloodknight" ? "Crimson Plate" : "Cloth Robe"));
+                (weapon?.name || (hero.class === "bloodknight" ? "Notched Greatsword" : "Grave Staff")) + " · " + (armor?.name || (hero.class === "bloodknight" ? "Crimson Plate" : "Cloth Robe"));
               panel.classList.add("hidden");
               mode = "play";
               updateHud();
@@ -2835,7 +2854,7 @@
             " kills · HP lost: " +
             Math.round(runStats.hpLost) +
             " · " +
-            (weapon?.name || (hero.class === "bloodknight" ? "Notched Greatsword" : hero.class === "storm" ? "Storm Staff" : hero.class === "ember" ? "Cinder Staff" : "Apprentice Staff")) +
+            (weapon?.name || (hero.class === "bloodknight" ? "Notched Greatsword" : hero.class === "sunwarden" ? "Sun-disc Staff" : hero.class === "ranger" ? "Frost Longbow" : hero.class === "ember" ? "Cinder Staff" : "Grave Staff")) +
             " / " +
             (armor?.name || (hero.class === "bloodknight" ? "Crimson Plate" : "Cloth Robe")) +
             ' · <span class="next-unlock">NEXT: ' + nextUnlock() + '</span>';
@@ -3469,7 +3488,8 @@
             xp=checkpoint.xp;needed=checkpoint.needed;weapon=structuredClone(checkpoint.weapon);armor=structuredClone(checkpoint.armor);
             runStats=structuredClone(checkpoint.runStats);runEmbers=checkpoint.runEmbers;xpReserve=checkpoint.xpReserve;
           }
-          buildFloor(number);hero.x=400;hero.y=800;hero.inv=2;hero.finalBossSpawned=false;
+          if(runMode==="descent"){profile.bestFloor=Math.max(profile.bestFloor||0,number);if(number>=3&&!profile.sunwarden){profile.sunwarden=true;showToast("SUNWARDEN UNLOCKED");}saveProfile();}
+          buildFloor(number);hero.x=400;hero.y=800;resetHeroActors();hero.inv=2;hero.finalBossSpawned=false;
           hero.pactNext=clock+20;hero.pactUntil=0;
           enemies=[];shots=[];hazards=[];pools=[];drops=[];zoneHazards=[];meteors=[];bloodEffects=[];boss=null;
           dungeonEvent=null;trialChoicePending=0;spawn=1;attack=0;waveClock=0;wave=1+(number-1)*4;
@@ -3977,6 +3997,203 @@
           }
           ctx.restore();
         }
+        // Prototype actors are separate from hostile enemies and never award XP on death.
+        let companions=[],heroTraps=[],heroSpirits=[],heroZones=[],companionId=0;
+        const friendlyTintCache=new WeakMap();
+        function resetHeroActors(){
+          companions=[];heroTraps=[];heroSpirits=[];heroZones=[];
+          if(!hero)return;
+          hero.trapCd=2;hero.wolfCd=0;hero.gustCd=3;hero.beamTick=0;hero.stillTime=0;hero.sanctuaryCd=0;hero.judgmentCd=1;hero.cycloneCd=1;
+          if(hero.class==="ranger")addWolf();
+        }
+        function skeletonCap(){return Math.min(16,(hero.minionCapacity||4)*(hero.evolutions.includes("legion")?2:1));}
+        function raiseMinion(x,y){
+          if(companions.filter(p=>p.kind==="skeleton").length>=skeletonCap())return false;
+          const max=120*(1+.4*(hero.boneArmor||0));
+          const p={id:++companionId,kind:"skeleton",x,y,r:12,hp:max,max,life:25,cd:.3,speed:270,faceX:0,faceY:1,stepPhase:0};clearWall(p);companions.push(p);
+          burst(x,y,"#cba4ff",6);return true;
+        }
+        function addWolf(){
+          const max=90+12*(hero.glacierWolf||0);const p={id:++companionId,kind:"wolf",x:hero.x-26,y:hero.y+20,r:13,hp:max,max,life:999999,cd:0,speed:285,faceX:1,faceY:0,stepPhase:0};clearWall(p);companions.push(p);
+        }
+        function nearestVisible(x,y,range){
+          let target=null,best=range;for(const e of enemies){const d=Math.hypot(e.x-x,e.y-y);if(e.hp>0&&d<best&&!segmentBlocked(x,y,e.x,e.y)){target=e;best=d;}}return target;
+        }
+        function pushEnemy(e,x,y,force){
+          if(!enemies.includes(e))return;const d=Math.hypot(e.x-x,e.y-y)||1,scale=e.type==="boss"?.2:1;
+          moveAroundWalls(e,(e.x-x)/d*force*scale,(e.y-y)/d*force*scale,.025);
+        }
+        function prototypeArea(x,y,r,amount,element){
+          for(const e of [...enemies])if(Math.hypot(e.x-x,e.y-y)<r+e.r&&!segmentBlocked(x,y,e.x,e.y))damageEnemy(e,amount,element);
+          rings.push({x,y,r:8,speed:r*3,life:.3,color:elementColors[element]});
+        }
+        function loseCompanion(p){
+          const index=companions.indexOf(p);if(index<0)return;companions.splice(index,1);
+          if(p.kind==="wolf"){hero.wolfCd=3;return;}
+          if(hero.graveBurst)prototypeArea(p.x,p.y,65,hero.damage*.45*hero.graveBurst,"shadow");
+          if(hero.evolutions.includes("soulstorm"))for(let i=0;i<3&&heroSpirits.length<24;i++)heroSpirits.push({x:p.x,y:p.y,life:2.5,damage:hero.damage*.45,angle:i*2.1});
+        }
+        function companionWaypoint(p,target,dt){
+          if(!isDescent()||!segmentBlocked(p.x,p.y,target.x,target.y,p.r))return target;
+          p.pathCd=(p.pathCd||0)-dt;
+          if(p.pathCd<=0){
+            p.pathCd=.6;const start=dungeonCell(p.x,p.y),goal=dungeonCell(target.x,target.y),queue=[start],parent=new Map([[start,null]]);
+            for(let i=0;i<queue.length&&!parent.has(goal);i++){const [x,y]=queue[i].split(",").map(Number);for(const [dx,dy]of [[1,0],[-1,0],[0,1],[0,-1]]){const key=(x+dx)+","+(y+dy);if(!parent.has(key)&&!dungeonSolid(x+dx,y+dy)){parent.set(key,queue[i]);queue.push(key);}}}
+            let key=goal;if(parent.has(key)){while(parent.get(key)&&parent.get(key)!==start)key=parent.get(key);const [x,y]=key.split(",").map(Number);p.waypoint={x:(x+.5)*80,y:(y+.5)*80};}else p.waypoint=null;
+          }return p.waypoint||target;
+        }
+        function nearbyAlly(e){
+          if(e.type==="boss"||e.treasure)return null;
+          let ally=null,best=180;for(const p of companions){const d=Math.hypot(p.x-e.x,p.y-e.y);if(p.hp>0&&d<best&&!segmentBlocked(e.x,e.y,p.x,p.y)){ally=p;best=d;}}return ally;
+        }
+        function updateCompanions(dt){
+          if(hero.class==="ranger"){
+            hero.wolfCd=Math.max(0,(hero.wolfCd||0)-dt);
+            const needed=hero.evolutions.includes("alpha")?2:1;
+            if(companions.filter(p=>p.kind==="wolf").length<needed&&hero.wolfCd<=0){addWolf();hero.wolfCd=3;}
+          }
+          if(hero.evolutions.includes("ossuary")){
+            const bones=companions.filter(p=>p.kind==="skeleton");
+            if(bones.length>=5&&companions.filter(p=>p.kind==="giant").length<2){const selected=bones.slice(0,5),x=selected.reduce((v,p)=>v+p.x,0)/5,y=selected.reduce((v,p)=>v+p.y,0)/5;companions=companions.filter(p=>!selected.includes(p));const max=160*(1+.4*(hero.boneArmor||0)),p={id:++companionId,kind:"giant",x,y,r:24,hp:max,max,life:15,cd:0,speed:165,faceX:0,faceY:1,stepPhase:0};clearWall(p);companions.push(p);burst(p.x,p.y,"#cba4ff",16);}
+          }
+          for(const p of [...companions]){
+            p.life-=dt;p.cd-=dt;p.inv=Math.max(0,(p.inv||0)-dt);
+            if(p.hp<=0||p.life<=0){loseCompanion(p);continue;}
+            const target=Math.hypot(p.x-hero.x,p.y-hero.y)<340?nearestVisible(p.x,p.y,p.kind==="wolf"?340:350):null,follow=target||hero;
+            const waypoint=companionWaypoint(p,follow,dt),dx=waypoint.x-p.x,dy=waypoint.y-p.y,d=Math.hypot(dx,dy)||1;
+            p.faceX=dx/d;p.faceY=dy/d;p.walking=target?d>p.r+target.r+7:d>45;
+            if(p.walking){p.stepPhase+=dt*12;const step=Math.min(d,p.speed*dt);moveAroundWalls(p,dx/d*step,dy/d*step,dt);}
+            if(target&&Math.hypot(target.x-p.x,target.y-p.y)<p.r+target.r+15&&p.cd<=0&&!segmentBlocked(p.x,p.y,target.x,target.y)){
+              p.cd=(p.kind==="giant"?1.1:p.kind==="wolf"?.7:.85)/(1+hero.attackHaste);
+              let power=hero.damage*(p.kind==="giant"?1.7:p.kind==="wolf"?.85:1.3);
+              if(hero.soulLink&&Math.hypot(p.x-hero.x,p.y-hero.y)<150)power*=1+.2*hero.soulLink;
+              if(p.kind==="wolf"&&hero.glacierWolf)afflict(target,"frost",power);
+              damageEnemy(target,power,p.kind==="wolf"?"frost":"shadow");
+              p.cast=.18;
+              if(hero.siphon&&p.kind!=="wolf")hero.hp=Math.min(hero.maxHp,hero.hp+.35*hero.siphon);
+              if(p.kind==="giant")prototypeArea(p.x,p.y,65,power*.35,"shadow");
+              if(p.kind==="wolf"&&hero.evolutions.includes("alpha")){const next=enemies.find(e=>e!==target&&Math.hypot(e.x-target.x,e.y-target.y)<130&&!segmentBlocked(target.x,target.y,e.x,e.y));if(next&&next!==target){arcs.push({x1:target.x,y1:target.y,x2:next.x,y2:next.y,life:.23,electric:true});damageEnemy(next,hero.damage*.4,"lightning");}}
+            }
+            p.cast=Math.max(0,(p.cast||0)-dt);
+            // Hostile contact can kill allies; it doesn't consume the hero's invulnerability.
+            const foe=enemies.find(e=>Math.hypot(e.x-p.x,e.y-p.y)<e.r+p.r&&!segmentBlocked(p.x,p.y,e.x,e.y));
+            if(foe&&p.inv<=0){p.hp-=foe.type==="boss"?28:foe.type==="brute"?18:9;p.inv=.8;if(p.hp<=0)loseCompanion(p);}
+          }
+        }
+        function fireRanger(){
+          const target=nearestVisible(hero.x,hero.y,hero.range);if(!target)return;
+          hero.shotCount=(hero.shotCount||0)+1;const angle=Math.atan2(target.y-hero.y,target.x-hero.x),fan=hero.thunderVolley&&hero.shotCount%6===0;
+          const offsets=fan?[-.32,-.16,0,.16,.32]:[0];
+          const aimAngles=offsets.map(offset=>angle+offset),targets=enemies.filter(e=>Math.hypot(e.x-hero.x,e.y-hero.y)<hero.range&&!segmentBlocked(hero.x,hero.y,e.x,e.y)).sort((a,b)=>Math.hypot(a.x-hero.x,a.y-hero.y)-Math.hypot(b.x-hero.x,b.y-hero.y));
+          for(let i=1;i<hero.projectiles;i++){const other=targets[Math.min(i,targets.length-1)];aimAngles.push(Math.atan2(other.y-hero.y,other.x-hero.x));}
+          for(const a of aimAngles){const crit=Math.random()<hero.critChance;shots.push({x:hero.x,y:hero.y,vx:Math.cos(a)*670,vy:Math.sin(a)*670,life:Math.max(.6,hero.range/670+.1),damage:hero.damage*(crit?hero.critMultiplier:1),baseDamage:hero.damage,fromHero:true,arrow:true,chain:hero.chain>0||hero.weaponEffect==="arc",arcRank:hero.weaponEffect==="arc"?hero.weaponRank:0,pierceLeft:0,splash:false,color:hero.frostBolts?"#a6e9ff":"#ffe783"});}
+          hero.aimX=Math.cos(angle);hero.aimY=Math.sin(angle);
+          if(!hero.moving){hero.faceX=hero.aimX;hero.faceY=hero.aimY;}hero.cast=.18;attack=hero.rate;sfx("shoot");
+        }
+        function updateTraps(dt){
+          hero.trapCd=(hero.trapCd||0)-dt;
+          if(hero.class==="ranger"&&hero.moving&&hero.trapCd<=0){hero.trapCd=2.8;heroTraps.push({x:hero.x,y:hero.y,life:12,r:32+(hero.iceTrap||0)*6});if(heroTraps.length>8)heroTraps.shift();}
+          for(const t of [...heroTraps]){t.life-=dt;const foe=nearestVisible(t.x,t.y,t.r+20);if(t.life<=0){heroTraps.splice(heroTraps.indexOf(t),1);continue;}if(!foe)continue;
+            for(const e of [...enemies])if(Math.hypot(e.x-t.x,e.y-t.y)<t.r+e.r&&!segmentBlocked(t.x,t.y,e.x,e.y)){
+              afflict(e,"frost",hero.damage*.4);e.stunUntil=Math.max(e.stunUntil||0,clock+.35+.3*(hero.iceTrap||0));
+              damageEnemy(e,hero.damage*(.45+.15*(hero.iceTrap||0)),"frost");if(hero.shockTrap)damageEnemy(e,hero.damage*.4*hero.shockTrap,"lightning");
+            }rings.push({x:t.x,y:t.y,r:8,speed:140,life:.3,color:hero.shockTrap?"#ffe783":"#a6e9ff"});heroTraps.splice(heroTraps.indexOf(t),1);
+          }
+          if(hero.evolutions.includes("blizzard")){
+            hero.trapLinkCd=(hero.trapLinkCd||0)-dt;if(hero.trapLinkCd<=0){hero.trapLinkCd=.5;for(let i=1;i<heroTraps.length;i++){const a=heroTraps[i-1],b=heroTraps[i],length=Math.hypot(b.x-a.x,b.y-a.y);if(length>700||length<1||segmentBlocked(a.x,a.y,b.x,b.y))continue;for(const e of [...enemies]){const along=((e.x-a.x)*(b.x-a.x)+(e.y-a.y)*(b.y-a.y))/(length*length);if(along>=0&&along<=1&&Math.abs((e.x-a.x)*(b.y-a.y)-(e.y-a.y)*(b.x-a.x))/length<e.r+10&&!segmentBlocked(a.x,a.y,e.x,e.y)){afflict(e,"frost",hero.damage*.2);e.stunUntil=Math.max(e.stunUntil||0,clock+.25);damageEnemy(e,hero.damage*.2,"frost");}}}}
+          }
+        }
+        function beamWidth(){return 60+(hero.radiance||0)*10+(hero.projectiles-1)*2+(hero.weaponEffect==="light"?hero.weaponRank*4:0);}
+        function beamEnds(){
+          const beams=[],count=hero.evolutions.includes("dawn")?3:1;
+          for(let i=0;i<count;i++){const angle=(hero.beamAngle||0)+i*Math.PI*2/3,range=hero.range;let length=range;
+            if(isDescent())for(let d=8;d<=range;d+=8)if(wallAt(hero.x+Math.cos(angle)*d,hero.y+Math.sin(angle)*d,2)){length=d-8;break;}
+            beams.push({angle,length,x:hero.x+Math.cos(angle)*length,y:hero.y+Math.sin(angle)*length});
+          }return beams;
+        }
+        function sunHit(e,amount,element){const crit=Math.random()<hero.critChance;damageEnemy(e,amount*(crit?hero.critMultiplier:1),element,0,false,crit);}
+        function updateSunwarden(dt){
+          hero.hp=Math.min(hero.maxHp,hero.hp+4.0*dt);
+          hero.beamAngle=(hero.beamAngle||0)+dt*1.4;
+          hero.beamTick=(hero.beamTick||0)-dt;
+          if(hero.beamTick<=0){hero.beamTick=.08/(1+hero.attackHaste);for(const beam of beamEnds())for(const e of [...enemies]){const dx=e.x-hero.x,dy=e.y-hero.y,along=dx*Math.cos(beam.angle)+dy*Math.sin(beam.angle),across=Math.abs(dx*Math.sin(beam.angle)-dy*Math.cos(beam.angle));if(along>=0&&along<beam.length+e.r&&across<e.r+beamWidth()&&!segmentBlocked(hero.x,hero.y,e.x,e.y)){e.dazzledUntil=clock+.8;sunHit(e,hero.damage*.65,"light");}}}
+          hero.gustCd-=dt;if(hero.gustCd<=0){hero.gustCd=1.4;const eye=hero.evolutions.includes("eye"),radius=eye?220:180;for(const e of [...enemies])if(Math.hypot(e.x-hero.x,e.y-hero.y)<radius+e.r&&!segmentBlocked(hero.x,hero.y,e.x,e.y)){pushEnemy(e,hero.x,hero.y,150+25*(hero.gale||0)+(hero.weaponEffect==="wind"?hero.weaponRank*8:0));sunHit(e,hero.damage*(eye?1.0:.65),"wind");}rings.push({x:hero.x,y:hero.y,r:20,speed:radius*2,life:.55,color:elementColors.wind});hero.cast=.18;}
+          hero.stillTime=hero.moving?0:(hero.stillTime||0)+dt;hero.sanctuaryCd=Math.max(0,hero.sanctuaryCd-dt);
+          if(hero.sanctuary&&hero.stillTime>=1.2&&hero.sanctuaryCd<=0){hero.sanctuaryCd=6;heroZones.push({kind:"sanctuary",x:hero.x,y:hero.y,r:66,life:4});if(heroZones.length>8)heroZones.shift();}
+          hero.judgmentCd-=dt;if(hero.judgment&&hero.judgmentCd<=0){const elite=enemies.find(e=>(e.type==="boss"||e.eventElite)&&Math.hypot(e.x-hero.x,e.y-hero.y)<hero.range&&!segmentBlocked(hero.x,hero.y,e.x,e.y));if(elite){hero.judgmentCd=4;heroZones.push({kind:"pillar",x:elite.x,y:elite.y,r:28,life:.6});damageEnemy(elite,hero.damage*.7*hero.judgment,"light");}}
+          hero.cycloneCd-=dt;if(hero.cyclone&&hero.cycloneCd<=0){hero.cycloneCd=8;heroZones.push({kind:"cyclone",x:hero.x,y:hero.y,r:55,life:5,tick:0,angle:hero.beamAngle});}
+          for(const zone of [...heroZones]){zone.life-=dt;if(zone.life<=0){heroZones.splice(heroZones.indexOf(zone),1);continue;}
+            if(zone.kind==="sanctuary"){if(hero.evolutions.includes("halo")){zone.x=hero.x;zone.y=hero.y;}if(Math.hypot(hero.x-zone.x,hero.y-zone.y)<zone.r)hero.hp=Math.min(hero.maxHp,hero.hp+(1+hero.sanctuary)*dt);}
+            if(zone.kind==="cyclone"){const target=nearestVisible(zone.x,zone.y,250),a=target?Math.atan2(target.y-zone.y,target.x-zone.x):zone.angle+Math.sin(clock)*.8;const o={x:zone.x,y:zone.y,r:8};moveAroundWalls(o,Math.cos(a)*45*dt,Math.sin(a)*45*dt,dt);zone.x=o.x;zone.y=o.y;for(const e of enemies)if(Math.hypot(e.x-zone.x,e.y-zone.y)<zone.r+e.r&&!segmentBlocked(zone.x,zone.y,e.x,e.y))pushEnemy(e,zone.x,zone.y,-40*dt);zone.tick-=dt;if(zone.tick<=0){zone.tick=.5;prototypeArea(zone.x,zone.y,zone.r,hero.damage*.18*hero.cyclone,"wind");}}
+          }
+        }
+        function updatePrototypeHeroes(dt){
+          updateCompanions(dt);if(hero.class==="ranger")updateTraps(dt);if(hero.class==="sunwarden")updateSunwarden(dt);
+          if(hero.class==="gravecaller"&&hero.spiritWisps){hero.wispTick=(hero.wispTick||0)-dt;if(hero.wispTick<=0){hero.wispTick=.55;for(let i=0;i<hero.spiritWisps;i++){const a=clock*1.8+i*Math.PI*2/hero.spiritWisps,x=hero.x+Math.cos(a)*75,y=hero.y+Math.sin(a)*75;if(segmentBlocked(hero.x,hero.y,x,y))continue;const target=nearestVisible(x,y,35);if(target)damageEnemy(target,hero.damage*.35,"arcane");}}}
+          for(const spirit of [...heroSpirits]){spirit.life-=dt;const target=nearestVisible(spirit.x,spirit.y,400);if(target){const d=Math.hypot(target.x-spirit.x,target.y-spirit.y)||1,step=Math.min(d,300*dt);spirit.x+=(target.x-spirit.x)/d*step;spirit.y+=(target.y-spirit.y)/d*step;if(d<target.r+8){damageEnemy(target,spirit.damage,"shadow");spirit.life=0;}}if(spirit.life<=0)heroSpirits.splice(heroSpirits.indexOf(spirit),1);}
+        }
+        function prototypeCardAllowed(o){
+          if(!["gravecaller","ranger","sunwarden"].includes(hero.class)||!o.element||o.element==="shared")return true;
+          return hero.class==="gravecaller"&&o.key==="blades";
+        }
+        function prototypeCards(){
+          const options=[];
+          function rank(name,element,key,max,text,extra){const value=hero[key]||0;if(value>=max)return;options.push({name,element,text:text+" · rank "+(value+1)+"/"+max,apply:()=>{hero[key]=value+1;if(extra)extra();}});}
+          if(hero.class==="gravecaller"){
+            rank("Raise Legion","shadow","capacityRank",3,"+1 skeleton capacity",()=>hero.minionCapacity=(hero.minionCapacity||4)+1);
+            rank("Bone Armor","shadow","boneArmor",3,"Skeletons and bone giants gain +40% HP",()=>{for(const p of companions){const bonus=p.max*.4/(1+.4*(hero.boneArmor-1));p.max+=bonus;p.hp+=bonus;}});
+            rank("Grave Burst","shadow","graveBurst",3,"Dying minions explode in shadow");rank("Siphon","shadow","siphon",3,"Minion hits drain life back to you");
+            rank("Spirit Wisps","arcane","spiritWisps",3,"An orbiting wisp strikes nearby foes");rank("Soul Link","arcane","soulLink",3,"Minions within 150px deal +20% damage");
+          }
+          if(hero.class==="ranger"){
+            if(!hero.frostBolts)options.push({name:"Frost Arrows",element:"frost",text:"Arrows chill foes · pairs with Chain Shot III for Shatterstorm",apply:()=>hero.frostBolts=true});
+            rank("Ice Trap","frost","iceTrap",3,"Traps freeze foes longer and cover more ground");rank("Glacier Wolf","frost","glacierWolf",3,"Wolf bites chill enemies · +12 wolf HP",()=>{for(const p of companions)if(p.kind==="wolf"){p.max+=12;p.hp+=12;}});
+            rank("Chain Shot","lightning","chain",4,"Arrows chain to more nearby enemies");rank("Shock Trap","lightning","shockTrap",3,"Traps deal an additional lightning pulse");
+            if(!hero.thunderVolley)options.push({name:"Thunder Volley",element:"lightning",text:"Every sixth arrow shot fires a five-arrow fan",apply:()=>hero.thunderVolley=true});
+          }
+          if(hero.class==="sunwarden"){
+            rank("Radiance","light","radiance",3,"Widen the sweeping light beam");rank("Sanctuary","light","sanctuary",3,"Stand still 1.2s to create a healing zone");rank("Judgment","light","judgment",3,"Holy pillars strike nearby elites and bosses");
+            rank("Gale","wind","gale",3,"Wind gusts push enemies farther");rank("Cyclone","wind","cyclone",3,"A wandering tornado pulls and damages enemies");rank("Tailwind","wind","tailwind",3,"+12 movement speed",()=>hero.speed+=12);
+          }return options;
+        }
+        function prototypeEvolutionAllowed(key){
+          if(hero.class==="gravecaller")return ["legion","ossuary","soulstorm"].includes(key);
+          if(hero.class==="ranger")return ["shatter","alpha","blizzard"].includes(key);
+          if(hero.class==="sunwarden")return ["dawn","eye","halo"].includes(key);
+          return true;
+        }
+        function prototypeEvolutions(){return [
+          ["legion","shadow","LEGION","Double skeleton capacity"],["ossuary","arcane","OSSUARY","Every five skeletons merge into a bone giant for 15s"],["soulstorm","shadow","SOUL STORM","Dying minions release three homing spirits"],
+          ["alpha","lightning","ALPHA PACK","A second wolf joins you; wolf bites chain lightning"],["blizzard","frost","BLIZZARD LINE","Nearby traps link into freezing walls"],
+          ["dawn","light","DAWNBREAKER","Your sweeping beam splits into three"],["eye","wind","EYE OF THE STORM","Wind gusts form a larger damaging ring"],["halo","light","HALO","Healing sanctuary zones follow you"]
+        ].map(([key,element,name,text])=>({key,element,name,text,ready:evolutionReady(key)}));}
+        function friendlySprite(img){
+          if(!friendlyTintCache.has(img)){const c=surface(img.naturalWidth,img.naturalHeight),g=c.getContext("2d");g.drawImage(img,0,0);g.globalCompositeOperation="source-atop";g.fillStyle="#9e68da55";g.fillRect(0,0,c.width,c.height);c.naturalWidth=c.width;c.naturalHeight=c.height;friendlyTintCache.set(img,c);}return friendlyTintCache.get(img);
+        }
+        function drawCompanions(){
+          for(const p of [...companions].sort((a,b)=>a.y-b.y)){
+            if(Math.abs(p.x-hero.x)>w/2+100||Math.abs(p.y-hero.y)>h/2+100)continue;
+            const kind=p.kind==="wolf"?"wolf":"skeleton",img=facingArt(kind,p.faceX,p.faceY,p.cast>0),height=p.kind==="giant"?110:p.kind==="wolf"?44:64,width=img?height*img.naturalWidth/img.naturalHeight:32;
+            groundShadow(p.x,p.y+p.r,18,7);ctx.strokeStyle=p.kind==="wolf"?"#92e8ff":"#c69bff";ctx.lineWidth=2;ctx.beginPath();ctx.ellipse(p.x,p.y+p.r,20,8,0,0,7);ctx.stroke();
+            if(img){if(p.kind!=="wolf"){drawGrounded(dangerOutline(img,"#bb82ff"),p.x,p.y+p.r,width+5,height+5,p.stepPhase,p.walking,p.faceX<0,false);drawGrounded(friendlySprite(img),p.x,p.y+p.r,width,height,p.stepPhase,p.walking,p.faceX<0,false);}else drawGrounded(img,p.x,p.y+p.r,width,height,p.stepPhase,p.walking,p.faceX<0,p.cast>0);}
+            else{ctx.fillStyle=p.kind==="wolf"?"#92e8ff":"#c69bff";ctx.fillRect(p.x-10,p.y-20,20,30);}
+            ctx.fillStyle="#15101c";ctx.fillRect(p.x-15,p.y-35,30,3);ctx.fillStyle=p.kind==="wolf"?"#92e8ff":"#c69bff";ctx.fillRect(p.x-15,p.y-35,30*Math.max(0,p.hp/p.max),3);
+          }
+        }
+        function drawArrow(s){
+          ctx.save();ctx.translate(s.x,s.y);ctx.rotate(Math.atan2(s.vy,s.vx));ctx.strokeStyle=s.color;ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(-19,0);ctx.lineTo(5,0);ctx.stroke();ctx.fillStyle="#f1f2e6";ctx.beginPath();ctx.moveTo(9,0);ctx.lineTo(2,-4);ctx.lineTo(2,4);ctx.closePath();ctx.fill();ctx.strokeStyle="#99b8c7";ctx.beginPath();ctx.moveTo(-18,-4);ctx.lineTo(-13,0);ctx.lineTo(-18,4);ctx.stroke();ctx.restore();
+        }
+        function drawPrototypeGround(){
+          for(const t of heroTraps){ctx.strokeStyle=hero.shockTrap?"#ffe783":"#a6e9ff";ctx.lineWidth=2;ctx.beginPath();ctx.ellipse(t.x,t.y,t.r,t.r*.5,0,0,7);ctx.stroke();ctx.beginPath();ctx.moveTo(t.x-9,t.y-7);ctx.lineTo(t.x+9,t.y+7);ctx.moveTo(t.x+9,t.y-7);ctx.lineTo(t.x-9,t.y+7);ctx.stroke();}
+          if(hero.evolutions.includes("blizzard"))for(let i=1;i<heroTraps.length;i++){const a=heroTraps[i-1],b=heroTraps[i];if(Math.hypot(a.x-b.x,a.y-b.y)<700&&!segmentBlocked(a.x,a.y,b.x,b.y)){ctx.strokeStyle="#9ce9ff99";ctx.lineWidth=8;ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(b.x,b.y);ctx.stroke();}}
+          if(hero.class==="sunwarden"){ctx.save();if(isDescent()){ctx.beginPath();for(const key of dungeon.cells){const [x,y]=key.split(",").map(Number);if(!dungeonSolid(x,y))ctx.rect(x*80,y*80,80,80);}ctx.clip();}
+          for(const b of beamEnds()){ctx.strokeStyle="#ffe9a333";ctx.lineWidth=beamWidth()*2;ctx.beginPath();ctx.moveTo(hero.x,hero.y);ctx.lineTo(b.x,b.y);ctx.stroke();ctx.strokeStyle="#fff2ccbb";ctx.lineWidth=3;ctx.stroke();drawGlow(b.x,b.y,16,elementColors.light);}
+          ctx.restore();}
+          for(const zone of heroZones){ctx.strokeStyle=zone.kind==="cyclone"?elementColors.wind:elementColors.light;ctx.lineWidth=2;ctx.fillStyle=zone.kind==="cyclone"?"#a6e4d71c":"#ffe5a11c";ctx.beginPath();ctx.ellipse(zone.x,zone.y,zone.r,zone.r*.7,0,0,7);ctx.fill();ctx.stroke();if(zone.kind==="pillar"){ctx.fillStyle="#fff0af80";ctx.fillRect(zone.x-8,zone.y-90,16,90);}if(zone.kind==="cyclone")for(let i=0;i<3;i++){ctx.beginPath();ctx.ellipse(zone.x+Math.sin(clock*4+i)*8,zone.y-i*12,zone.r*(.8-i*.15),12,0,clock*3+i,clock*3+i+4);ctx.stroke();}}
+          for(let i=0;i<(hero.spiritWisps||0);i++){const a=clock*1.8+i*Math.PI*2/hero.spiritWisps,x=hero.x+Math.cos(a)*75,y=hero.y+Math.sin(a)*75;if(!segmentBlocked(hero.x,hero.y,x,y))drawGlow(x,y,10,"#c89cff");}
+          for(const spirit of heroSpirits)drawGlow(spirit.x,spirit.y,10,"#bb8dff");
+        }
+
         function updateSpells(dt) {
           if(hero.class === "bloodknight") updateBloodknight(dt);
           if (hero.evolutions?.includes("storm")) {
@@ -4023,7 +4240,7 @@
                 let dx = e.x - hero.x,
                   dy = e.y - hero.y,
                   d = dx * dx + dy * dy;
-                if (d < best) {
+                if (d < best && !segmentBlocked(hero.x,hero.y,e.x,e.y)) {
                   best = d;
                   target = e;
                 }
@@ -4044,7 +4261,7 @@
                       ey = e.y - hero.y,
                       along = ex * ux + ey * uy,
                       side = Math.abs(ex * uy - ey * ux);
-                    if (along > 0 && along < reach && side < e.r + 11) candidates.push({ e, along });
+                    if (along > 0 && along < reach && side < e.r + 11 && !segmentBlocked(hero.x,hero.y,e.x,e.y)) candidates.push({ e, along });
                   }
                   candidates.sort((a, b) => a.along - b.along);
                   for (const item of candidates) {
@@ -4291,7 +4508,7 @@
             e.shatterAt = clock + 1.4;
             rings.push({ x: e.x, y: e.y, r: 8, life: 0.35, speed: 180, color: "#abe9ff" });
             for (const other of [...enemies])
-              if (other !== e && Math.hypot(other.x - e.x, other.y - e.y) < 78 + other.r) {
+              if (other !== e && Math.hypot(other.x - e.x, other.y - e.y) < 78 + other.r && !segmentBlocked(e.x,e.y,other.x,other.y)) {
                 afflict(other, "frost", hero.damage * 0.3);
                 damageEnemy(other, hero.damage * 0.4, "frost", 2);
               }
@@ -4322,6 +4539,7 @@
           }
           if (e.hp > 0) return;
           enemies.splice(enemies.indexOf(e), 1);
+          if(hero.class==="gravecaller"&&Math.random()<.35)raiseMinion(e.x,e.y);
           if(hero.evolutions?.includes("crimson")&&spreadDepth<2&&deathReactionBudget++<18) {
             bloodEffects.push({kind:"pulse",x:e.x,y:e.y,r:78,life:.4,color:elementColors.blood});
             hero.hp=Math.min(hero.maxHp,hero.hp+2);
@@ -4403,8 +4621,8 @@
           if (kills % 5 === 0) awardEmbers(1);
           if (e.type === "boss") {
             awardEmbers(16);
-            if (!profile.storm) {
-              profile.storm = true;
+            if (!profile.ranger) {
+              profile.ranger = true;
               saveProfile();
               hero.justUnlockedStorm = true;
             }
@@ -4465,7 +4683,7 @@
                 ? "CRYPT HEART DEFEATED · +50 EMBERS"
                 : hero.justUnlockedBloodknight ? "BLOODKNIGHT UNLOCKED"
                 : hero.justUnlockedStorm
-                ? "STORMCALLER UNLOCKED"
+                ? "STORM RANGER UNLOCKED"
                 : boss
                   ? "GUARDIAN DOWN · 1 LEFT"
                   : (bossNames[e.variant] || "GUARDIAN") + " DEFEATED",
@@ -4705,6 +4923,7 @@
             dt,
           );
           if(hero.moving)tipOnce("move","Drag the joystick to move. Attacks are automatic.");
+          updatePrototypeHeroes(dt);
           updateSpells(dt);
           updateSites(dt);
           updateZoneHazards(dt);
@@ -4806,7 +5025,9 @@
             spawn = Math.max(0.16, 0.48 - clock * 0.005) * (Math.random() * 0.45 + 0.78) / (1 + Math.min(0.35, 0.04 * endlessTier())) / (isDescent()?[.75,.85,.95,1,1.05][dungeon.floor-1]:1);
           }
           attack -= dt;
-          if (attack <= 0 && hero.class === "bloodknight") {
+          if(attack<=0&&hero.class==="sunwarden"){attack=hero.rate;}
+          else if(attack<=0&&hero.class==="ranger"){fireRanger();}
+          else if (attack <= 0 && hero.class === "bloodknight") {
             swingBlade();
             if(mode!=="play")return;
             attack=hero.baseRate/((1+hero.attackHaste)*(hero.pactUntil>clock?1.4:1)*(hero.hasteUntil>clock?1.25:1));
@@ -4824,11 +5045,12 @@
                 vx: ((e.x - hero.x) / d) * 510,
                 vy: ((e.y - hero.y) / d) * 510,
                 life: 0.75,
-                damage: hero.damage * (Math.random() < hero.critChance ? hero.critMultiplier : 1),
-                baseDamage: hero.damage,
+                damage: hero.damage * (hero.class==="gravecaller"?.6:1) * (Math.random() < hero.critChance ? hero.critMultiplier : 1),
+                baseDamage: hero.damage*(hero.class==="gravecaller"?.6:1),
+                element:hero.class==="gravecaller"?"arcane":undefined,
                 fromHero: true,
                 color: hero.evolutions?.includes("barrage") ? "#ffc46f" : undefined,
-                chain: hero.class === "storm" || !!hero.chain || hero.weaponEffect === "arc",
+                chain: hero.class === "ranger" || !!hero.chain || hero.weaponEffect === "arc",
                 arcRank: hero.weaponEffect === "arc" ? hero.weaponRank : 0,
                 pierceLeft: (hero.weaponEffect === "pierce" ? hero.weaponRank : 0) + (hero.pierceBonus || 0),
                 splash: hero.evolutions?.includes("barrage") || false,
@@ -4874,15 +5096,16 @@
                 let dx = foe.x - fx,
                   dy = foe.y - fy,
                   d = dx * dx + dy * dy;
-                if (d < best) {
+                if (d < best && !segmentBlocked(fx,fy,foe.x,foe.y)) {
                   best = d;
                   e = foe;
                 }
               }
               if (e) {
                 let d = Math.hypot(e.x - fx, e.y - fy) || 1;
-                if(kind === "blood" || kind === "earth") {
+                if(kind === "blood" || kind === "earth" || kind==="light" || kind==="wind") {
                   bloodEffects.push({kind:"pulse",x:e.x,y:e.y,r:28,life:.35,color:elementColors[kind]});
+                  if(kind==="wind")pushEnemy(e,hero.x,hero.y,30);
                   if(kind === "earth") e.stunUntil=Math.max(e.stunUntil||0,clock+.22);
                   damageEnemy(e,hero.damage*.38,kind);
                   fairyTimers[kind]=1.4;
@@ -4910,7 +5133,7 @@
                       let dx = other.x - fx,
                         dy = other.y - fy,
                         along = dx * ux + dy * uy;
-                      if (along > d && along < 310 && Math.abs(dx * uy - dy * ux) < other.r + 10) {
+                      if (along > d && along < 310 && Math.abs(dx * uy - dy * ux) < other.r + 10 && !segmentBlocked(fx,fy,other.x,other.y)) {
                         damageEnemy(other, hero.damage * 0.36 * (1 + (hero.arcaneAmp || 0) * 0.15), "arcane");
                         if (++hits >= 1) break;
                       }
@@ -4926,7 +5149,7 @@
                         let dx = other.x - source.x,
                           dy = other.y - source.y,
                           d = dx * dx + dy * dy;
-                        if (d < range) {
+                        if (d < range && !segmentBlocked(source.x,source.y,other.x,other.y)) {
                           range = d;
                           next = other;
                         }
@@ -4984,7 +5207,7 @@
                   seen = new Set([victim]);
                 for (let hop = 0; hop < Math.min(5, hero.chain + (shot.arcRank || 0) + 1); hop++) {
                   let next = enemies
-                    .filter((e) => !seen.has(e) && Math.hypot(e.x - source.x, e.y - source.y) < 125)
+                    .filter((e) => !seen.has(e) && Math.hypot(e.x - source.x, e.y - source.y) < 125 && !segmentBlocked(source.x,source.y,e.x,e.y))
                     .sort(
                       (a, b) =>
                         Math.hypot(a.x - source.x, a.y - source.y) -
@@ -4994,7 +5217,7 @@
                   arcs.push({ x1: source.x, y1: source.y, x2: next.x, y2: next.y, life: 0.27 });
                   burst(next.x, next.y, "#7df1ff", 6);
                   let chainHit =
-                    shot.damage * (0.45 + (hero.class === "storm" ? 0.23 : 0) +
+                    shot.damage * (0.45 + (hero.class === "ranger" ? 0.23 : 0) +
                       (hero.chain + (shot.arcRank || 0)) * 0.1) * Math.pow(0.85, hop);
                   if (hero.poison) afflict(next, "poison", chainHit);
                   if (hero.fire) afflict(next, "burn", chainHit);
@@ -5011,7 +5234,7 @@
               damageEnemy(
                 victim,
                 shot.damage * (victim.type === "boss" && victim.recover > 0 ? 1.35 : 1),
-                shot.baseDamage && shot.damage > shot.baseDamage ? "neutral" :
+                shot.arrow ? (hero.frostBolts?"frost":"lightning") : shot.baseDamage && shot.damage > shot.baseDamage ? "neutral" :
                   shot.element === "flame" ? "fire" : shot.element === "venom" ? "poison" :
                   shot.element ? shot.element : shot.fromHero && (hero.frostBolts || hero.weaponEffect === "frost") ? "frost" :
                   shot.fromHero && hero.weaponEffect === "venom" ? "poison" :
@@ -5081,8 +5304,9 @@
             }
             if (!enemies.includes(e)) continue;
             if(e.stunUntil>clock){e.walking=0;continue;}
-            let dx = hero.x - e.x,
-              dy = hero.y - e.y,
+            const allyTarget=nearbyAlly(e);
+            let dx = (allyTarget||hero).x - e.x,
+              dy = (allyTarget||hero).y - e.y,
               d = Math.hypot(dx, dy) || 1;
             e.faceX = dx / d;
             e.faceY = dy / d;
@@ -5177,7 +5401,7 @@
                 dt * (e.type === "runner" ? 13 : e.type === "boss" ? 6 : 9) * Math.max(0.5, e.speed / 100);
             if (e.walking && !chargerBusy) {
               let step =
-                e.speed *
+                e.speed * (e.dazzledUntil>clock?(e.type==="boss"?.9:.5):1) *
                 (e.recover > 0 ? 0.4 : 1) *
                 (e.frostTime > 0
                   ? hero.evolutions?.includes("zero")
@@ -5638,9 +5862,9 @@
           return img && img.complete && img.naturalWidth > 0;
         }
         function facingArt(name, x, y, casting) {
-          if(name==="bloodknight"&&casting&&spriteReady("bloodknight-cast"))return art["bloodknight-cast"];
+          if(["bloodknight","ranger","sunwarden","wolf"].includes(name)&&casting&&spriteReady(name+"-cast"))return art[name+"-cast"];
           let base = name,
-            side = ["mage","storm","ember","bloodknight"].includes(base) && Math.abs(x) > Math.abs(y) * 0.72,
+            side = ["gravecaller","ranger","ember","bloodknight","sunwarden","wolf"].includes(base) && Math.abs(x) > Math.abs(y) * 0.72,
             back = !side && y < -0.15,
             key = base + (side ? "-side" : back ? "-back" : "") + (casting ? "-cast" : "");
           let direction=base+(side?"-side":back?"-back":"");
@@ -5765,21 +5989,21 @@
           return true;
         }
         function drawArtHero() {
-          let heroArt=spriteReady(hero.class)?hero.class:"mage";
+          let heroArt=spriteReady(hero.class)?hero.class:"gravecaller";
           if(!spriteReady(heroArt))return false;
           let x = hero.x,
             y = hero.y,
             w = 55,
             h = hero.class === "bloodknight" ? 90 : 80,
-            fx = hero.faceX || 0,
-            fy = hero.faceY === undefined ? 1 : hero.faceY,
+            fx = hero.class==="ranger"&&hero.cast>.025 ? (hero.aimX??hero.faceX??0) : hero.faceX || 0,
+            fy = hero.class==="ranger"&&hero.cast>.025 ? (hero.aimY??hero.faceY??1) : hero.faceY === undefined ? 1 : hero.faceY,
             casting = hero.cast > 0.025,
             img = facingArt(heroArt, fx, fy, casting),
             side = Math.abs(fx) > Math.abs(fy) * 0.72;
           if(img.cinematic)w=Math.min(92,h*img.naturalWidth/img.naturalHeight);
           groundShadow(x,y+18,20,7);
           drawHeroRing(x,y+18,hero.class);
-          ctx.strokeStyle = hero.class === "storm" ? "#ffe47abb" : hero.armor > 0 ? "#85d7e899" : "#bb9b6288";
+          ctx.strokeStyle = hero.class === "ranger" ? "#ffe47abb" : hero.armor > 0 ? "#85d7e899" : "#bb9b6288";
           ctx.lineWidth = 2;
           ctx.beginPath();
           ctx.arc(x, y + 9, 22 + Math.sin(clock * 4) * 1.5, 0, 7);
@@ -5787,7 +6011,7 @@
           ctx.save();
           if (hero.inv > 0 && Math.floor(hero.inv * 16) % 2) ctx.globalAlpha = 0.45;
           let heroHit=Math.max(0,1-(clock-(hero.lastHit??-99))/.18);
-          drawGrounded(img, x, y + 19, w, h, hero.stepPhase || 0, hero.moving, side && fx < 0, casting, fx, heroHit);
+          drawGrounded(img, x, y + 19, w, h, hero.stepPhase || 0, hero.moving, (side || hero.class==="ranger"&&casting) && fx < 0, casting, fx, heroHit);
           ctx.restore();
           if (casting && hero.class !== "bloodknight") {
             let pulse = Math.sin(Math.min(1, hero.cast / 0.18) * Math.PI),
@@ -5797,7 +6021,7 @@
               ? "#a5ff86"
               : hero.fire
                 ? "#ffb067"
-                : hero.class === "storm"
+                : hero.class === "ranger"
                   ? "#ffe77f"
                   : "#92f1ff";
             ctx.lineWidth = 2;
@@ -6181,8 +6405,9 @@
             top = hero.y - h / 2 - 70;
           dungeonFloor(left, top);
           drawSpellEffects(left, top);
+          drawPrototypeGround();
           ctx.save();ctx.globalAlpha=.10;
-          drawGlow(hero.x,hero.y,52,hero.class==="bloodknight"?"#d45768":hero.class==="ember"?"#ffb174":hero.class==="storm"?"#99dfff":"#b9a0ef");ctx.restore();
+          drawGlow(hero.x,hero.y,52,hero.class==="bloodknight"?"#d45768":hero.class==="ember"?"#ffb174":hero.class==="ranger"?"#99dfff":hero.class==="sunwarden"?"#ffe5a1":"#b9a0ef");ctx.restore();
           for (const e of enemies)
             if (e.type === "boss" && e.slam) {
               let t = Math.max(0, Math.min(1, e.slam.time / (e.slam.duration || 1.15)));
@@ -6245,6 +6470,7 @@
               ctx.fillText(o.type === "nuke" ? "✦" : o.type === "shield" ? "S" : "»", o.x, o.y + 4);
             }
           }
+          drawCompanions();
           for (const e of enemies)
             if (e.x > left - 80 && e.x < left + w + 220 && e.y > top - 80 && e.y < top + h + 220) {
               if (e.windup) {
@@ -6302,6 +6528,7 @@
             }
           for (const s of shots) {
             if (s.x < left || s.x > left + w + 140 || s.y < top || s.y > top + h + 140) continue;
+            if(s.arrow){drawArrow(s);continue;}
             let color = s.color || (s.baseDamage && s.damage > s.baseDamage ? "#fff3a3" : "#ffcf80");
             ctx.strokeStyle = color;
             ctx.lineWidth = 3;
@@ -6436,7 +6663,7 @@
               fx = hero.x + Math.cos(angle) * 38,
               fy = hero.y - 30 + Math.sin(angle) * 15,
               color =
-                kind === "blood" ? elementColors.blood : kind === "earth" ? elementColors.earth : kind === "flame"
+                kind === "light" ? elementColors.light : kind==="wind"?elementColors.wind : kind === "blood" ? elementColors.blood : kind === "earth" ? elementColors.earth : kind === "flame"
                   ? "#ffb66e"
                   : kind === "frost"
                     ? "#a4e7ff"
