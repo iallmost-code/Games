@@ -1,7 +1,7 @@
 # Ember Crypt development notes
 
-- This is the current v60 mobile browser game. Keep the game working from root `index.html` with relative `assets/` paths and no required build or external service.
-- Preserve gameplay, all three heroes and their element-restricted upgrades, three zones, depth modifiers, achievements, shrine, relics, save slots, save-code export/import, and wave 20 victory unless the task changes them.
+- This is the current v61 mobile browser game. Keep the game working from root `index.html` with relative `assets/` paths and no required build or external service.
+- Preserve gameplay, all four heroes and their element-restricted upgrades, three zones, depth modifiers, achievements, shrine, relics, save slots, save-code export/import, and wave 20 victory unless the task changes them.
 - Preserve the one-thumb controls. The bottom-center joystick, pause button, automatic attacks, and Settings sound/speed controls are intentional. Do not add an in-game action button unless asked.
 - Preserve localStorage save compatibility. Run format is v9; change format/version and write a migration only when changing serialized run structure.
 - Keep WebP-first cinematic assets with PNG fallback. Maintain readable hero ring, danger cues, and the 40 FPS limiter.
