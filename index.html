@@ -1194,6 +1194,7 @@
           if(data.run?.version===9){data.run.version=10;data.run.balanceVersion=10;data.run.runMode="endless";data.run.floor=0;}
           return data;
         }
+        let depthPreview = localStorage.getItem("ember-crypt-depth-preview") !== "0";
         function renderSettings(){
           let body=menuBase("SETTINGS",settingsReturn,slots[activeSlot]?.name||"");
           body.append(menuButton("SOUND · "+(soundEnabled?"ON":"OFF"),()=>{soundToggle.click();renderMenu("settings");}),
@@ -1201,6 +1202,7 @@
             menuButton("VIBRATION · "+(vibrationEnabled?"ON":"OFF"),()=>{
               vibrationEnabled=!vibrationEnabled;localStorage.setItem("ember-crypt-vibrate-"+activeSlot,vibrationEnabled?"1":"0");
               renderMenu("settings");}),
+            menuButton("GRAPHICS · "+(depthPreview?"2.5D PREVIEW":"CLASSIC"),()=>{depthPreview=!depthPreview;localStorage.setItem("ember-crypt-depth-preview",depthPreview?"1":"0");renderMenu("settings");},"Raised walls and depth overlap in The Descent."),
             menuButton("RESET TIPS",()=>{profile.tips={};tipQueue=[];activeTip=null;saveProfile();renderMenu("settings");},"Show first-run tips again for this character."),
             menuButton("RENAME CHARACTER",()=>renderNameEntry(activeSlot,true)),
             menuButton("SWITCH CHARACTER",()=>{if(settingsReturn==="pause")saveRun(true);
@@ -3514,17 +3516,47 @@
               ctx.fillStyle="#17181d";ctx.fillRect(x+(dx===1?76:0),y+(dy===1?76:0),dx?4:80,dy?4:80);
             }
           }
+          if(depthPreview)drawRaisedWalls(left,top,false);
           // Dark alcoves along room edges make approaching spawns legible.
           for(const [x,y,rw,rh] of floorSpec().rooms){ctx.fillStyle="#06090bdd";ctx.fillRect((x+rw/2)*80-22,y*80+10,44,28);}
           for(const [x,y,rw,rh] of floorSpec().rooms){
             const px=(x+rw-.6)*80,py=(y+rh-.4)*80;
             if(px<left-80||py<top-80||px>left+w+200||py>top+h+200)continue;
-            if(spriteReady("prop-tomb-"+zone))drawProp("prop-tomb-"+zone,px,py,70,90);
-            if(spriteReady("prop-brazier"))drawProp("prop-brazier",x*80+28,(y+.8)*80,32,50);
+            if(!depthPreview&&spriteReady("prop-tomb-"+zone))drawProp("prop-tomb-"+zone,px,py,70,90);
+            if(!depthPreview&&spriteReady("prop-brazier"))drawProp("prop-brazier",x*80+28,(y+.8)*80,32,50);
           }
           ctx.fillStyle=dungeon.open?"#ffd16b":"#835346";ctx.fillRect(24*80,9*80,14,160);
           ctx.font="bold 15px system-ui";ctx.textAlign="center";ctx.fillText(dungeon.open?"BOSS DOOR OPEN":"BOSS · "+Math.max(0,floorSpec().goal-(kills-dungeon.startKills))+" KILLS / "+Math.max(0,Math.ceil(180-dungeon.elapsed))+"s",24*80,9*80-14);
           if(dungeon.stairs){const {x,y}=dungeon.stairs;ctx.fillStyle="#bce9df";for(let i=0;i<5;i++)ctx.fillRect(x-28+i*4,y-26+i*10,56-i*8,7);ctx.fillText("DESCEND",x,y-42);}
+        }
+        // Low, north-projected masonry: collision stays on the original ground plane.
+        function drawRaisedWalls(left,top,foreground){
+          const zone=currentZone(),cap=["#806550","#7196a2","#79805a"][zone],face=["#44342b","#344e59","#444c32"][zone];
+          for(let ty=Math.floor(top/80)-1;ty<=Math.ceil((top+h+180)/80);ty++)
+            for(let tx=Math.floor(left/80)-1;tx<=Math.ceil((left+w+180)/80);tx++){
+              if(!dungeonSolid(tx,ty))continue;
+              const north=!dungeonSolid(tx,ty-1),south=!dungeonSolid(tx,ty+1),west=!dungeonSolid(tx-1,ty),east=!dungeonSolid(tx+1,ty);
+              if(!(north||south||west||east)||north!==foreground)continue;
+              const x=tx*80,y=ty*80,height=28;
+              ctx.save();
+              // Fade foreground masonry near the player to preserve combat readability.
+              if(foreground&&Math.abs(hero.x-x-40)<95&&Math.abs(hero.y-y)<100)ctx.globalAlpha=.32;
+              ctx.fillStyle="#00000050";ctx.fillRect(x+8,y,80,92);
+              ctx.fillStyle=face;ctx.fillRect(x,y-height,80,80+height);
+              ctx.fillStyle=cap;ctx.fillRect(x,y-height,80,13);
+              ctx.fillStyle="#ffffff20";ctx.fillRect(x,y-height,80,2);
+              ctx.fillStyle="#00000045";ctx.fillRect(x+76,y-height,4,80+height);
+              ctx.strokeStyle="#0c101650";ctx.lineWidth=2;
+              for(let line=y;line<y+80;line+=20){ctx.beginPath();ctx.moveTo(x,line);ctx.lineTo(x+80,line);ctx.stroke();ctx.beginPath();ctx.moveTo(x+((line/20)%2?25:55),line-20);ctx.lineTo(x+((line/20)%2?25:55),line);ctx.stroke();}
+              ctx.restore();
+            }
+        }
+        function dungeonProps(){
+          const props=[],zone=currentZone();
+          for(const [x,y,rw,rh]of floorSpec().rooms){
+            props.push({prop:"prop-tomb-"+zone,x:(x+rw-.6)*80,y:(y+rh-.4)*80,width:70,height:90});
+            props.push({prop:"prop-brazier",x:x*80+28,y:(y+.8)*80,width:32,height:50});
+          }return props;
         }
         function drawMinimap(){
           const canvas=$("dungeonMap");canvas.hidden=!isDescent()||mode!=="play";if(canvas.hidden)return;
@@ -6190,8 +6222,11 @@
               ctx.fillText(o.type === "nuke" ? "✦" : o.type === "shield" ? "S" : "»", o.x, o.y + 4);
             }
           }
-          for (const e of enemies)
+          const depthActors=isDescent()&&depthPreview?[...enemies,{player:true,x:hero.x,y:hero.y,r:19},...dungeonProps()].sort((a,b)=>(a.y+(a.r||0))-(b.y+(b.r||0))):enemies;
+          for (const e of depthActors)
             if (e.x > left - 80 && e.x < left + w + 220 && e.y > top - 80 && e.y < top + h + 220) {
+              if(e.player){drawHero();continue;}
+              if(e.prop){groundShadow(e.x,e.y,30,10);drawProp(e.prop,e.x,e.y,e.width,e.height);if(e.prop==="prop-brazier")drawGlow(e.x,e.y-35,36,["#ffb174","#99dfff","#b5dc7c"][currentZone()]);continue;}
               if (e.windup) {
                 let fill = 1 - e.windup.time / 0.6;
                 ctx.strokeStyle = "rgba(255,48,36," + (0.22 + fill * 0.4) + ")";
@@ -6354,7 +6389,8 @@
             ctx.stroke();
             ctx.shadowBlur = 0;
           }
-          drawHero();
+          if(!(isDescent()&&depthPreview))drawHero();
+          if(isDescent()&&depthPreview)drawRaisedWalls(left,top,true);
           if (hero.shieldUntil > clock && hero.shieldCharges > 0) {
             ctx.strokeStyle = "#86cfff";
             ctx.lineWidth = 3;
