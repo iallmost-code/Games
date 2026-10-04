@@ -23,3 +23,9 @@ The zone floor tiles are processed once at load to lower brightness and color sa
 ## Checks
 
 JavaScript syntax; profile separation, save-code round-trip, legacy save migration, pause/resume and menu navigation; actual canvas rendering of the new atlases, portraits and all three heroes in crowded 90-enemy scenes. CPU canvas timings are diagnostic only and do not measure phone browser FPS.
+
+## Bloodknight row (v61)
+
+`assets/cinematic/bloodknight.png` is an original generated transparent 2172 × 724 single-row sheet matching the existing heroes: dark-crimson plate, horned helm and a notched greatsword in front, side, back and attack poses. `bloodknight.webp` uses quality 85 and full alpha quality (about 427 KB versus 1.9 MB PNG). The original three-hero atlas is unchanged.
+
+The new atlas has transparent gutters at 25%, 50% and 72% of its width. The wider final cell contains the complete sweeping sword. The runtime slices these cells and loads WebP first with PNG fallback. A distinct attack sprite replaces the idle pose during the red blade arc; the Blood/Earth floor ring remains visible. No per-enemy blur is added.
