@@ -39,3 +39,7 @@ Run saves now use v10. Existing v9 runs migrate to ENDLESS with their current st
 Boss doors open after 180 seconds or the floor kill goal. Defeat the guardian and walk onto the stairs. Ash Catacombs, Frost Vault, Venom Hollow, The Sunken Halls and The Heart Chamber culminate in the Crypt Heart victory. Walls block movement, projectiles and blade swings. See [tests/README.md](tests/README.md) for browser checks and the seeded Endless balance simulation.
 
 Floor 1 tuning reduces regular enemy arrivals by 25%, limits living Cinder Imps to three, and activates lava vents every 16 seconds instead of eight. Relative regular-spawn rates across floors are 75%, 85%, 95%, 100% and 105%; later floors keep their full hazard cadence. The minimap is approximately 30% smaller with 75% opacity. These changes leave Endless spawn and hazard pacing unchanged.
+
+### 2.5D visual preview
+
+Settings → GRAPHICS switches between 2.5D PREVIEW (default) and CLASSIC. The Descent preview adds low raised masonry, directional wall shadows, lit braziers and depth-sorted heroes, enemies and room props. Foreground walls fade near the hero. This uses the existing canvas and sprite assets; collision, camera, controls, save formats and Endless remain unchanged. The preference persists on this browser independently of character saves.
