@@ -606,7 +606,7 @@
       @media (prefers-reduced-motion:reduce) { .menu-embers i,.start-prompt { animation:none; } }
     </style>
     <style>
-      #dungeonMap{position:fixed;left:12px;top:142px;width:144px;height:94px;z-index:4;pointer-events:none;border:1px solid #847157;border-radius:5px}
+      #dungeonMap{position:fixed;left:12px;top:142px;width:101px;height:66px;opacity:.75;z-index:4;pointer-events:none;border:1px solid #847157;border-radius:5px}
       #firstRunTip{position:fixed;top:108px;left:50%;transform:translateX(-50%);width:min(340px,88vw);padding:9px 12px;background:#171c26ed;border:1px solid #bea57c;border-radius:7px;color:#ffedca;text-align:center;font:12px system-ui;z-index:7;pointer-events:none}
       [hidden]{display:none!important}
     </style>
@@ -2996,6 +2996,9 @@
                                 ? "runner"
                         : "ghoul");
           if (!forcedType && Math.random() < 0.13) type = ["cinderImp", "frostGolem", "sporeSpitter"][zone];
+          if(isDescent()&&dungeon.floor===1&&type==="cinderImp"&&enemies.filter(e=>e.type==="cinderImp"&&e.hp>0).length>=3){
+            if(forcedType)return null;type="ghoul";
+          }
           if (!forcedType && wave >= 2) {
             let danger = Math.random();
             if (danger < 0.11) type = "charger";
@@ -3188,7 +3191,7 @@
         function updateZoneHazards(dt) {
           let zone = isDescent()&&dungeon.floor===4?Math.floor(Math.random()*3):currentZone();
           if (clock >= zoneHazardNext) {
-            zoneHazardNext = clock + (zone === 0 ? 8 : 11);
+            zoneHazardNext = clock + (zone === 0 ? (isDescent()&&dungeon.floor===1?16:8) : 11);
             zoneHazards = zoneHazards.filter((z) => (isDescent()&&dungeon.floor===4||z.zone === zone) && z.life > 0).slice(-5);
             let a = Math.random() * Math.PI * 2, dist = 145 + Math.random() * 95;
             let z = { x: hero.x + Math.cos(a) * dist, y: hero.y + Math.sin(a) * dist,
@@ -3449,7 +3452,7 @@
           hero.pactNext=clock+20;hero.pactUntil=0;
           enemies=[];shots=[];hazards=[];pools=[];drops=[];zoneHazards=[];meteors=[];bloodEffects=[];boss=null;
           dungeonEvent=null;trialChoicePending=0;spawn=1;attack=0;waveClock=0;wave=1+(number-1)*4;
-          fairyTimers={};magnetTimer=0;zoneHazardNext=clock+8;sites=[];siteCycle=0;siteNext=Infinity;
+          fairyTimers={};magnetTimer=0;zoneHazardNext=clock+(number===1?16:8);sites=[];siteCycle=0;siteNext=Infinity;
           for(let i=4;i<7;i++){let [x,y,rw,rh]=floorSpec().rooms[i];sites.push({x:(x+rw/2)*80,y:(y+rh/2)*80,kind:["well","forge","cache"][i-4],used:false,r:35});}
           floorCheckpoint={floor:number,hero:structuredClone(hero),clock,kills,level,xp,needed,weapon:structuredClone(weapon),armor:structuredClone(armor),runStats:structuredClone(runStats),runEmbers,xpReserve};
           if(number>1)tipOnce("zone"+number,floorSpec().hazard);toastTimer=0;toastEl.classList.remove("show");updateHud();
@@ -3848,12 +3851,14 @@
         }
         function swingBlade(){
           let angle=Math.atan2(hero.faceY??1,hero.faceX||0);
-          if(!hero.moving){
-            let target=null,distance=Infinity;
-            for(const e of enemies){const d=Math.hypot(e.x-hero.x,e.y-hero.y);if(d<distance&&!segmentBlocked(hero.x,hero.y,e.x,e.y)){target=e;distance=d;}}
-            if(target){angle=Math.atan2(target.y-hero.y,target.x-hero.x);hero.faceX=Math.cos(angle);hero.faceY=Math.sin(angle);}
-          }
           const radius=hero.range||95,half=Math.PI*150/360;
+          let target=null,distance=Infinity;
+          // Moving swings prioritize enemies in reach, including pursuers behind the hero.
+          for(const e of enemies){
+            const d=Math.hypot(e.x-hero.x,e.y-hero.y);
+            if(d<distance&&(!hero.moving||d<=radius+e.r)&&!segmentBlocked(hero.x,hero.y,e.x,e.y)){target=e;distance=d;}
+          }
+          if(target){angle=Math.atan2(target.y-hero.y,target.x-hero.x);hero.faceX=Math.cos(angle);hero.faceY=Math.sin(angle);}
           // Rear swings share one attack cycle, but each is a distinct blade sweep.
           for(let swing=0;swing<(hero.projectiles||1);swing++){
             const facing=angle+(swing?Math.PI:0);let healed=0;
@@ -4742,7 +4747,8 @@
           spawn -= dt;
           if (spawn <= 0 && enemies.length < 95) {
             spawnEnemy();
-            spawn = Math.max(0.16, 0.48 - clock * 0.005) * (Math.random() * 0.45 + 0.78) / (1 + Math.min(0.35, 0.04 * endlessTier()));
+            // Divide the interval by the floor rate: 0.75 means 25% fewer regular arrivals.
+            spawn = Math.max(0.16, 0.48 - clock * 0.005) * (Math.random() * 0.45 + 0.78) / (1 + Math.min(0.35, 0.04 * endlessTier())) / (isDescent()?[.75,.85,.95,1,1.05][dungeon.floor-1]:1);
           }
           attack -= dt;
           if (attack <= 0 && hero.class === "bloodknight") {

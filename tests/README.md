@@ -40,3 +40,24 @@ node tests/descent.cjs
 This Chromium integration suite checks authored map connectivity and movement, locked doors, offscreen spawns, swept collisions for both projectile teams, Bloodknight swings through walls, timer/kill door triggers, floor-entry checkpoints, v9→v10 run migration, v9/v10 EC1 codes, Settings import, slot isolation and Reset Tips.
 
 It then plays all five floors with each of the four heroes (20 floor/hero combinations), using real joystick movement, automatic attacks, spawns, upgrades, bosses, stairs and victory. Health and base damage are increased for this progression check; this is an accelerated assisted browser playthrough, not a human difficulty or balance measurement. Screenshots and `descent-results.json` go to `/tmp`. The checked-in `descent-playthrough.json` records the passing progression run. The suite also verifies Endless wave-20 victory/tier continuation, independent mode records, and an unmodified live mobile animation loop with the minimap below the HUD. The Bloodknight suite explicitly selects ENDLESS so its original arena combat regression checks remain comparable.
+
+## Descent tuning: normal Floor 1 survival
+
+```sh
+node tests/descent-tuning.cjs
+```
+
+Chromium runs five identical seeds for each hero before/after the tuning, stopping at death or 180 seconds. The movement bot turns continuously, avoids walls and picks offered upgrades. It uses depth 0, no shrine purchases, and the normal starting health, armor and damage; only hero unlocks are supplied. No health/damage/clock/spawn overrides are used in survival runs. This is a normal-stat automated diagnostic, not a human difficulty measurement. The baseline source is pinned to the original Descent commit `d11e59a6c2cd72dfc3fefbb3052fdce61fb29cf1`; keep repository history available for reproduction.
+
+The script writes `tests/descent-tuning-results.json`, and separately checks rear-target moving aim, reach fallback, walls, the floor-specific Cinder Imp cap and minimap dimensions/opacity. Screenshots go to `/tmp`.
+
+Recorded five-seed Floor 1 results (180-second cap):
+
+| Hero | Before median | Tuned median | Survived 180s before → after |
+| --- | --- | --- | --- |
+| Crypt Mage | 180s | 180s | 3/5 → 3/5 |
+| Stormcaller | 59.72s | 180s | 1/5 → 3/5 |
+| Emberweaver | 50.57s | 144.63s | 0/5 → 2/5 |
+| Bloodknight | 39.90s | 180s | 1/5 → 5/5 |
+
+A 180s value is censored at the test limit. Tuned runs never exceeded three living Cinder Imps; peak simultaneous lava vents fell from three to two under the doubled activation interval. Seeds and individual runs are in `descent-tuning-results.json`.
