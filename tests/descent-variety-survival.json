@@ -1,0 +1,1224 @@
+{
+  "baselineCommit": "f0b3ff9",
+  "policy": "Five seeded constant-turn joystick bots per hero/version, wall avoidance and offered upgrades, depth 0, no shrine purchases or HP/damage overrides. 180-second Floor 1 cap. Automated normal-stat survival diagnostic, not a human playtest.",
+  "seeds": [
+    17,
+    37,
+    71,
+    113,
+    151
+  ],
+  "summary": {
+    "mage": {
+      "before": {
+        "medianSeconds": 180,
+        "rangeSeconds": [
+          79.88,
+          180
+        ],
+        "survived180": 3,
+        "maxImps": 3,
+        "maxLava": 2
+      },
+      "after": {
+        "medianSeconds": 180,
+        "rangeSeconds": [
+          79.88,
+          180
+        ],
+        "survived180": 3,
+        "maxImps": 3,
+        "maxLava": 2
+      }
+    },
+    "storm": {
+      "before": {
+        "medianSeconds": 180,
+        "rangeSeconds": [
+          73.25,
+          180
+        ],
+        "survived180": 3,
+        "maxImps": 3,
+        "maxLava": 2
+      },
+      "after": {
+        "medianSeconds": 180,
+        "rangeSeconds": [
+          73.25,
+          180
+        ],
+        "survived180": 3,
+        "maxImps": 3,
+        "maxLava": 2
+      }
+    },
+    "ember": {
+      "before": {
+        "medianSeconds": 144.63,
+        "rangeSeconds": [
+          39.15,
+          180
+        ],
+        "survived180": 2,
+        "maxImps": 3,
+        "maxLava": 2
+      },
+      "after": {
+        "medianSeconds": 144.63,
+        "rangeSeconds": [
+          39.15,
+          180
+        ],
+        "survived180": 2,
+        "maxImps": 3,
+        "maxLava": 2
+      }
+    },
+    "bloodknight": {
+      "before": {
+        "medianSeconds": 180,
+        "rangeSeconds": [
+          180,
+          180
+        ],
+        "survived180": 5,
+        "maxImps": 3,
+        "maxLava": 2
+      },
+      "after": {
+        "medianSeconds": 180,
+        "rangeSeconds": [
+          180,
+          180
+        ],
+        "survived180": 5,
+        "maxImps": 3,
+        "maxLava": 2
+      }
+    }
+  },
+  "results": [
+    {
+      "version": "before",
+      "kind": "mage",
+      "seed": 17,
+      "seconds": 180,
+      "alive": true,
+      "hp": 100,
+      "kills": 692,
+      "level": 14,
+      "mode": "trial",
+      "maxImps": 3,
+      "maxLava": 2,
+      "decisions": 14,
+      "initial": {
+        "hp": 100,
+        "armor": 30,
+        "damage": 24,
+        "depth": 0,
+        "shrine": {
+          "power": 0,
+          "vigor": 0,
+          "fleet": 0,
+          "magnet": 0,
+          "armor": 0,
+          "reroll": 0
+        }
+      }
+    },
+    {
+      "version": "before",
+      "kind": "mage",
+      "seed": 37,
+      "seconds": 162.1,
+      "alive": false,
+      "hp": 0,
+      "kills": 584,
+      "level": 13,
+      "mode": "over",
+      "maxImps": 3,
+      "maxLava": 2,
+      "decisions": 13,
+      "initial": {
+        "hp": 100,
+        "armor": 30,
+        "damage": 24,
+        "depth": 0,
+        "shrine": {
+          "power": 0,
+          "vigor": 0,
+          "fleet": 0,
+          "magnet": 0,
+          "armor": 0,
+          "reroll": 0
+        }
+      }
+    },
+    {
+      "version": "before",
+      "kind": "mage",
+      "seed": 71,
+      "seconds": 180,
+      "alive": true,
+      "hp": 100,
+      "kills": 682,
+      "level": 13,
+      "mode": "trial",
+      "maxImps": 3,
+      "maxLava": 2,
+      "decisions": 14,
+      "initial": {
+        "hp": 100,
+        "armor": 30,
+        "damage": 24,
+        "depth": 0,
+        "shrine": {
+          "power": 0,
+          "vigor": 0,
+          "fleet": 0,
+          "magnet": 0,
+          "armor": 0,
+          "reroll": 0
+        }
+      }
+    },
+    {
+      "version": "before",
+      "kind": "mage",
+      "seed": 113,
+      "seconds": 79.88,
+      "alive": false,
+      "hp": 0,
+      "kills": 212,
+      "level": 7,
+      "mode": "over",
+      "maxImps": 3,
+      "maxLava": 2,
+      "decisions": 6,
+      "initial": {
+        "hp": 100,
+        "armor": 30,
+        "damage": 24,
+        "depth": 0,
+        "shrine": {
+          "power": 0,
+          "vigor": 0,
+          "fleet": 0,
+          "magnet": 0,
+          "armor": 0,
+          "reroll": 0
+        }
+      }
+    },
+    {
+      "version": "before",
+      "kind": "mage",
+      "seed": 151,
+      "seconds": 180,
+      "alive": true,
+      "hp": 130,
+      "kills": 692,
+      "level": 13,
+      "mode": "trial",
+      "maxImps": 3,
+      "maxLava": 2,
+      "decisions": 14,
+      "initial": {
+        "hp": 100,
+        "armor": 30,
+        "damage": 24,
+        "depth": 0,
+        "shrine": {
+          "power": 0,
+          "vigor": 0,
+          "fleet": 0,
+          "magnet": 0,
+          "armor": 0,
+          "reroll": 0
+        }
+      }
+    },
+    {
+      "version": "before",
+      "kind": "storm",
+      "seed": 17,
+      "seconds": 180,
+      "alive": true,
+      "hp": 100,
+      "kills": 695,
+      "level": 13,
+      "mode": "trial",
+      "maxImps": 3,
+      "maxLava": 2,
+      "decisions": 14,
+      "initial": {
+        "hp": 100,
+        "armor": 35,
+        "damage": 23,
+        "depth": 0,
+        "shrine": {
+          "power": 0,
+          "vigor": 0,
+          "fleet": 0,
+          "magnet": 0,
+          "armor": 0,
+          "reroll": 0
+        }
+      }
+    },
+    {
+      "version": "before",
+      "kind": "storm",
+      "seed": 37,
+      "seconds": 180,
+      "alive": true,
+      "hp": 137,
+      "kills": 692,
+      "level": 13,
+      "mode": "trial",
+      "maxImps": 3,
+      "maxLava": 2,
+      "decisions": 15,
+      "initial": {
+        "hp": 100,
+        "armor": 35,
+        "damage": 23,
+        "depth": 0,
+        "shrine": {
+          "power": 0,
+          "vigor": 0,
+          "fleet": 0,
+          "magnet": 0,
+          "armor": 0,
+          "reroll": 0
+        }
+      }
+    },
+    {
+      "version": "before",
+      "kind": "storm",
+      "seed": 71,
+      "seconds": 112.33,
+      "alive": false,
+      "hp": 0,
+      "kills": 348,
+      "level": 10,
+      "mode": "over",
+      "maxImps": 3,
+      "maxLava": 2,
+      "decisions": 10,
+      "initial": {
+        "hp": 100,
+        "armor": 35,
+        "damage": 23,
+        "depth": 0,
+        "shrine": {
+          "power": 0,
+          "vigor": 0,
+          "fleet": 0,
+          "magnet": 0,
+          "armor": 0,
+          "reroll": 0
+        }
+      }
+    },
+    {
+      "version": "before",
+      "kind": "storm",
+      "seed": 113,
+      "seconds": 73.25,
+      "alive": false,
+      "hp": 0,
+      "kills": 183,
+      "level": 7,
+      "mode": "over",
+      "maxImps": 3,
+      "maxLava": 2,
+      "decisions": 6,
+      "initial": {
+        "hp": 100,
+        "armor": 35,
+        "damage": 23,
+        "depth": 0,
+        "shrine": {
+          "power": 0,
+          "vigor": 0,
+          "fleet": 0,
+          "magnet": 0,
+          "armor": 0,
+          "reroll": 0
+        }
+      }
+    },
+    {
+      "version": "before",
+      "kind": "storm",
+      "seed": 151,
+      "seconds": 180,
+      "alive": true,
+      "hp": 130,
+      "kills": 690,
+      "level": 13,
+      "mode": "trial",
+      "maxImps": 3,
+      "maxLava": 2,
+      "decisions": 14,
+      "initial": {
+        "hp": 100,
+        "armor": 35,
+        "damage": 23,
+        "depth": 0,
+        "shrine": {
+          "power": 0,
+          "vigor": 0,
+          "fleet": 0,
+          "magnet": 0,
+          "armor": 0,
+          "reroll": 0
+        }
+      }
+    },
+    {
+      "version": "before",
+      "kind": "ember",
+      "seed": 17,
+      "seconds": 39.15,
+      "alive": false,
+      "hp": 0,
+      "kills": 60,
+      "level": 4,
+      "mode": "over",
+      "maxImps": 2,
+      "maxLava": 2,
+      "decisions": 3,
+      "initial": {
+        "hp": 110,
+        "armor": 36,
+        "damage": 25,
+        "depth": 0,
+        "shrine": {
+          "power": 0,
+          "vigor": 0,
+          "fleet": 0,
+          "magnet": 0,
+          "armor": 0,
+          "reroll": 0
+        }
+      }
+    },
+    {
+      "version": "before",
+      "kind": "ember",
+      "seed": 37,
+      "seconds": 180,
+      "alive": true,
+      "hp": 107,
+      "kills": 691,
+      "level": 14,
+      "mode": "trial",
+      "maxImps": 3,
+      "maxLava": 2,
+      "decisions": 16,
+      "initial": {
+        "hp": 110,
+        "armor": 36,
+        "damage": 25,
+        "depth": 0,
+        "shrine": {
+          "power": 0,
+          "vigor": 0,
+          "fleet": 0,
+          "magnet": 0,
+          "armor": 0,
+          "reroll": 0
+        }
+      }
+    },
+    {
+      "version": "before",
+      "kind": "ember",
+      "seed": 71,
+      "seconds": 144.63,
+      "alive": false,
+      "hp": 0,
+      "kills": 501,
+      "level": 12,
+      "mode": "over",
+      "maxImps": 3,
+      "maxLava": 2,
+      "decisions": 12,
+      "initial": {
+        "hp": 110,
+        "armor": 36,
+        "damage": 25,
+        "depth": 0,
+        "shrine": {
+          "power": 0,
+          "vigor": 0,
+          "fleet": 0,
+          "magnet": 0,
+          "armor": 0,
+          "reroll": 0
+        }
+      }
+    },
+    {
+      "version": "before",
+      "kind": "ember",
+      "seed": 113,
+      "seconds": 180,
+      "alive": true,
+      "hp": 80,
+      "kills": 687,
+      "level": 14,
+      "mode": "trial",
+      "maxImps": 3,
+      "maxLava": 2,
+      "decisions": 16,
+      "initial": {
+        "hp": 110,
+        "armor": 36,
+        "damage": 25,
+        "depth": 0,
+        "shrine": {
+          "power": 0,
+          "vigor": 0,
+          "fleet": 0,
+          "magnet": 0,
+          "armor": 0,
+          "reroll": 0
+        }
+      }
+    },
+    {
+      "version": "before",
+      "kind": "ember",
+      "seed": 151,
+      "seconds": 46.3,
+      "alive": false,
+      "hp": 0,
+      "kills": 70,
+      "level": 4,
+      "mode": "over",
+      "maxImps": 3,
+      "maxLava": 2,
+      "decisions": 3,
+      "initial": {
+        "hp": 110,
+        "armor": 36,
+        "damage": 25,
+        "depth": 0,
+        "shrine": {
+          "power": 0,
+          "vigor": 0,
+          "fleet": 0,
+          "magnet": 0,
+          "armor": 0,
+          "reroll": 0
+        }
+      }
+    },
+    {
+      "version": "before",
+      "kind": "bloodknight",
+      "seed": 17,
+      "seconds": 180,
+      "alive": true,
+      "hp": 140,
+      "kills": 679,
+      "level": 14,
+      "mode": "trial",
+      "maxImps": 3,
+      "maxLava": 2,
+      "decisions": 15,
+      "initial": {
+        "hp": 140,
+        "armor": 45,
+        "damage": 58,
+        "depth": 0,
+        "shrine": {
+          "power": 0,
+          "vigor": 0,
+          "fleet": 0,
+          "magnet": 0,
+          "armor": 0,
+          "reroll": 0
+        }
+      }
+    },
+    {
+      "version": "before",
+      "kind": "bloodknight",
+      "seed": 37,
+      "seconds": 180,
+      "alive": true,
+      "hp": 200,
+      "kills": 686,
+      "level": 14,
+      "mode": "trial",
+      "maxImps": 3,
+      "maxLava": 2,
+      "decisions": 15,
+      "initial": {
+        "hp": 140,
+        "armor": 45,
+        "damage": 58,
+        "depth": 0,
+        "shrine": {
+          "power": 0,
+          "vigor": 0,
+          "fleet": 0,
+          "magnet": 0,
+          "armor": 0,
+          "reroll": 0
+        }
+      }
+    },
+    {
+      "version": "before",
+      "kind": "bloodknight",
+      "seed": 71,
+      "seconds": 180,
+      "alive": true,
+      "hp": 133,
+      "kills": 685,
+      "level": 14,
+      "mode": "trial",
+      "maxImps": 3,
+      "maxLava": 2,
+      "decisions": 14,
+      "initial": {
+        "hp": 140,
+        "armor": 45,
+        "damage": 58,
+        "depth": 0,
+        "shrine": {
+          "power": 0,
+          "vigor": 0,
+          "fleet": 0,
+          "magnet": 0,
+          "armor": 0,
+          "reroll": 0
+        }
+      }
+    },
+    {
+      "version": "before",
+      "kind": "bloodknight",
+      "seed": 113,
+      "seconds": 180,
+      "alive": true,
+      "hp": 34.6,
+      "kills": 693,
+      "level": 13,
+      "mode": "trial",
+      "maxImps": 3,
+      "maxLava": 2,
+      "decisions": 13,
+      "initial": {
+        "hp": 140,
+        "armor": 45,
+        "damage": 58,
+        "depth": 0,
+        "shrine": {
+          "power": 0,
+          "vigor": 0,
+          "fleet": 0,
+          "magnet": 0,
+          "armor": 0,
+          "reroll": 0
+        }
+      }
+    },
+    {
+      "version": "before",
+      "kind": "bloodknight",
+      "seed": 151,
+      "seconds": 180,
+      "alive": true,
+      "hp": 56.2,
+      "kills": 691,
+      "level": 13,
+      "mode": "play",
+      "maxImps": 3,
+      "maxLava": 2,
+      "decisions": 15,
+      "initial": {
+        "hp": 140,
+        "armor": 45,
+        "damage": 58,
+        "depth": 0,
+        "shrine": {
+          "power": 0,
+          "vigor": 0,
+          "fleet": 0,
+          "magnet": 0,
+          "armor": 0,
+          "reroll": 0
+        }
+      }
+    },
+    {
+      "version": "after",
+      "kind": "mage",
+      "seed": 17,
+      "seconds": 180,
+      "alive": true,
+      "hp": 100,
+      "kills": 692,
+      "level": 14,
+      "mode": "trial",
+      "maxImps": 3,
+      "maxLava": 2,
+      "decisions": 14,
+      "initial": {
+        "hp": 100,
+        "armor": 30,
+        "damage": 24,
+        "depth": 0,
+        "shrine": {
+          "power": 0,
+          "vigor": 0,
+          "fleet": 0,
+          "magnet": 0,
+          "armor": 0,
+          "reroll": 0
+        }
+      }
+    },
+    {
+      "version": "after",
+      "kind": "mage",
+      "seed": 37,
+      "seconds": 162.1,
+      "alive": false,
+      "hp": 0,
+      "kills": 584,
+      "level": 13,
+      "mode": "over",
+      "maxImps": 3,
+      "maxLava": 2,
+      "decisions": 13,
+      "initial": {
+        "hp": 100,
+        "armor": 30,
+        "damage": 24,
+        "depth": 0,
+        "shrine": {
+          "power": 0,
+          "vigor": 0,
+          "fleet": 0,
+          "magnet": 0,
+          "armor": 0,
+          "reroll": 0
+        }
+      }
+    },
+    {
+      "version": "after",
+      "kind": "mage",
+      "seed": 71,
+      "seconds": 180,
+      "alive": true,
+      "hp": 100,
+      "kills": 682,
+      "level": 13,
+      "mode": "trial",
+      "maxImps": 3,
+      "maxLava": 2,
+      "decisions": 14,
+      "initial": {
+        "hp": 100,
+        "armor": 30,
+        "damage": 24,
+        "depth": 0,
+        "shrine": {
+          "power": 0,
+          "vigor": 0,
+          "fleet": 0,
+          "magnet": 0,
+          "armor": 0,
+          "reroll": 0
+        }
+      }
+    },
+    {
+      "version": "after",
+      "kind": "mage",
+      "seed": 113,
+      "seconds": 79.88,
+      "alive": false,
+      "hp": 0,
+      "kills": 212,
+      "level": 7,
+      "mode": "over",
+      "maxImps": 3,
+      "maxLava": 2,
+      "decisions": 6,
+      "initial": {
+        "hp": 100,
+        "armor": 30,
+        "damage": 24,
+        "depth": 0,
+        "shrine": {
+          "power": 0,
+          "vigor": 0,
+          "fleet": 0,
+          "magnet": 0,
+          "armor": 0,
+          "reroll": 0
+        }
+      }
+    },
+    {
+      "version": "after",
+      "kind": "mage",
+      "seed": 151,
+      "seconds": 180,
+      "alive": true,
+      "hp": 130,
+      "kills": 692,
+      "level": 13,
+      "mode": "trial",
+      "maxImps": 3,
+      "maxLava": 2,
+      "decisions": 14,
+      "initial": {
+        "hp": 100,
+        "armor": 30,
+        "damage": 24,
+        "depth": 0,
+        "shrine": {
+          "power": 0,
+          "vigor": 0,
+          "fleet": 0,
+          "magnet": 0,
+          "armor": 0,
+          "reroll": 0
+        }
+      }
+    },
+    {
+      "version": "after",
+      "kind": "storm",
+      "seed": 17,
+      "seconds": 180,
+      "alive": true,
+      "hp": 100,
+      "kills": 695,
+      "level": 13,
+      "mode": "trial",
+      "maxImps": 3,
+      "maxLava": 2,
+      "decisions": 14,
+      "initial": {
+        "hp": 100,
+        "armor": 35,
+        "damage": 23,
+        "depth": 0,
+        "shrine": {
+          "power": 0,
+          "vigor": 0,
+          "fleet": 0,
+          "magnet": 0,
+          "armor": 0,
+          "reroll": 0
+        }
+      }
+    },
+    {
+      "version": "after",
+      "kind": "storm",
+      "seed": 37,
+      "seconds": 180,
+      "alive": true,
+      "hp": 137,
+      "kills": 692,
+      "level": 13,
+      "mode": "trial",
+      "maxImps": 3,
+      "maxLava": 2,
+      "decisions": 15,
+      "initial": {
+        "hp": 100,
+        "armor": 35,
+        "damage": 23,
+        "depth": 0,
+        "shrine": {
+          "power": 0,
+          "vigor": 0,
+          "fleet": 0,
+          "magnet": 0,
+          "armor": 0,
+          "reroll": 0
+        }
+      }
+    },
+    {
+      "version": "after",
+      "kind": "storm",
+      "seed": 71,
+      "seconds": 112.33,
+      "alive": false,
+      "hp": 0,
+      "kills": 348,
+      "level": 10,
+      "mode": "over",
+      "maxImps": 3,
+      "maxLava": 2,
+      "decisions": 10,
+      "initial": {
+        "hp": 100,
+        "armor": 35,
+        "damage": 23,
+        "depth": 0,
+        "shrine": {
+          "power": 0,
+          "vigor": 0,
+          "fleet": 0,
+          "magnet": 0,
+          "armor": 0,
+          "reroll": 0
+        }
+      }
+    },
+    {
+      "version": "after",
+      "kind": "storm",
+      "seed": 113,
+      "seconds": 73.25,
+      "alive": false,
+      "hp": 0,
+      "kills": 183,
+      "level": 7,
+      "mode": "over",
+      "maxImps": 3,
+      "maxLava": 2,
+      "decisions": 6,
+      "initial": {
+        "hp": 100,
+        "armor": 35,
+        "damage": 23,
+        "depth": 0,
+        "shrine": {
+          "power": 0,
+          "vigor": 0,
+          "fleet": 0,
+          "magnet": 0,
+          "armor": 0,
+          "reroll": 0
+        }
+      }
+    },
+    {
+      "version": "after",
+      "kind": "storm",
+      "seed": 151,
+      "seconds": 180,
+      "alive": true,
+      "hp": 130,
+      "kills": 690,
+      "level": 13,
+      "mode": "trial",
+      "maxImps": 3,
+      "maxLava": 2,
+      "decisions": 14,
+      "initial": {
+        "hp": 100,
+        "armor": 35,
+        "damage": 23,
+        "depth": 0,
+        "shrine": {
+          "power": 0,
+          "vigor": 0,
+          "fleet": 0,
+          "magnet": 0,
+          "armor": 0,
+          "reroll": 0
+        }
+      }
+    },
+    {
+      "version": "after",
+      "kind": "ember",
+      "seed": 17,
+      "seconds": 39.15,
+      "alive": false,
+      "hp": 0,
+      "kills": 60,
+      "level": 4,
+      "mode": "over",
+      "maxImps": 2,
+      "maxLava": 2,
+      "decisions": 3,
+      "initial": {
+        "hp": 110,
+        "armor": 36,
+        "damage": 25,
+        "depth": 0,
+        "shrine": {
+          "power": 0,
+          "vigor": 0,
+          "fleet": 0,
+          "magnet": 0,
+          "armor": 0,
+          "reroll": 0
+        }
+      }
+    },
+    {
+      "version": "after",
+      "kind": "ember",
+      "seed": 37,
+      "seconds": 180,
+      "alive": true,
+      "hp": 107,
+      "kills": 691,
+      "level": 14,
+      "mode": "trial",
+      "maxImps": 3,
+      "maxLava": 2,
+      "decisions": 16,
+      "initial": {
+        "hp": 110,
+        "armor": 36,
+        "damage": 25,
+        "depth": 0,
+        "shrine": {
+          "power": 0,
+          "vigor": 0,
+          "fleet": 0,
+          "magnet": 0,
+          "armor": 0,
+          "reroll": 0
+        }
+      }
+    },
+    {
+      "version": "after",
+      "kind": "ember",
+      "seed": 71,
+      "seconds": 144.63,
+      "alive": false,
+      "hp": 0,
+      "kills": 501,
+      "level": 12,
+      "mode": "over",
+      "maxImps": 3,
+      "maxLava": 2,
+      "decisions": 12,
+      "initial": {
+        "hp": 110,
+        "armor": 36,
+        "damage": 25,
+        "depth": 0,
+        "shrine": {
+          "power": 0,
+          "vigor": 0,
+          "fleet": 0,
+          "magnet": 0,
+          "armor": 0,
+          "reroll": 0
+        }
+      }
+    },
+    {
+      "version": "after",
+      "kind": "ember",
+      "seed": 113,
+      "seconds": 180,
+      "alive": true,
+      "hp": 80,
+      "kills": 687,
+      "level": 14,
+      "mode": "trial",
+      "maxImps": 3,
+      "maxLava": 2,
+      "decisions": 16,
+      "initial": {
+        "hp": 110,
+        "armor": 36,
+        "damage": 25,
+        "depth": 0,
+        "shrine": {
+          "power": 0,
+          "vigor": 0,
+          "fleet": 0,
+          "magnet": 0,
+          "armor": 0,
+          "reroll": 0
+        }
+      }
+    },
+    {
+      "version": "after",
+      "kind": "ember",
+      "seed": 151,
+      "seconds": 46.3,
+      "alive": false,
+      "hp": 0,
+      "kills": 70,
+      "level": 4,
+      "mode": "over",
+      "maxImps": 3,
+      "maxLava": 2,
+      "decisions": 3,
+      "initial": {
+        "hp": 110,
+        "armor": 36,
+        "damage": 25,
+        "depth": 0,
+        "shrine": {
+          "power": 0,
+          "vigor": 0,
+          "fleet": 0,
+          "magnet": 0,
+          "armor": 0,
+          "reroll": 0
+        }
+      }
+    },
+    {
+      "version": "after",
+      "kind": "bloodknight",
+      "seed": 17,
+      "seconds": 180,
+      "alive": true,
+      "hp": 140,
+      "kills": 679,
+      "level": 14,
+      "mode": "trial",
+      "maxImps": 3,
+      "maxLava": 2,
+      "decisions": 15,
+      "initial": {
+        "hp": 140,
+        "armor": 45,
+        "damage": 58,
+        "depth": 0,
+        "shrine": {
+          "power": 0,
+          "vigor": 0,
+          "fleet": 0,
+          "magnet": 0,
+          "armor": 0,
+          "reroll": 0
+        }
+      }
+    },
+    {
+      "version": "after",
+      "kind": "bloodknight",
+      "seed": 37,
+      "seconds": 180,
+      "alive": true,
+      "hp": 200,
+      "kills": 686,
+      "level": 14,
+      "mode": "trial",
+      "maxImps": 3,
+      "maxLava": 2,
+      "decisions": 15,
+      "initial": {
+        "hp": 140,
+        "armor": 45,
+        "damage": 58,
+        "depth": 0,
+        "shrine": {
+          "power": 0,
+          "vigor": 0,
+          "fleet": 0,
+          "magnet": 0,
+          "armor": 0,
+          "reroll": 0
+        }
+      }
+    },
+    {
+      "version": "after",
+      "kind": "bloodknight",
+      "seed": 71,
+      "seconds": 180,
+      "alive": true,
+      "hp": 133,
+      "kills": 685,
+      "level": 14,
+      "mode": "trial",
+      "maxImps": 3,
+      "maxLava": 2,
+      "decisions": 14,
+      "initial": {
+        "hp": 140,
+        "armor": 45,
+        "damage": 58,
+        "depth": 0,
+        "shrine": {
+          "power": 0,
+          "vigor": 0,
+          "fleet": 0,
+          "magnet": 0,
+          "armor": 0,
+          "reroll": 0
+        }
+      }
+    },
+    {
+      "version": "after",
+      "kind": "bloodknight",
+      "seed": 113,
+      "seconds": 180,
+      "alive": true,
+      "hp": 34.6,
+      "kills": 693,
+      "level": 13,
+      "mode": "trial",
+      "maxImps": 3,
+      "maxLava": 2,
+      "decisions": 13,
+      "initial": {
+        "hp": 140,
+        "armor": 45,
+        "damage": 58,
+        "depth": 0,
+        "shrine": {
+          "power": 0,
+          "vigor": 0,
+          "fleet": 0,
+          "magnet": 0,
+          "armor": 0,
+          "reroll": 0
+        }
+      }
+    },
+    {
+      "version": "after",
+      "kind": "bloodknight",
+      "seed": 151,
+      "seconds": 180,
+      "alive": true,
+      "hp": 56.2,
+      "kills": 691,
+      "level": 13,
+      "mode": "play",
+      "maxImps": 3,
+      "maxLava": 2,
+      "decisions": 15,
+      "initial": {
+        "hp": 140,
+        "armor": 45,
+        "damage": 58,
+        "depth": 0,
+        "shrine": {
+          "power": 0,
+          "vigor": 0,
+          "fleet": 0,
+          "magnet": 0,
+          "armor": 0,
+          "reroll": 0
+        }
+      }
+    }
+  ],
+  "browserErrors": []
+}

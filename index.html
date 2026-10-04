@@ -1047,7 +1047,7 @@
             prompt.onclick=()=>renderMenu("slots");menuPage.append(prompt);
             menuPage.onclick=(e)=>{if(e.target===menuPage||e.target===title)renderMenu("slots");};
           }
-          menuPage.append(menuText("span","v62 · THE DESCENT","menu-version"));
+          menuPage.append(menuText("span","v63 · INTO THE DEPTHS","menu-version"));
           if(!menuEmbers.children.length)for(let i=0;i<22;i++){
             let ember=document.createElement("i");
             ember.style.setProperty("--x",(i*47%100)+"%");
@@ -1568,6 +1568,7 @@
             upgrade: [500, 1050, 0.3, 0.044, "sine", 200],
             loot: [560, 850, 0.23, 0.035, "sine", 150],
             boss: [135, 58, 0.48, 0.037, "sawtooth", 900],
+            door: [125, 58, 0.22, 0.012, "sawtooth", 1250],
             warning: [480, 240, 0.25, 0.028, "triangle", 550],
             bossDown: [270, 740, 0.4, 0.045, "triangle", 400],
             hurt: [190, 65, 0.2, 0.043, "sawtooth", 170],
@@ -2972,7 +2973,8 @@
             x = hero.x + (side < 2 ? offset * (w + 60) : (side === 2 ? -1 : 1) * (w / 2 + 55)),
             y = hero.y + (side < 2 ? (side === 0 ? -1 : 1) * (h / 2 + 55) : offset * (h + 60)),
             roll = Math.random();
-          if(isDescent()){const point=dungeonSpawn();if(!point)return null;x=point.x;y=point.y; }
+          let entrance=null;
+          if(isDescent()){entrance=dungeonSpawn();if(!entrance)return null;x=entrance.x;y=entrance.y;}
           let zone = currentZone(),
             type =
               forcedType ||
@@ -3086,8 +3088,14 @@
           });
           if (hero.depth >= 5) enemies[enemies.length - 1].r *= 1 + 0.1 * depthStacks(5);
           clearWall(enemies[enemies.length - 1]);
+          const newcomer=enemies[enemies.length-1];
+          if(entrance){
+            newcomer.arrivingUntil=clock+1;
+            newcomer.entryId=entrance.id;newcomer.entryX=newcomer.x;newcomer.entryY=newcomer.y;newcomer.entryAngle=entrance.angle;
+            sfx("door");
+          }
           noteEnemy(type);
-          return enemies[enemies.length-1];
+          return newcomer;
         }
         const eventColors = { chest: "#ffd58b", altar: "#ef7696", sprite: "#9be5ff" };
         const eventNames = { chest: "SEALED CHEST", altar: "CURSED ALTAR", sprite: "TRAPPED SPRITE" };
@@ -3416,10 +3424,10 @@
         let tipQueue = [], activeTip = null, tipTime = 0, navTime = 0, navField = new Map();
         const descentFloors = [
           {name:"ASH CATACOMBS",zone:0,boss:"warden",goal:100,hazard:"Ash vents flare after a warning. Keep moving out of the glow.",rooms:[[2,7,6,6],[10,7,6,6],[18,7,5,6],[25,6,7,8],[10,1,6,4],[18,15,5,4],[2,15,6,4]],links:[[8,9,2,2],[16,9,2,2],[23,9,2,2],[12,5,2,2],[20,13,2,2],[4,13,2,2]]},
-          {name:"FROST VAULT",zone:1,boss:"tyrant",goal:130,hazard:"Frozen patches make you slide. Allow room to stop.",rooms:[[2,7,6,6],[10,7,6,6],[18,7,5,6],[25,6,7,8],[2,1,6,4],[18,1,5,4],[10,15,6,4]],links:[[8,9,2,2],[16,9,2,2],[23,9,2,2],[4,5,2,2],[20,5,2,2],[12,13,2,2]]},
-          {name:"VENOM HOLLOW",zone:2,boss:"colossus",goal:160,hazard:"Spore patches burst when approached. Leave the marked ground.",rooms:[[2,7,6,6],[10,7,6,6],[18,7,5,6],[25,6,7,8],[10,1,6,4],[2,15,6,4],[18,15,5,4]],links:[[8,9,2,2],[16,9,2,2],[23,9,2,2],[12,5,2,2],[4,13,2,2],[20,13,2,2]]},
-          {name:"THE SUNKEN HALLS",zone:1,boss:"oracle",goal:190,hazard:"The sunken halls mix ash vents, slippery ice and bursting spores.",rooms:[[2,7,6,6],[10,7,6,6],[18,7,5,6],[25,6,7,8],[2,1,6,4],[18,1,5,4],[10,15,6,4]],links:[[8,9,2,2],[16,9,2,2],[23,9,2,2],[4,5,2,2],[20,5,2,2],[12,13,2,2]]},
-          {name:"THE HEART CHAMBER",zone:0,boss:"heart",goal:220,hazard:"The Heart guards its chamber with marked slams. Keep an escape route.",rooms:[[2,7,6,6],[10,7,6,6],[18,7,5,6],[25,6,7,8],[10,1,6,4],[18,15,5,4],[2,15,6,4]],links:[[8,9,2,2],[16,9,2,2],[23,9,2,2],[12,5,2,2],[20,13,2,2],[4,13,2,2]]}
+          {name:"FROST VAULT",zone:1,boss:"tyrant",goal:130,hazard:"Frozen patches make you slide. Allow room to stop.",rooms:[[2,7,6,6],[10,6,6,10],[18,2,5,11],[25,6,7,8],[2,1,6,4],[10,18,6,3],[18,15,5,5]],links:[[8,9,2,2],[16,9,2,2],[23,9,2,2],[4,5,2,2],[12,16,2,2],[20,13,2,2]]},
+          {name:"VENOM HOLLOW",zone:2,boss:"colossus",goal:160,hazard:"Spore patches burst when approached. Leave the marked ground.",rooms:[[2,7,6,6],[10,6,7,8],[19,7,4,6],[25,6,7,8],[10,1,7,3],[10,16,7,4],[2,1,6,4]],links:[[8,9,2,2],[17,9,2,2],[23,9,2,2],[12,4,2,2],[12,14,2,2],[4,5,2,2]]},
+          {name:"THE SUNKEN HALLS",zone:1,boss:"oracle",goal:190,hazard:"The sunken halls mix ash vents, slippery ice and bursting spores.",rooms:[[2,7,6,6],[10,7,6,6],[18,7,5,6],[25,6,7,8],[2,1,6,4],[10,15,6,4],[18,1,5,4]],links:[[8,9,2,2],[16,9,2,2],[23,9,2,2],[4,5,2,2],[8,2,10,2],[20,5,2,2],[4,13,2,4],[6,15,4,2],[12,13,2,2]]},
+          {name:"THE HEART CHAMBER",zone:0,boss:"heart",goal:220,hazard:"The Heart guards its chamber with marked slams. Keep an escape route.",rooms:[[2,7,6,6],[10,7,4,6],[16,8,4,4],[25,4,7,12],[10,1,4,4],[16,16,4,4],[2,15,6,4]],links:[[8,9,2,2],[14,9,2,2],[20,9,5,2],[11,5,2,2],[17,12,2,4],[4,13,2,2]]}
         ];
         const dungeonTile=80;
         function isDescent(){return runMode==="descent" && !!dungeon;}
@@ -3430,6 +3438,19 @@
           const spec=descentFloors[number-1], cells=new Set();
           for(const [x,y,w,h] of [...spec.rooms,...spec.links])for(let i=x;i<x+w;i++)for(let j=y;j<y+h;j++)cells.add(i+","+j);
           dungeon={floor:number,cells,elapsed:0,startKills:kills,open:false,bossStarted:false,stairs:null,explored:[],title:2.5,eventAt:30};
+          dungeon.entrances=[];
+          spec.rooms.forEach(([x,y,rw,rh],room)=>{
+            if(room===3)return;
+            const primary=new Set([Math.floor(rw/2)+":0",Math.floor(rw/2)+":"+(rh-1),"0:"+Math.floor(rh/2),(rw-1)+":"+Math.floor(rh/2)]);
+            // Preserve the original edge ordering/distribution; do not funnel packs through a few doors.
+            for(let dx=0;dx<rw;dx++)for(let dy=0;dy<rh;dy++){
+              if(dx!==0&&dy!==0&&dx!==rw-1&&dy!==rh-1)continue;
+              const px=(x+dx+.5)*80,py=(y+dy+.5)*80;
+              if(wallAt(px,py,35))continue;
+              const angle=dy===0?Math.PI/2:dy===rh-1?-Math.PI/2:dx===0?0:Math.PI;
+              dungeon.entrances.push({x:px,y:py,angle,id:room+":"+dx+":"+dy,primary:primary.has(dx+":"+dy)});
+            }
+          });
           navField.clear();navTime=0;
         }
         function dungeonSolid(x,y){
@@ -3494,15 +3515,50 @@
           }
         }
         function dungeonSpawn(){
-          const candidates=[];
-          for(const [rx,ry,rw,rh] of floorSpec().rooms.slice(0,3).concat(floorSpec().rooms.slice(4))){
-            for(let x=rx;x<rx+rw;x++)for(let y=ry;y<ry+rh;y++){
-              if(x!==rx&&x!==rx+rw-1&&y!==ry&&y!==ry+rh-1)continue;
-              const px=(x+.5)*80,py=(y+.5)*80,d=Math.hypot(px-hero.x,py-hero.y);
-              if((Math.abs(px-hero.x)>w/2+65||Math.abs(py-hero.y)>h/2+65)&&d<1600&&!wallAt(px,py,35))candidates.push({x:px,y:py,d});
-            }
+          const candidates=dungeon.entrances.map(door=>({...door,d:Math.hypot(door.x-hero.x,door.y-hero.y)}))
+            .filter(door=>(Math.abs(door.x-hero.x)>w/2+65||Math.abs(door.y-hero.y)>h/2+65)&&door.d<1600&&!wallAt(door.x,door.y,35));
+          candidates.sort((a,b)=>a.d-b.d);
+          return candidates[Math.floor(Math.random()*Math.min(12,candidates.length))]||null;
+        }
+        function arrivalGroups(){
+          const groups=new Map();
+          for(const e of enemies){
+            if(!(e.arrivingUntil>clock)||!e.entryId)continue;
+            const group=groups.get(e.entryId);
+            if(group){group.count++;group.remaining=Math.max(group.remaining,e.arrivingUntil-clock);}
+            else groups.set(e.entryId,{x:e.entryX,y:e.entryY,angle:e.entryAngle,remaining:e.arrivingUntil-clock,count:1});
           }
-          candidates.sort((a,b)=>a.d-b.d);return candidates[Math.floor(Math.random()*Math.min(12,candidates.length))]||null;
+          return [...groups.values()];
+        }
+        function drawDungeonEntrances(left,top){
+          const color=["#ffb66e","#a5e4ff","#b7db78"][currentZone()];
+          for(const door of dungeon.entrances){
+            if(!door.primary)continue;
+            if(door.x<left-50||door.y<top-50||door.x>left+w+190||door.y>top+h+190)continue;
+            ctx.save();ctx.translate(door.x,door.y);ctx.rotate(door.angle);
+            ctx.fillStyle="#030609e8";ctx.beginPath();ctx.ellipse(-13,0,13,24,0,0,7);ctx.fill();
+            ctx.strokeStyle="#8c847144";ctx.lineWidth=3;ctx.beginPath();ctx.ellipse(-13,0,14,25,0,0,7);ctx.stroke();ctx.restore();
+          }
+          for(const group of arrivalGroups()){
+            const progress=Math.max(0,Math.min(1,1-group.remaining));
+            ctx.save();ctx.globalAlpha=.3+progress*.5;drawGlow(group.x,group.y,40,color);ctx.restore();
+            ctx.strokeStyle=color;ctx.lineWidth=2;ctx.beginPath();ctx.arc(group.x,group.y,24+progress*8,0,Math.PI*2*progress);ctx.stroke();
+            // A shadow stretches out of the doorway ahead of the approaching pack.
+            ctx.save();ctx.translate(group.x,group.y);ctx.rotate(group.angle);ctx.fillStyle="#030609e8";ctx.beginPath();ctx.ellipse(-13,0,13,24,0,0,7);ctx.fill();ctx.fillStyle="#020406c9";ctx.beginPath();ctx.ellipse(10+progress*14,0,12+progress*14,9,0,0,7);ctx.fill();ctx.restore();
+          }
+        }
+        function drawArrivalCues(){
+          if(!isDescent()||mode!=="play")return;
+          const groups=arrivalGroups().filter(g=>Math.abs(g.x-hero.x)>w/2-28||Math.abs(g.y-hero.y)>h/2-28)
+            .sort((a,b)=>Math.hypot(a.x-hero.x,a.y-hero.y)-Math.hypot(b.x-hero.x,b.y-hero.y)).slice(0,3);
+          const top=Math.min(h*.4,document.querySelector(".hud").getBoundingClientRect().bottom+110+(activeTip?80:0)),bottom=Math.max(top+20,h-180);
+          for(const group of groups){
+            const dx=group.x-hero.x,dy=group.y-hero.y,angle=Math.atan2(dy,dx),scale=Math.min((w/2-18)/Math.max(1,Math.abs(dx)),(h/2-22)/Math.max(1,Math.abs(dy)));
+            const x=w/2+dx*scale,y=Math.max(top,Math.min(bottom,h/2+dy*scale));
+            ctx.save();ctx.translate(x,y);ctx.fillStyle="#171013d9";ctx.strokeStyle="#ffcb80";ctx.lineWidth=1.5;
+            ctx.beginPath();ctx.arc(0,0,12,0,7);ctx.fill();ctx.stroke();ctx.rotate(angle);
+            ctx.fillStyle="#ffcb80";ctx.beginPath();ctx.moveTo(7,0);ctx.lineTo(-4,-5);ctx.lineTo(-1,0);ctx.lineTo(-4,5);ctx.closePath();ctx.fill();ctx.restore();
+          }
         }
         function drawDungeon(left,top){
           ctx.fillStyle="#080b0d";ctx.fillRect(left,top,w+140,h+140);
@@ -3514,8 +3570,7 @@
               ctx.fillStyle="#17181d";ctx.fillRect(x+(dx===1?76:0),y+(dy===1?76:0),dx?4:80,dy?4:80);
             }
           }
-          // Dark alcoves along room edges make approaching spawns legible.
-          for(const [x,y,rw,rh] of floorSpec().rooms){ctx.fillStyle="#06090bdd";ctx.fillRect((x+rw/2)*80-22,y*80+10,44,28);}
+          drawDungeonEntrances(left,top);
           for(const [x,y,rw,rh] of floorSpec().rooms){
             const px=(x+rw-.6)*80,py=(y+rh-.4)*80;
             if(px<left-80||py<top-80||px>left+w+200||py>top+h+200)continue;
@@ -6430,6 +6485,7 @@
           ctx.globalAlpha = 1;
           drawSiteCompass();
           drawMinimap();
+          drawArrivalCues();
           if(isDescent()&&dungeon.title>0){ctx.fillStyle="#080b13cf";ctx.fillRect(0,h*.36,w,76);ctx.fillStyle="#ffdc9d";ctx.font="bold 17px system-ui";ctx.textAlign="center";ctx.fillText("FLOOR "+dungeon.floor+" · "+floorSpec().name,w/2,h*.36+43);}
           if(!vignetteCache||vignetteCache.width!==Math.ceil(w)||vignetteCache.height!==Math.ceil(h)){
             vignetteCache=surface(Math.ceil(w),Math.ceil(h));let g=vignetteCache.getContext("2d");
