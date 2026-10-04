@@ -8,7 +8,7 @@ const root = path.resolve(__dirname, '..');
 const http = require('node:http');
 const source = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
 for (const m of source.matchAll(/<script[^>]*>([\s\S]*?)<\/script>/g)) new Function(m[1]);
-const hooks = `window.gameTest={begin,selectSlot,applyProfile,saveProfile,restoreRun,readRun,saveRun,makeSaveCode,loadSaveCode,levelUp,renderMenu,renderHeroScreen,damageEnemy,swingBlade,updateBloodknight,update,draw,spawnEnemy,evolutionReady,juggernautActive,showBestiary,facingArt,wallAt,
+const hooks = `window.gameTest={begin,set selectedMode(v){selectedMode=v},selectSlot,applyProfile,saveProfile,restoreRun,readRun,saveRun,makeSaveCode,loadSaveCode,levelUp,renderMenu,renderHeroScreen,damageEnemy,swingBlade,updateBloodknight,update,draw,spawnEnemy,evolutionReady,juggernautActive,showBestiary,facingArt,wallAt,
 get hero(){return hero},get profile(){return profile},get enemies(){return enemies},set enemies(v){enemies=v},get shots(){return shots},get art(){return art},get effects(){return bloodEffects},get keys(){return keys},get joy(){return joy},get clock(){return clock},set clock(v){clock=v},get mode(){return mode},set mode(v){mode=v},get level(){return level},set level(v){level=v},get kills(){return kills},get runStats(){return runStats},get attack(){return attack},set attack(v){attack=v},get selectedHero(){return selectedHero},set selectedHero(v){selectedHero=v},set spawn(v){spawn=v},get slots(){return slots}};`;
 const testSource = source.replace('function sfx(kind) {', 'function sfx(kind) { return;').replaceAll('requestAnimationFrame(frame);', '').replace('      })();', hooks+'\n      })();');
 const server = http.createServer((req, res) => {
@@ -30,7 +30,7 @@ const server = http.createServer((req, res) => {
   await page.locator('input').fill('Knight');await page.getByRole('button',{name:'CREATE & PLAY',exact:true}).click();
   const result=await page.evaluate(()=>{
     const g=gameTest;function check(condition,message){if(!condition)throw Error(message);}
-    function reset(kind='bloodknight'){g.selectedHero=kind;g.begin();g.enemies=[];g.spawn=999;g.hero.critChance=0;}
+    function reset(kind='bloodknight'){g.selectedMode='endless';g.selectedHero=kind;g.begin();g.enemies=[];g.spawn=999;g.hero.critChance=0;}
     function enemy(x,y,type='runner',hp=1000){const e={x,y,type,hp,max:hp,r:10,speed:0,attack:99,faceX:0,faceY:1};g.enemies.push(e);return e;}
     // Pre-existing profiles retain progress and unlock from the existing cumulative boss count.
     g.applyProfile({embers:117,total:400,bosses:3,storm:true,upgrades:{power:2},bestDepth:{mage:4,storm:2}});
@@ -70,7 +70,7 @@ const server = http.createServer((req, res) => {
     for(const name of ['Bloodletting','Crimson Thirst','Berserk','Blood Pact','Blood Fairy','Stone Skin','Shockwave','Earth Spikes I','Quake Step','Earth Fairy'])check(cards.has(name),'Missing '+name);
     reset();g.hero.earthSpikes=2;g.hero.bloodletting=1;g.hero.swingCount=13;g.clock=44;g.saveRun(true);g.hero.hp=1;g.restoreRun();check(g.hero.hp===140&&g.hero.swingCount===13&&g.hero.earthSpikes===2,'Knight save roundtrip');
     const code=g.makeSaveCode();const imported=g.loadSaveCode(code);check(imported.run.hero.class==='bloodknight'&&imported.run.hero.earthSpikes===2&&imported.profile.bloodknight,'Save-code roundtrip');
-    const saved=g.readRun();saved.version=8;saved.balanceVersion=8;localStorage.setItem('ember-crypt-slot-1-run-v9',JSON.stringify(saved));g.restoreRun();check(g.readRun().version===9,'Old run migration');
+    const saved=g.readRun();saved.version=8;saved.balanceVersion=8;localStorage.setItem('ember-crypt-slot-1-run-v10',JSON.stringify(saved));g.restoreRun();check(g.readRun().version===10,'Old run migration');
     reset();g.hero.fairies=['blood','earth'];enemy(70,0);g.update(.025);check(!g.shots.length,'Knight fairies produced projectiles');g.draw();
     return {cards:[...cards],canvas:document.querySelector('canvas').width,repairRatio:repaired/g.hero.armor};
   });
@@ -98,7 +98,7 @@ const server = http.createServer((req, res) => {
     for(const style of ['circle','aggressive']) for(const kind of ['mage','storm','ember','bloodknight']) for(const seed of [17,37,71,113,151]) {
       results.push(await page.evaluate(({style,kind,seed})=>{
         let state=seed;Math.random=()=>{state=(state+0x6D2B79F5)|0;let t=Math.imul(state^(state>>>15),1|state);t=(t+Math.imul(t^(t>>>7),61|t))^t;return ((t^(t>>>14))>>>0)/4294967296;};
-        const g=gameTest;g.applyProfile({bosses:3,storm:true,ember:true});g.selectedHero=kind;g.begin();
+        const g=gameTest;g.applyProfile({bosses:3,storm:true,ember:true});g.selectedMode='endless';g.selectedHero=kind;g.begin();
         // Both policies start in the same open corridor and use only movement + offered cards.
         g.hero.x=210;g.hero.y=200;
         const priorities=kind==='bloodknight'?['EVOLUTION','Crimson Thirst','Bloodletting','Stone Skin','Blood Fairy','Shockwave','Earth Spikes','Berserk','Twin Flame','Long Reach','Quake Step','Earth Fairy','Quick Hands','Iron Heart']:['EVOLUTION','Twin Flame','Quick Hands','ARCANE LANCE','Chain Spark','METEOR SIGIL','GRAVE NOVA','Firebrand','Venom Bolts','Fairy','Iron Heart'];

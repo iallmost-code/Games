@@ -1,0 +1,132 @@
+{
+  "mechanics": 12,
+  "runs": [
+    {
+      "kind": "mage",
+      "floor": 1,
+      "bosses": 4,
+      "next": 2
+    },
+    {
+      "kind": "mage",
+      "floor": 2,
+      "bosses": 5,
+      "next": 3
+    },
+    {
+      "kind": "mage",
+      "floor": 3,
+      "bosses": 6,
+      "next": 4
+    },
+    {
+      "kind": "mage",
+      "floor": 4,
+      "bosses": 7,
+      "next": 5
+    },
+    {
+      "kind": "mage",
+      "floor": 5,
+      "bosses": 8,
+      "victory": true
+    },
+    {
+      "kind": "storm",
+      "floor": 1,
+      "bosses": 4,
+      "next": 2
+    },
+    {
+      "kind": "storm",
+      "floor": 2,
+      "bosses": 5,
+      "next": 3
+    },
+    {
+      "kind": "storm",
+      "floor": 3,
+      "bosses": 6,
+      "next": 4
+    },
+    {
+      "kind": "storm",
+      "floor": 4,
+      "bosses": 7,
+      "next": 5
+    },
+    {
+      "kind": "storm",
+      "floor": 5,
+      "bosses": 8,
+      "victory": true
+    },
+    {
+      "kind": "ember",
+      "floor": 1,
+      "bosses": 4,
+      "next": 2
+    },
+    {
+      "kind": "ember",
+      "floor": 2,
+      "bosses": 5,
+      "next": 3
+    },
+    {
+      "kind": "ember",
+      "floor": 3,
+      "bosses": 6,
+      "next": 4
+    },
+    {
+      "kind": "ember",
+      "floor": 4,
+      "bosses": 7,
+      "next": 5
+    },
+    {
+      "kind": "ember",
+      "floor": 5,
+      "bosses": 8,
+      "victory": true
+    },
+    {
+      "kind": "bloodknight",
+      "floor": 1,
+      "bosses": 4,
+      "next": 2
+    },
+    {
+      "kind": "bloodknight",
+      "floor": 2,
+      "bosses": 5,
+      "next": 3
+    },
+    {
+      "kind": "bloodknight",
+      "floor": 3,
+      "bosses": 6,
+      "next": 4
+    },
+    {
+      "kind": "bloodknight",
+      "floor": 4,
+      "bosses": 7,
+      "next": 5
+    },
+    {
+      "kind": "bloodknight",
+      "floor": 5,
+      "bosses": 8,
+      "victory": true
+    }
+  ],
+  "browserErrors": [],
+  "assistance": "Deterministic joystick, health kept high and 3000 base damage; actual game movement, attacks, spawns, doors, stairs, upgrades and draw.",
+  "liveMobile": "Unmodified animation loop at 390\u00d7844; tip auto-hide, assets and minimap below HUD passed.",
+  "additionalChecks": [
+    "Endless wave-20 Heart victory and tier continuation",
+    "Independent records for Descent and Endless"
+  ]
+}
