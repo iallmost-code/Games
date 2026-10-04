@@ -26,15 +26,15 @@ const server=http.createServer((req,res)=>{const name=decodeURIComponent(req.url
   g.shots=[{x:220,y:575,vx:0,vy:-500,life:1,damage:100}];g.hazards=[{x:220,y:575,vx:0,vy:-500,life:1,damage:100}];g.update(.05);check(!g.shots.length&&!g.hazards.length,'Projectile wall collision');
   g.begin();g.kills=g.dungeon.startKills+100;g.updateDungeon(.05);check(g.dungeon.open,'Kill goal door');
   g.begin();g.updateDungeon(179.9);check(!g.dungeon.open,'Door too early');g.updateDungeon(.1);check(g.dungeon.open,'Timer door');
-  g.floorEntry(3);g.hero.hp=2;g.hero.x=1100;g.kills+=10;g.saveRun(true);const saved=g.readRun();check(saved.version===10&&saved.floor===3&&saved.floorCheckpoint.floor===3,'Floor v10 save');g.restoreRun();check(g.dungeon.floor===3&&g.dungeon.elapsed===0&&g.hero.x===400&&g.hero.hp!==2,'Continue floor entry');
-  const code=g.makeSaveCode(),decoded=g.loadSaveCode(code);check(decoded.run.version===10&&decoded.run.floor===3,'v10 save code');
+  g.floorEntry(3);g.hero.hp=2;g.hero.x=1100;g.kills+=10;g.saveRun(true);const saved=g.readRun();check(saved.version===11&&saved.floor===3&&saved.floorCheckpoint.floor===3,'Floor v11 save');g.restoreRun();check(g.dungeon.floor===3&&g.dungeon.elapsed===0&&g.hero.x===400&&g.hero.hp!==2,'Continue floor entry');
+  const code=g.makeSaveCode(),decoded=g.loadSaveCode(code);check(decoded.run.version===11&&decoded.run.floor===3,'v11 save code');
   g.selectedMode='endless';g.begin();g.hero.hp=73;g.hero.x=-500;g.saveRun(true);const legacy=g.readRun();legacy.version=9;legacy.balanceVersion=9;delete legacy.runMode;delete legacy.floor;delete legacy.floorCheckpoint;
-  localStorage.removeItem('ember-crypt-slot-1-run-v10');localStorage.setItem('ember-crypt-slot-1-run-v9',JSON.stringify(legacy));g.restoreRun();check(g.runMode==='endless'&&!g.dungeon&&g.hero.hp===73&&g.hero.x===-500,'v9 migration changed run');check(g.readRun().version===10&&!localStorage.getItem('ember-crypt-slot-1-run-v9'),'Migration not persisted');
+  localStorage.removeItem('ember-crypt-slot-1-run-v11');localStorage.setItem('ember-crypt-slot-1-run-v9',JSON.stringify(legacy));g.restoreRun();check(g.runMode==='endless'&&!g.dungeon&&g.hero.hp===73&&g.hero.x===-500,'v9 migration changed run');check(g.readRun().version===11&&!localStorage.getItem('ember-crypt-slot-1-run-v9'),'Migration not persisted');
   // Construct a real old EC1 payload with the old run shape/checksum.
   const payload=JSON.parse(atob(code.split('.')[2].replace(/-/g,'+').replace(/_/g,'/')));payload.run=legacy;const json=JSON.stringify(payload);let h=2166136261;for(let i=0;i<json.length;i++){h^=json.charCodeAt(i);h=Math.imul(h,16777619);}const oldCode='EC1.'+(h>>>0).toString(36)+'.'+btoa(json).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
   check(g.loadSaveCode(oldCode).run.runMode==='endless','v9 code migration');
   g.begin();g.hero.maxHp=g.hero.hp=1000000;g.clock=600;g.update(.05);const heart=g.enemies.find(e=>e.variant==='heart');check(heart,'Endless wave 20 Heart');g.damageEnemy(heart,1e9);g.update(.05);check(g.mode==='victory','Endless victory');g.continueEndless();g.waveClock=690;g.update(.05);check(g.hero.endless&&g.endlessTier()>=1,'Endless tiers');
-  g.profile.records.descent.kills=456;g.profile.records.descent.bestDepth.mage=2;g.saveProfile();g.selectedMode='descent';g.begin();check(g.profile.records.endless.kills!==456&&g.profile.records.endless.bestDepth.mage!==2,'Mode records mixed');g.selectedMode='endless';g.begin();g.saveRun(true);
+  g.profile.records.descent.kills=456;g.profile.records.descent.bestDepth.gravecaller=2;g.saveProfile();g.selectedMode='descent';g.begin();check(g.profile.records.endless.kills!==456&&g.profile.records.endless.bestDepth.gravecaller!==2,'Mode records mixed');g.selectedMode='endless';g.begin();g.saveRun(true);
   g.profile.embers=123;g.profile.upgrades={vigor:2};g.profile.tips={move:true};g.saveProfile();
   return {code,oldCode,checks:12};
  });
@@ -45,9 +45,9 @@ const server=http.createServer((req,res)=>{const name=decodeURIComponent(req.url
  // Import into slot 2 through the actual Settings controls, leaving slot 1 alone.
  await page.evaluate(()=>{gameTest.selectSlot(1);gameTest.renderMenu('settings');});await page.getByLabel('Paste save code').fill(mechanics.code);await page.getByRole('button',{name:'LOAD',exact:true}).click();await page.getByRole('button',{name:'REPLACE THIS CHARACTER · CONFIRM',exact:true}).click();
  assert(await page.evaluate(()=>gameTest.readRun().floor===3));await page.evaluate(()=>{gameTest.selectSlot(0);gameTest.renderMenu('settings');});await page.getByRole('button',{name:/^RESET TIPS/}).click();assert(await page.evaluate(()=>Object.keys(gameTest.profile.tips).length===0));
- console.log('PASS: syntax, walls, swept projectiles, spawns, both door triggers, floor checkpoint, v9→v10, v9/v10 codes, UI import, slot isolation, Reset Tips');
+ console.log('PASS: syntax, walls, swept projectiles, spawns, both door triggers, floor checkpoint, v9→v11, v9/v11 codes, UI import, slot isolation, Reset Tips');
  const runs=[];
- for(const kind of ['mage','storm','ember','bloodknight']){
+ for(const kind of ['gravecaller','ranger','ember','bloodknight','sunwarden']){
   await page.evaluate(kind=>{const g=gameTest;g.applyProfile({bosses:3,storm:true,ember:true});g.selectedHero=kind;g.selectedMode='descent';g.begin();g.hero.maxHp=g.hero.hp=1000000;g.hero.damage=3000;},kind);
   for(let floor=1;floor<=5;floor++){
    const result=await page.evaluate(({floor,kind})=>{
@@ -74,8 +74,8 @@ const server=http.createServer((req,res)=>{const name=decodeURIComponent(req.url
  }
  assert.equal(errors.length,0,errors.join('\n'));fs.writeFileSync('/tmp/descent-results.json',JSON.stringify({mechanics:mechanics.checks,runs,browserErrors:errors,assistance:'Deterministic joystick, health kept high and 3000 base damage; actual game movement, attacks, spawns, doors, stairs, upgrades and draw.'},null,2));
  const live=await browser.newPage({viewport:{width:390,height:844}});live.on('pageerror',e=>errors.push(e.message));await live.goto(`http://localhost:${server.address().port}/live`);await live.getByRole('button',{name:'TAP TO START'}).click({force:true});await live.getByRole('button',{name:'SLOT 1 · + NEW CHARACTER',exact:true}).click();await live.locator('input').fill('Live');await live.getByRole('button',{name:'CREATE & PLAY',exact:true}).click();await live.keyboard.down('ArrowRight');await live.waitForTimeout(1000);await live.keyboard.up('ArrowRight');await live.waitForTimeout(5000);
- assert(await live.evaluate(()=>{const hud=document.querySelector('.hud').getBoundingClientRect(),map=document.querySelector('#dungeonMap').getBoundingClientRect();return !document.querySelector('#dungeonMap').hidden&&map.top>hud.bottom&&document.querySelector('#firstRunTip').hidden;}));await live.screenshot({path:'/tmp/descent-live-mobile.png'});assert.equal(errors.length,0,errors.join('\n'));
+ assert(await live.evaluate(()=>{const hud=document.querySelector('.hud').getBoundingClientRect(),map=document.querySelector('#dungeonMap').getBoundingClientRect();return !document.querySelector('#dungeonMap').hidden&&map.top>hud.bottom&&document.querySelector('#firstRunTip').textContent!=='Drag the joystick to move. Attacks are automatic.';}));await live.screenshot({path:'/tmp/descent-live-mobile.png'});assert.equal(errors.length,0,errors.join('\n'));
  console.log('PASS: live unmodified mobile frame loop, assets, tip auto-hide and HUD/minimap separation');
- console.log('PASS: all 20 floor/hero combinations in Chromium, no browser errors');
+ console.log('PASS: all 25 floor/hero combinations in Chromium, no browser errors');
  }finally{await browser.close();server.close();}
 })().catch(e=>{console.error(e);server.close();process.exitCode=1;});

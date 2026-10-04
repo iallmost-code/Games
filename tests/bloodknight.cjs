@@ -34,11 +34,11 @@ const server = http.createServer((req, res) => {
     function enemy(x,y,type='runner',hp=1000){const e={x,y,type,hp,max:hp,r:10,speed:0,attack:99,faceX:0,faceY:1};g.enemies.push(e);return e;}
     // Pre-existing profiles retain progress and unlock from the existing cumulative boss count.
     g.applyProfile({embers:117,total:400,bosses:3,storm:true,upgrades:{power:2},bestDepth:{mage:4,storm:2}});
-    check(g.profile.bloodknight&&g.profile.embers===117&&g.profile.bestDepth.mage===4&&g.profile.bestDepth.bloodknight===0,'Legacy profile migration');
+    check(g.profile.bloodknight&&g.profile.embers===117&&g.profile.bestDepth.gravecaller===4&&g.profile.bestDepth.bloodknight===0,'Legacy profile migration');
     g.applyProfile({bosses:2,bestDepth:{mage:3}});g.selectedHero='bloodknight';g.renderHeroScreen();
     check(document.querySelector('#menuPage').textContent.includes('Defeat 3 bosses total · 2/3'),'Locked condition');
     check(document.querySelector('.menu-actions button').disabled,'Locked hero can start');
-    reset('mage');const boss=enemy(30,0,'boss',1);boss.variant='warden';g.damageEnemy(boss,10,'blood');check(g.profile.bloodknight&&g.profile.bosses===3,'Third boss unlock');
+    reset('gravecaller');const boss=enemy(30,0,'boss',1);boss.variant='warden';g.damageEnemy(boss,10,'blood');check(g.profile.bloodknight&&g.profile.bosses===3,'Third boss unlock');
     g.profile.upgrades={};reset();check(g.hero.hp===140&&g.hero.armor===45&&g.hero.speed===207&&g.hero.damage>24&&g.hero.range===95&&g.hero.baseRate===.55,'Base stats');
     g.hero.moving=1;g.hero.faceX=1;g.hero.faceY=0;
     const front=enemy(70,0),edge=enemy(22,72),behind=enemy(-70,0),far=enemy(130,0);
@@ -66,11 +66,11 @@ const server = http.createServer((req, res) => {
     // Additive matchups keep old elemental weaknesses.
     reset();let target=enemy(40,0,'ghoul');g.damageEnemy(target,20,'blood');check(target.hp===970,'Blood weakness');target=enemy(40,0,'ghoul');g.damageEnemy(target,20,'fire');check(target.hp===970,'Old fire weakness');target=enemy(40,0,'wraith');g.damageEnemy(target,20,'blood');check(target.hp===990,'Blood resistance');target=enemy(40,0,'wraith');g.damageEnemy(target,20,'earth');check(target.hp===970,'Earth weakness');
     g.showBestiary();check(document.querySelector('#bestiary').textContent.includes('BLOOD')&&document.querySelector('#bestiary').textContent.includes('EARTH'),'Bestiary elements');
-    const cards=new Set();for(const kind of ['mage','storm','ember','bloodknight']){reset(kind);for(let n=0;n<100;n++){g.level=5;g.levelUp();for(const button of document.querySelectorAll('#choices .choice')){if(kind==='bloodknight'){check(!/\b(fire|poison|frost|lightning|arcane|shadow)\b/.test(button.className),'Wrong element offered');cards.add(button.querySelector('span')?.textContent);}else check(!/\b(blood|earth)\b/.test(button.className),'Knight card leaked');}}}
+    const cards=new Set();for(const kind of ['gravecaller','ranger','ember','bloodknight']){reset(kind);for(let n=0;n<100;n++){g.level=5;g.levelUp();for(const button of document.querySelectorAll('#choices .choice')){if(kind==='bloodknight'){check(!/\b(fire|poison|frost|lightning|arcane|shadow)\b/.test(button.className),'Wrong element offered');cards.add(button.querySelector('span')?.textContent);}else check(!/\b(blood|earth)\b/.test(button.className),'Knight card leaked');}}}
     for(const name of ['Bloodletting','Crimson Thirst','Berserk','Blood Pact','Blood Fairy','Stone Skin','Shockwave','Earth Spikes I','Quake Step','Earth Fairy'])check(cards.has(name),'Missing '+name);
     reset();g.hero.earthSpikes=2;g.hero.bloodletting=1;g.hero.swingCount=13;g.clock=44;g.saveRun(true);g.hero.hp=1;g.restoreRun();check(g.hero.hp===140&&g.hero.swingCount===13&&g.hero.earthSpikes===2,'Knight save roundtrip');
     const code=g.makeSaveCode();const imported=g.loadSaveCode(code);check(imported.run.hero.class==='bloodknight'&&imported.run.hero.earthSpikes===2&&imported.profile.bloodknight,'Save-code roundtrip');
-    const saved=g.readRun();saved.version=8;saved.balanceVersion=8;localStorage.setItem('ember-crypt-slot-1-run-v10',JSON.stringify(saved));g.restoreRun();check(g.readRun().version===10,'Old run migration');
+    const saved=g.readRun();saved.version=8;saved.balanceVersion=8;localStorage.removeItem('ember-crypt-slot-1-run-v11');localStorage.setItem('ember-crypt-slot-1-run-v10',JSON.stringify(saved));g.restoreRun();check(g.readRun().version===11,'Old run migration');
     reset();g.hero.fairies=['blood','earth'];enemy(70,0);g.update(.025);check(!g.shots.length,'Knight fairies produced projectiles');g.draw();
     return {cards:[...cards],canvas:document.querySelector('canvas').width,repairRatio:repaired/g.hero.armor};
   });
@@ -95,7 +95,7 @@ const server = http.createServer((req, res) => {
   console.log('PASS: Bloodknight PNG fallback');await fallback.close();
   if(process.env.BALANCE) {
     const results=[];
-    for(const style of ['circle','aggressive']) for(const kind of ['mage','storm','ember','bloodknight']) for(const seed of [17,37,71,113,151]) {
+    for(const style of ['circle','aggressive']) for(const kind of ['gravecaller','ranger','ember','bloodknight']) for(const seed of [17,37,71,113,151]) {
       results.push(await page.evaluate(({style,kind,seed})=>{
         let state=seed;Math.random=()=>{state=(state+0x6D2B79F5)|0;let t=Math.imul(state^(state>>>15),1|state);t=(t+Math.imul(t^(t>>>7),61|t))^t;return ((t^(t>>>14))>>>0)/4294967296;};
         const g=gameTest;g.applyProfile({bosses:3,storm:true,ember:true});g.selectedMode='endless';g.selectedHero=kind;g.begin();

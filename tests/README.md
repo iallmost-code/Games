@@ -39,7 +39,7 @@ node tests/descent.cjs
 
 This Chromium integration suite checks authored map connectivity and movement, locked doors, offscreen spawns, swept collisions for both projectile teams, Bloodknight swings through walls, timer/kill door triggers, floor-entry checkpoints, v9→v10 run migration, v9/v10 EC1 codes, Settings import, slot isolation and Reset Tips.
 
-It then plays all five floors with each of the four heroes (20 floor/hero combinations), using real joystick movement, automatic attacks, spawns, upgrades, bosses, stairs and victory. Health and base damage are increased for this progression check; this is an accelerated assisted browser playthrough, not a human difficulty or balance measurement. Screenshots and `descent-results.json` go to `/tmp`. The checked-in `descent-playthrough.json` records the passing progression run. The suite also verifies Endless wave-20 victory/tier continuation, independent mode records, and an unmodified live mobile animation loop with the minimap below the HUD. The Bloodknight suite explicitly selects ENDLESS so its original arena combat regression checks remain comparable.
+It then plays all five floors with each of the five heroes (25 floor/hero combinations), using real joystick movement, automatic attacks, spawns, upgrades, bosses, stairs and victory. Health and base damage are increased for this progression check; this is an accelerated assisted browser playthrough, not a human difficulty or balance measurement. Screenshots and `descent-results.json` go to `/tmp`. The checked-in `descent-playthrough.json` records the passing progression run. The suite also verifies Endless wave-20 victory/tier continuation, independent mode records, and an unmodified live mobile animation loop with the minimap below the HUD. The Bloodknight suite explicitly selects ENDLESS so its original arena combat regression checks remain comparable.
 
 ## Descent tuning: normal Floor 1 survival
 
@@ -69,8 +69,38 @@ node tests/descent-variety.cjs
 BASELINE_COMMIT=f0b3ff9 RESULT_PATH=tests/descent-variety-survival.json node tests/descent-tuning.cjs
 ```
 
-The variety suite checks all five authored layouts, room connectivity before/after opening the boss door, Sunken bypass loops, valid room-edge entrances, one-second announcements ahead of normal enemy approaches, timer pausing, approach, v10 checkpoint restart and unchanged Endless spawns. It captures all five maps and a mid-warning viewport in Chromium. The existing Descent suite covers all 20 floor/hero progression combinations.
+The variety suite checks all five authored layouts, room connectivity before/after opening the boss door, Sunken bypass loops, valid room-edge entrances, one-second announcements ahead of normal enemy approaches, timer pausing, approach, v10 checkpoint restart and unchanged Endless spawns. It captures all five maps and a mid-warning viewport in Chromium. The existing Descent suite covers all 25 floor/hero progression combinations.
 
 The normal-stat survival comparison uses the previously merged Descent/tuning build as its baseline and writes a separate historical report; it uses the same five seeds, movement policy and normal stats as the earlier diagnostic. `BASELINE_COMMIT` and `RESULT_PATH` optionally choose a baseline/report without overwriting the original tuning results.
 
 The final v63 comparison reproduces all 20 tuned Floor 1 outcomes exactly: three-minute survival stays Mage 3/5, Stormcaller 3/5, Emberweaver 2/5 and Bloodknight 5/5. Median survival stays 180s, 180s, 144.63s and 180s respectively (180s is the test cap). Arrival announcements do not delay, hide or make enemies invulnerable; combat timing and Floor 1's layout/spawn distribution are preserved. This is an automated normal-stat regression check, not a human playtest.
+
+## Five-hero prototype (v64)
+
+Run all checks in Chromium with Playwright available:
+
+```sh
+node tests/bloodknight.cjs
+node tests/descent.cjs
+node tests/descent-variety.cjs
+node tests/new-heroes.cjs
+BASELINE_COMMIT=9906620 RESULT_PATH=tests/new-heroes-survival.json node tests/descent-tuning.cjs
+```
+
+`new-heroes.cjs` checks the new starter and unlock condition, corpse-raise odds, caps and lifetimes, mortal allies and ordinary-enemy attention, minion melee/link/siphon/explosions/giants/spirits, independent arrows and aim, wolves, traps, volleys, beams, shared crit stats, gusts, Sanctuary/Halo/Dawnbreaker/Cyclone/Judgment, all nine evolution prerequisites, elemental card isolation, Light/Wind matchups, gear effects, pause and actor serialization. It generates real old Mage, Stormcaller and Bloodknight saves with the preceding v63 source and tests profile-v2/v9/v10→v11 migration, current-floor restart, safe replacement of removed heroes, embers/shrine/achievements/tips/records/unlock preservation, slot isolation and old/new EC1 codes. It also renders the three new kits, runs the unmodified mobile frame loop with each of all five heroes at normal stats, and forces the new atlas through PNG fallback.
+
+The Descent progression suite now covers 25 floor/hero combinations with assisted health/damage solely to exercise progression. `new-heroes-progression.json` records that result; `new-heroes-checks.json` records the additional mechanical/migration checks. Survival below uses normal starting HP, armor and damage, depth 0 and no shrine upgrades or combat overrides. Bots use the same five seeds and constant-turn joystick policy with wall avoidance, normal offered cards/gear and Sanctuary choices. Historical before results use `9906620` (the authored-floor/arrival build).
+
+| Hero | Median time | Range | Alive at 180s cap | Cleared Floor 1 earlier |
+| --- | --- | --- | --- | --- |
+| Gravecaller | 180.00s | 92.58–180.00s | 4/5 | 0/5 |
+| Storm Ranger | 158.55s | 158.15–180.00s | 2/5 | 3/5 |
+| Emberweaver | 144.63s | 39.15–180.00s | 2/5 | 0/5 |
+| Bloodknight | 180.00s | 146.20–180.00s | 3/5 | 0/5 |
+| Sunwarden | 154.63s | 127.30–180.00s | 2/5 | 0/5 |
+
+A 180-second result is censored at the cap. Early floor clears are successful completions, not deaths; Storm Ranger's median ends on an early clear. Individual outcomes, initial stats and floor/exit reasons are in `new-heroes-survival.json` (20 legacy baseline runs plus 25 prototype runs). No run exceeded three living Cinder Imps or two concurrent lava vents. These are automated normal-stat diagnostics, not a human playtest or physical-phone FPS measurement.
+
+For focused tuning only, `CURRENT_ONLY=1 HERO_FILTER=gravecaller,ranger,sunwarden RESULT_PATH=/tmp/hero-tuning.json` runs the chosen current heroes without the legacy comparison.
+
+Optional owner playtest: [new-heroes-playtest.ec1.txt](new-heroes-playtest.ec1.txt) is a no-run profile with all five heroes unlocked, zero embers and no shrine upgrades. Import it into an empty prototype slot through Settings → LOAD SAVE CODE to try the new kits immediately. The normal unlock conditions remain in the game.

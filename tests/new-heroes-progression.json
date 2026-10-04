@@ -1,0 +1,157 @@
+{
+  "mechanics": 12,
+  "runs": [
+    {
+      "kind": "gravecaller",
+      "floor": 1,
+      "bosses": 4,
+      "next": 2
+    },
+    {
+      "kind": "gravecaller",
+      "floor": 2,
+      "bosses": 5,
+      "next": 3
+    },
+    {
+      "kind": "gravecaller",
+      "floor": 3,
+      "bosses": 6,
+      "next": 4
+    },
+    {
+      "kind": "gravecaller",
+      "floor": 4,
+      "bosses": 7,
+      "next": 5
+    },
+    {
+      "kind": "gravecaller",
+      "floor": 5,
+      "bosses": 8,
+      "victory": true
+    },
+    {
+      "kind": "ranger",
+      "floor": 1,
+      "bosses": 4,
+      "next": 2
+    },
+    {
+      "kind": "ranger",
+      "floor": 2,
+      "bosses": 5,
+      "next": 3
+    },
+    {
+      "kind": "ranger",
+      "floor": 3,
+      "bosses": 6,
+      "next": 4
+    },
+    {
+      "kind": "ranger",
+      "floor": 4,
+      "bosses": 7,
+      "next": 5
+    },
+    {
+      "kind": "ranger",
+      "floor": 5,
+      "bosses": 8,
+      "victory": true
+    },
+    {
+      "kind": "ember",
+      "floor": 1,
+      "bosses": 4,
+      "next": 2
+    },
+    {
+      "kind": "ember",
+      "floor": 2,
+      "bosses": 5,
+      "next": 3
+    },
+    {
+      "kind": "ember",
+      "floor": 3,
+      "bosses": 6,
+      "next": 4
+    },
+    {
+      "kind": "ember",
+      "floor": 4,
+      "bosses": 7,
+      "next": 5
+    },
+    {
+      "kind": "ember",
+      "floor": 5,
+      "bosses": 8,
+      "victory": true
+    },
+    {
+      "kind": "bloodknight",
+      "floor": 1,
+      "bosses": 4,
+      "next": 2
+    },
+    {
+      "kind": "bloodknight",
+      "floor": 2,
+      "bosses": 5,
+      "next": 3
+    },
+    {
+      "kind": "bloodknight",
+      "floor": 3,
+      "bosses": 6,
+      "next": 4
+    },
+    {
+      "kind": "bloodknight",
+      "floor": 4,
+      "bosses": 7,
+      "next": 5
+    },
+    {
+      "kind": "bloodknight",
+      "floor": 5,
+      "bosses": 8,
+      "victory": true
+    },
+    {
+      "kind": "sunwarden",
+      "floor": 1,
+      "bosses": 4,
+      "next": 2
+    },
+    {
+      "kind": "sunwarden",
+      "floor": 2,
+      "bosses": 5,
+      "next": 3
+    },
+    {
+      "kind": "sunwarden",
+      "floor": 3,
+      "bosses": 6,
+      "next": 4
+    },
+    {
+      "kind": "sunwarden",
+      "floor": 4,
+      "bosses": 7,
+      "next": 5
+    },
+    {
+      "kind": "sunwarden",
+      "floor": 5,
+      "bosses": 8,
+      "victory": true
+    }
+  ],
+  "browserErrors": [],
+  "assistance": "Deterministic joystick, health kept high and 3000 base damage; actual game movement, attacks, spawns, doors, stairs, upgrades and draw."
+}
