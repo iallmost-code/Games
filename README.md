@@ -1,13 +1,14 @@
 # Ember Crypt
 
 Current playable build: **v60 Stone & Motion**  
-Live game: https://ember-crypt.alpine0-0.chatgpt.site
+Play: https://iallmost-code.github.io/Games/ (GitHub Pages, deployed from `main`)  
+ChatGPT Sites copy: https://ember-crypt.alpine0-0.chatgpt.site
 
 This is the complete mobile browser game source. Open `index.html` in a browser or serve this folder with `python3 -m http.server 8000` and visit http://localhost:8000. The game uses plain HTML, CSS, JavaScript, and the art in `assets/`; there is no build step.
 
 ## Work on it in Codex
 
-Select this repository and its default branch, `claude/game-from-gpt-v2t55i`, in a Codex Cloud environment. `AGENTS.md` records the game constraints. The published game lives on the existing Sites link above; commits to this repository do not automatically deploy it.
+Select this repository and its default branch, `main`, in a Codex Cloud environment. `AGENTS.md` records the game constraints. Pushing to `main` redeploys the GitHub Pages link within a minute or two; the ChatGPT Sites copy is separate and is not updated by commits.
 
 ## Current game
 

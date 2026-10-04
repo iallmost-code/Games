@@ -5,5 +5,5 @@
 - Preserve the one-thumb controls. The bottom-center joystick, pause button, automatic attacks, and Settings sound/speed controls are intentional. Do not add an in-game action button unless asked.
 - Preserve localStorage save compatibility. Run format is v9; change format/version and write a migration only when changing serialized run structure.
 - Keep WebP-first cinematic assets with PNG fallback. Maintain readable hero ring, danger cues, and the 40 FPS limiter.
-- The existing public game is hosted separately at https://ember-crypt.alpine0-0.chatgpt.site. A GitHub commit alone does not update that link.
+- `main` is published by GitHub Pages at https://iallmost-code.github.io/Games/; anything pushed to `main` goes live. Work on a branch and merge to `main` only after testing. The ChatGPT Sites copy (https://ember-crypt.alpine0-0.chatgpt.site) is separate and not updated by commits.
 - Verify JavaScript syntax and a real canvas render after changes. Test profile isolation and save migration for changes affecting persistence. Avoid performance-heavy per-enemy blur or filter operations.
