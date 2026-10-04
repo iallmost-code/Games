@@ -104,3 +104,25 @@ A 180-second result is censored at the cap. Early floor clears are successful co
 For focused tuning only, `CURRENT_ONLY=1 HERO_FILTER=gravecaller,ranger,sunwarden RESULT_PATH=/tmp/hero-tuning.json` runs the chosen current heroes without the legacy comparison.
 
 Optional owner playtest: [new-heroes-playtest.ec1.txt](new-heroes-playtest.ec1.txt) is a no-run profile with all five heroes unlocked, zero embers and no shrine upgrades. Import it into an empty prototype slot through Settings → LOAD SAVE CODE to try the new kits immediately. The normal unlock conditions remain in the game.
+
+## Landscape + skills (`codex/landscape-skills`)
+
+Run:
+
+```sh
+NODE_PATH=/opt/codex/runtimes/codex-primary-runtime/dependencies/node/node_modules node tests/landscape-skills.cjs
+```
+
+The new suite checks 390×844 portrait and 844×390 landscape for all five heroes: full-width canvas, safe HUD/minimap/button geometry, portrait joystick spacing, floating joystick placement, menus, native browser frame loop, and real simultaneous touch input. Keyboard movement/Space/E, rotation/release, and menu typing are covered. Combat checks exercise actual Colossus slams during and after Dash, swept wall collision, four-second cooldown and Fleet Step, all five Ultimates, readiness effects, paused timers, no idle charge, and the minimum 60-second recharge ceiling under sustained damage. Saves cover optional-field defaults in v11, existing progress/upgrades, cooldown/charge/Army in Endless, Descent floor checkpoints, EC1 codes, and slot isolation.
+
+`landscape-skills-results.json` stores the geometry, combat/save results and normal-stat charge measurements. These first-charge runs use the established seeded constant-turn movement bot with wall avoidance and normal offered upgrades; no HP, damage or shrine boosts, and no manual skills. Seed 37 is tested in both orientations. The browser checks exercise native timing separately from accelerated diagnostic updates.
+
+| Hero | Portrait first charge | Landscape first charge |
+|---|---:|---:|
+| Gravecaller | 79.40s | 78.33s |
+| Storm Ranger | 78.75s | 84.93s |
+| Emberweaver | 78.38s | 87.75s |
+| Bloodknight | 84.85s | 85.83s |
+| Sunwarden | 83.83s | 82.08s |
+
+These are automated Chromium results, not physical-phone or human playtest claims. The existing Bloodknight, Descent (25 assisted floor/hero combinations), authored-floor/arrival and new-hero/migration suites also remain applicable.
