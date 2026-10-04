@@ -126,3 +126,13 @@ The new suite checks 390×844 portrait and 844×390 landscape for all five heroe
 | Sunwarden | 83.83s | 82.08s |
 
 These are automated Chromium results, not physical-phone or human playtest claims. The existing Bloodknight, Descent (25 assisted floor/hero combinations), authored-floor/arrival and new-hero/migration suites also remain applicable.
+
+## Isometric action RPG preview (v65)
+
+```sh
+node tests/action-rpg.cjs
+```
+
+The new suite exercises the default isometric renderer in Chromium: all five heroes on all five floors at 390×844 and 844×390 (50 scenes), screen-aligned movement and Dash, swept walls, projected offscreen spawns, depth ordering, Ultimate visuals, HUD geometry, actual boss-slam invulnerability, paused effects, transient effect reset, unchanged profile-v2/run-v11/EC1 saves, Endless state and the Settings Classic comparison. Native animation, keyboard and skill-button input are checked for all ten hero/orientation combinations. `action-rpg-results.json` records the results. Cached draw timings are headless CPU diagnostics, not measured phone FPS.
+
+Historical combat/navigation bots feed world-axis joystick vectors. `classic-camera-fixture.cjs` explicitly selects the real Classic graphics preference for those existing suites; the new suite independently tests projected screen-space input. Bloodknight, Descent, floor variety, new heroes/migration and landscape/skills regressions passed. Descent progression remains an assisted test, not normal-difficulty human playtesting. The ten normal-stat Ultimate charge runs still measured roughly 78–88 seconds.

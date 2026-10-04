@@ -2,7 +2,7 @@
 // NODE_PATH=<Playwright installation> node tests/descent.cjs
 const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path'),http=require('node:http');
 const {chromium}=require('playwright'),root=path.resolve(__dirname,'..');
-const source=fs.readFileSync(path.join(root,'index.html'),'utf8');
+const source=require('./classic-camera-fixture.cjs')(fs.readFileSync(path.join(root,'index.html'),'utf8'));
 for(const m of source.matchAll(/<script[^>]*>([\s\S]*?)<\/script>/g))new Function(m[1]);
 const hooks=`window.gameTest={begin,continueEndless,endlessTier,selectSlot,applyProfile,saveProfile,restoreRun,readRun,saveRun,makeSaveCode,loadSaveCode,renderMenu,damageEnemy,swingBlade,update,draw,spawnEnemy,spawnBoss,spawnTreasureImp,spawnWaveSurprise,spawnCasterAmbush,spawnDungeonEvent,updateDungeon,wallAt,moveAroundWalls,segmentBlocked,tipOnce,floorEntry,
 get hero(){return hero},get profile(){return profile},get enemies(){return enemies},set enemies(v){enemies=v},get shots(){return shots},set shots(v){shots=v},get hazards(){return hazards},set hazards(v){hazards=v},get dungeon(){return dungeon},get checkpoint(){return floorCheckpoint},get joy(){return joy},get clock(){return clock},set clock(v){clock=v},set waveClock(v){waveClock=v},get mode(){return mode},set mode(v){mode=v},get level(){return level},get kills(){return kills},set kills(v){kills=v},get selectedHero(){return selectedHero},set selectedHero(v){selectedHero=v},get runMode(){return runMode},set selectedMode(v){selectedMode=v},get slots(){return slots},set spawn(v){spawn=v}};`;

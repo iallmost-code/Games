@@ -1,6 +1,6 @@
 // Chromium checks for authored topology and doorway arrival announcements.
 const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path'),http=require('node:http');
-const {chromium}=require('playwright'),root=path.resolve(__dirname,'..'),source=fs.readFileSync(path.join(root,'index.html'),'utf8');
+const {chromium}=require('playwright'),root=path.resolve(__dirname,'..'),source=require('./classic-camera-fixture.cjs')(fs.readFileSync(path.join(root,'index.html'),'utf8'));
 for(const m of source.matchAll(/<script[^>]*>([\s\S]*?)<\/script>/g))new Function(m[1]);
 const hooks=`window.gameTest={begin,floorEntry,floorSpec,dungeonSolid,spawnEnemy,update,draw,damageEnemy,afflict,saveRun,readRun,restoreRun,arrivalGroups,clearWall,
 get hero(){return hero},get dungeon(){return dungeon},get enemies(){return enemies},set enemies(v){enemies=v},get shots(){return shots},get clock(){return clock},get mode(){return mode},set mode(v){mode=v},set spawn(v){spawn=v},get slots(){return slots},set selectedMode(v){selectedMode=v}};`;

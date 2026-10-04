@@ -1,6 +1,6 @@
 # Ember Crypt
 
-**Prototype: v64 Five Heroes — branch `codex/new-heroes`, awaiting owner playtest.**
+**Prototype: v65 Action RPG Preview — branch `codex/action-rpg-preview`, awaiting owner playtest.**
 The public links below still serve the published main build.
 Play: https://iallmost-code.github.io/Games/ (GitHub Pages, deployed from `main`)
 ChatGPT Sites copy: https://ember-crypt.alpine0-0.chatgpt.site
@@ -80,3 +80,15 @@ Ultimates charge from actual damage and kills, with a combat-second charge cap t
 Profiles v2, run keys v11 and EC1 codes remain compatible. Skill state is stored as optional hero fields; old runs default to ready Dash and zero Ultimate charge. Endless preserves charge/cooldown and temporary armies. Descent continues to resume from the current floor's entry checkpoint.
 
 Run `tests/landscape-skills.cjs` for both phone orientations, real multi-touch input, all five Ultimates, Dash versus boss slams, old-field defaults, save codes, slot isolation and normal-stat charge timing.
+
+## Action RPG presentation preview
+
+This branch builds on the five heroes and landscape/Dash/Ultimate prototype. The new default is an angled isometric camera: raised textured masonry, depth-sorted upright characters and props, animated torchlight, ground shadows, eight cached walking phases, attack follow-through, emerging summoned skeletons, Dash afterimages, heighted shots and falling meteors, and separate Ultimate effects. A compact landscape HUD leaves more of the scene visible.
+
+Controls remain joystick + Dash + Ultimate, with automatic basic attacks. Screen-space movement is converted through the camera; collision, damage, ranges, floor layouts and saved coordinates remain in world space. Spawns and navigation arrows use the projected viewport. Profile v2, run v11 and existing EC1 codes are unchanged; cosmetic state is never saved.
+
+For a direct comparison, pause → Settings → GRAPHICS toggles between ISOMETRIC and CLASSIC. This is a device preference, independent of character slots. Serve this branch with `python3 -m http.server 8000`. The existing optional hero-unlock save code still works. Main and its public links are unchanged.
+
+`tests/action-rpg.cjs` checks 50 hero/floor/orientation scenes, projected controls, walls, offscreen arrivals, all Ultimates, transient effects, saves and the native loop in both phone orientations. Historical combat/navigation bot suites explicitly use Classic through a shared preference fixture so their original world-axis routes remain valid.
+
+This remains a sprite-based browser prototype. [ACTION_RPG_DIRECTION.md](ACTION_RPG_DIRECTION.md) describes the route to fully rigged 3D characters, aimed combat and richer equipment/loot systems.
