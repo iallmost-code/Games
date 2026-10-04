@@ -1,6 +1,6 @@
 # Ember Crypt development notes
 
-- This is the v64 five-hero prototype. Keep the game working from root `index.html` with relative `assets/` paths and no required build or external service.
+- This is the v65 action RPG presentation prototype, built on the five-hero and landscape/skills branches. Keep the game working from root `index.html` with relative `assets/` paths and no required build or external service.
 - Preserve gameplay, all five heroes and their element-restricted upgrades, three zones, depth modifiers, achievements, shrine, relics, save slots, save-code export/import, and wave 20 victory unless the task changes them.
 - Controls: joystick + Dash + Ultimate; no other in-game buttons. Automatic attacks stay automatic. Preserve the pause control and Settings sound/speed controls. Landscape uses a floating left joystick and right skill buttons; portrait keeps the bottom-center joystick. Desktop uses WASD/arrows, Space = Dash, E = Ultimate.
 - Preserve localStorage save compatibility. Profiles are v2 and runs are v11. Migrate Mage→Gravecaller and Stormcaller→Storm Ranger without losing progress; v9 runs migrate to ENDLESS; change format/version and write a migration only when changing serialized run structure.
@@ -15,3 +15,6 @@
 - This hero lineup is PROTOTYPE ONLY on `codex/new-heroes`. Open a PR for owner playtesting; DO NOT merge or push to main. Keep the authored floor layouts and arrival cues.
 
 - The landscape/skills prototype lives on `codex/landscape-skills`. Open a PR for playtesting; DO NOT merge or push main. v11 skill fields are additive and must default safely for old runs.
+
+- `codex/action-rpg-preview` adds a selectable isometric camera and visual skill animations. Keep it unmerged for owner playtesting. Isometric screen input must go through `inputVector`; physics, ranges, dungeon cells and saved coordinates stay in world space. Spawn visibility, camera culling and navigation cues must use the projected viewport.
+- Depth-sort upright actors, props, raised masonry and heighted projectiles; keep foreground walls translucent near the hero. Cosmetic queues/effects are transient and must never enter run/profile saves. Classic remains available in Settings. Historical world-axis bot suites select Classic through `tests/classic-camera-fixture.cjs`; `tests/action-rpg.cjs` validates the new camera/input/render path.

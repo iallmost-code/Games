@@ -1,0 +1,778 @@
+{
+  "scenes": [
+    {
+      "hero": "gravecaller",
+      "floor": 1,
+      "width": 390,
+      "height": 844,
+      "sceneItems": 76,
+      "worldViewport": [
+        1002.34,
+        1002.34
+      ],
+      "movement": "screen-aligned",
+      "spawns": "offscreen",
+      "ultimate": "animated"
+    },
+    {
+      "hero": "gravecaller",
+      "floor": 2,
+      "width": 390,
+      "height": 844,
+      "sceneItems": 91,
+      "worldViewport": [
+        1153.42,
+        1153.42
+      ],
+      "movement": "screen-aligned",
+      "spawns": "offscreen",
+      "ultimate": "animated"
+    },
+    {
+      "hero": "gravecaller",
+      "floor": 3,
+      "width": 390,
+      "height": 844,
+      "sceneItems": 94,
+      "worldViewport": [
+        1153.42,
+        1153.42
+      ],
+      "movement": "screen-aligned",
+      "spawns": "offscreen",
+      "ultimate": "animated"
+    },
+    {
+      "hero": "gravecaller",
+      "floor": 4,
+      "width": 390,
+      "height": 844,
+      "sceneItems": 112,
+      "worldViewport": [
+        1153.42,
+        1153.42
+      ],
+      "movement": "screen-aligned",
+      "spawns": "offscreen",
+      "ultimate": "animated"
+    },
+    {
+      "hero": "gravecaller",
+      "floor": 5,
+      "width": 390,
+      "height": 844,
+      "sceneItems": 89,
+      "worldViewport": [
+        1153.42,
+        1153.42
+      ],
+      "movement": "screen-aligned",
+      "spawns": "offscreen",
+      "ultimate": "animated"
+    },
+    {
+      "hero": "ranger",
+      "floor": 1,
+      "width": 390,
+      "height": 844,
+      "sceneItems": 111,
+      "worldViewport": [
+        1153.42,
+        1153.42
+      ],
+      "movement": "screen-aligned",
+      "spawns": "offscreen",
+      "ultimate": "animated"
+    },
+    {
+      "hero": "ranger",
+      "floor": 2,
+      "width": 390,
+      "height": 844,
+      "sceneItems": 116,
+      "worldViewport": [
+        1153.42,
+        1153.42
+      ],
+      "movement": "screen-aligned",
+      "spawns": "offscreen",
+      "ultimate": "animated"
+    },
+    {
+      "hero": "ranger",
+      "floor": 3,
+      "width": 390,
+      "height": 844,
+      "sceneItems": 122,
+      "worldViewport": [
+        1153.42,
+        1153.42
+      ],
+      "movement": "screen-aligned",
+      "spawns": "offscreen",
+      "ultimate": "animated"
+    },
+    {
+      "hero": "ranger",
+      "floor": 4,
+      "width": 390,
+      "height": 844,
+      "sceneItems": 139,
+      "worldViewport": [
+        1153.42,
+        1153.42
+      ],
+      "movement": "screen-aligned",
+      "spawns": "offscreen",
+      "ultimate": "animated"
+    },
+    {
+      "hero": "ranger",
+      "floor": 5,
+      "width": 390,
+      "height": 844,
+      "sceneItems": 115,
+      "worldViewport": [
+        1153.42,
+        1153.42
+      ],
+      "movement": "screen-aligned",
+      "spawns": "offscreen",
+      "ultimate": "animated"
+    },
+    {
+      "hero": "ember",
+      "floor": 1,
+      "width": 390,
+      "height": 844,
+      "sceneItems": 76,
+      "worldViewport": [
+        1153.42,
+        1153.42
+      ],
+      "movement": "screen-aligned",
+      "spawns": "offscreen",
+      "ultimate": "animated"
+    },
+    {
+      "hero": "ember",
+      "floor": 2,
+      "width": 390,
+      "height": 844,
+      "sceneItems": 87,
+      "worldViewport": [
+        1153.42,
+        1153.42
+      ],
+      "movement": "screen-aligned",
+      "spawns": "offscreen",
+      "ultimate": "animated"
+    },
+    {
+      "hero": "ember",
+      "floor": 3,
+      "width": 390,
+      "height": 844,
+      "sceneItems": 87,
+      "worldViewport": [
+        1153.42,
+        1153.42
+      ],
+      "movement": "screen-aligned",
+      "spawns": "offscreen",
+      "ultimate": "animated"
+    },
+    {
+      "hero": "ember",
+      "floor": 4,
+      "width": 390,
+      "height": 844,
+      "sceneItems": 105,
+      "worldViewport": [
+        1153.42,
+        1153.42
+      ],
+      "movement": "screen-aligned",
+      "spawns": "offscreen",
+      "ultimate": "animated"
+    },
+    {
+      "hero": "ember",
+      "floor": 5,
+      "width": 390,
+      "height": 844,
+      "sceneItems": 84,
+      "worldViewport": [
+        1153.42,
+        1153.42
+      ],
+      "movement": "screen-aligned",
+      "spawns": "offscreen",
+      "ultimate": "animated"
+    },
+    {
+      "hero": "bloodknight",
+      "floor": 1,
+      "width": 390,
+      "height": 844,
+      "sceneItems": 80,
+      "worldViewport": [
+        1153.42,
+        1153.42
+      ],
+      "movement": "screen-aligned",
+      "spawns": "offscreen",
+      "ultimate": "animated"
+    },
+    {
+      "hero": "bloodknight",
+      "floor": 2,
+      "width": 390,
+      "height": 844,
+      "sceneItems": 85,
+      "worldViewport": [
+        1153.42,
+        1153.42
+      ],
+      "movement": "screen-aligned",
+      "spawns": "offscreen",
+      "ultimate": "animated"
+    },
+    {
+      "hero": "bloodknight",
+      "floor": 3,
+      "width": 390,
+      "height": 844,
+      "sceneItems": 89,
+      "worldViewport": [
+        1153.42,
+        1153.42
+      ],
+      "movement": "screen-aligned",
+      "spawns": "offscreen",
+      "ultimate": "animated"
+    },
+    {
+      "hero": "bloodknight",
+      "floor": 4,
+      "width": 390,
+      "height": 844,
+      "sceneItems": 104,
+      "worldViewport": [
+        1153.42,
+        1153.42
+      ],
+      "movement": "screen-aligned",
+      "spawns": "offscreen",
+      "ultimate": "animated"
+    },
+    {
+      "hero": "bloodknight",
+      "floor": 5,
+      "width": 390,
+      "height": 844,
+      "sceneItems": 81,
+      "worldViewport": [
+        1153.42,
+        1153.42
+      ],
+      "movement": "screen-aligned",
+      "spawns": "offscreen",
+      "ultimate": "animated"
+    },
+    {
+      "hero": "sunwarden",
+      "floor": 1,
+      "width": 390,
+      "height": 844,
+      "sceneItems": 82,
+      "worldViewport": [
+        1153.42,
+        1153.42
+      ],
+      "movement": "screen-aligned",
+      "spawns": "offscreen",
+      "ultimate": "animated"
+    },
+    {
+      "hero": "sunwarden",
+      "floor": 2,
+      "width": 390,
+      "height": 844,
+      "sceneItems": 81,
+      "worldViewport": [
+        1153.42,
+        1153.42
+      ],
+      "movement": "screen-aligned",
+      "spawns": "offscreen",
+      "ultimate": "animated"
+    },
+    {
+      "hero": "sunwarden",
+      "floor": 3,
+      "width": 390,
+      "height": 844,
+      "sceneItems": 89,
+      "worldViewport": [
+        1153.42,
+        1153.42
+      ],
+      "movement": "screen-aligned",
+      "spawns": "offscreen",
+      "ultimate": "animated"
+    },
+    {
+      "hero": "sunwarden",
+      "floor": 4,
+      "width": 390,
+      "height": 844,
+      "sceneItems": 106,
+      "worldViewport": [
+        1153.42,
+        1153.42
+      ],
+      "movement": "screen-aligned",
+      "spawns": "offscreen",
+      "ultimate": "animated"
+    },
+    {
+      "hero": "sunwarden",
+      "floor": 5,
+      "width": 390,
+      "height": 844,
+      "sceneItems": 82,
+      "worldViewport": [
+        1153.42,
+        1153.42
+      ],
+      "movement": "screen-aligned",
+      "spawns": "offscreen",
+      "ultimate": "animated"
+    },
+    {
+      "hero": "gravecaller",
+      "floor": 1,
+      "width": 844,
+      "height": 390,
+      "sceneItems": 78,
+      "worldViewport": [
+        1002.34,
+        1002.34
+      ],
+      "movement": "screen-aligned",
+      "spawns": "offscreen",
+      "ultimate": "animated"
+    },
+    {
+      "hero": "gravecaller",
+      "floor": 2,
+      "width": 844,
+      "height": 390,
+      "sceneItems": 79,
+      "worldViewport": [
+        1002.34,
+        1002.34
+      ],
+      "movement": "screen-aligned",
+      "spawns": "offscreen",
+      "ultimate": "animated"
+    },
+    {
+      "hero": "gravecaller",
+      "floor": 3,
+      "width": 844,
+      "height": 390,
+      "sceneItems": 93,
+      "worldViewport": [
+        1002.34,
+        1002.34
+      ],
+      "movement": "screen-aligned",
+      "spawns": "offscreen",
+      "ultimate": "animated"
+    },
+    {
+      "hero": "gravecaller",
+      "floor": 4,
+      "width": 844,
+      "height": 390,
+      "sceneItems": 98,
+      "worldViewport": [
+        1002.34,
+        1002.34
+      ],
+      "movement": "screen-aligned",
+      "spawns": "offscreen",
+      "ultimate": "animated"
+    },
+    {
+      "hero": "gravecaller",
+      "floor": 5,
+      "width": 844,
+      "height": 390,
+      "sceneItems": 84,
+      "worldViewport": [
+        1002.34,
+        1002.34
+      ],
+      "movement": "screen-aligned",
+      "spawns": "offscreen",
+      "ultimate": "animated"
+    },
+    {
+      "hero": "ranger",
+      "floor": 1,
+      "width": 844,
+      "height": 390,
+      "sceneItems": 103,
+      "worldViewport": [
+        1002.34,
+        1002.34
+      ],
+      "movement": "screen-aligned",
+      "spawns": "offscreen",
+      "ultimate": "animated"
+    },
+    {
+      "hero": "ranger",
+      "floor": 2,
+      "width": 844,
+      "height": 390,
+      "sceneItems": 107,
+      "worldViewport": [
+        1002.34,
+        1002.34
+      ],
+      "movement": "screen-aligned",
+      "spawns": "offscreen",
+      "ultimate": "animated"
+    },
+    {
+      "hero": "ranger",
+      "floor": 3,
+      "width": 844,
+      "height": 390,
+      "sceneItems": 121,
+      "worldViewport": [
+        1002.34,
+        1002.34
+      ],
+      "movement": "screen-aligned",
+      "spawns": "offscreen",
+      "ultimate": "animated"
+    },
+    {
+      "hero": "ranger",
+      "floor": 4,
+      "width": 844,
+      "height": 390,
+      "sceneItems": 121,
+      "worldViewport": [
+        1002.34,
+        1002.34
+      ],
+      "movement": "screen-aligned",
+      "spawns": "offscreen",
+      "ultimate": "animated"
+    },
+    {
+      "hero": "ranger",
+      "floor": 5,
+      "width": 844,
+      "height": 390,
+      "sceneItems": 112,
+      "worldViewport": [
+        1002.34,
+        1002.34
+      ],
+      "movement": "screen-aligned",
+      "spawns": "offscreen",
+      "ultimate": "animated"
+    },
+    {
+      "hero": "ember",
+      "floor": 1,
+      "width": 844,
+      "height": 390,
+      "sceneItems": 71,
+      "worldViewport": [
+        1002.34,
+        1002.34
+      ],
+      "movement": "screen-aligned",
+      "spawns": "offscreen",
+      "ultimate": "animated"
+    },
+    {
+      "hero": "ember",
+      "floor": 2,
+      "width": 844,
+      "height": 390,
+      "sceneItems": 71,
+      "worldViewport": [
+        1002.34,
+        1002.34
+      ],
+      "movement": "screen-aligned",
+      "spawns": "offscreen",
+      "ultimate": "animated"
+    },
+    {
+      "hero": "ember",
+      "floor": 3,
+      "width": 844,
+      "height": 390,
+      "sceneItems": 87,
+      "worldViewport": [
+        1002.34,
+        1002.34
+      ],
+      "movement": "screen-aligned",
+      "spawns": "offscreen",
+      "ultimate": "animated"
+    },
+    {
+      "hero": "ember",
+      "floor": 4,
+      "width": 844,
+      "height": 390,
+      "sceneItems": 90,
+      "worldViewport": [
+        1002.34,
+        1002.34
+      ],
+      "movement": "screen-aligned",
+      "spawns": "offscreen",
+      "ultimate": "animated"
+    },
+    {
+      "hero": "ember",
+      "floor": 5,
+      "width": 844,
+      "height": 390,
+      "sceneItems": 78,
+      "worldViewport": [
+        1002.34,
+        1002.34
+      ],
+      "movement": "screen-aligned",
+      "spawns": "offscreen",
+      "ultimate": "animated"
+    },
+    {
+      "hero": "bloodknight",
+      "floor": 1,
+      "width": 844,
+      "height": 390,
+      "sceneItems": 69,
+      "worldViewport": [
+        1002.34,
+        1002.34
+      ],
+      "movement": "screen-aligned",
+      "spawns": "offscreen",
+      "ultimate": "animated"
+    },
+    {
+      "hero": "bloodknight",
+      "floor": 2,
+      "width": 844,
+      "height": 390,
+      "sceneItems": 73,
+      "worldViewport": [
+        1002.34,
+        1002.34
+      ],
+      "movement": "screen-aligned",
+      "spawns": "offscreen",
+      "ultimate": "animated"
+    },
+    {
+      "hero": "bloodknight",
+      "floor": 3,
+      "width": 844,
+      "height": 390,
+      "sceneItems": 84,
+      "worldViewport": [
+        1002.34,
+        1002.34
+      ],
+      "movement": "screen-aligned",
+      "spawns": "offscreen",
+      "ultimate": "animated"
+    },
+    {
+      "hero": "bloodknight",
+      "floor": 4,
+      "width": 844,
+      "height": 390,
+      "sceneItems": 88,
+      "worldViewport": [
+        1002.34,
+        1002.34
+      ],
+      "movement": "screen-aligned",
+      "spawns": "offscreen",
+      "ultimate": "animated"
+    },
+    {
+      "hero": "bloodknight",
+      "floor": 5,
+      "width": 844,
+      "height": 390,
+      "sceneItems": 77,
+      "worldViewport": [
+        1002.34,
+        1002.34
+      ],
+      "movement": "screen-aligned",
+      "spawns": "offscreen",
+      "ultimate": "animated"
+    },
+    {
+      "hero": "sunwarden",
+      "floor": 1,
+      "width": 844,
+      "height": 390,
+      "sceneItems": 68,
+      "worldViewport": [
+        1002.34,
+        1002.34
+      ],
+      "movement": "screen-aligned",
+      "spawns": "offscreen",
+      "ultimate": "animated"
+    },
+    {
+      "hero": "sunwarden",
+      "floor": 2,
+      "width": 844,
+      "height": 390,
+      "sceneItems": 72,
+      "worldViewport": [
+        1002.34,
+        1002.34
+      ],
+      "movement": "screen-aligned",
+      "spawns": "offscreen",
+      "ultimate": "animated"
+    },
+    {
+      "hero": "sunwarden",
+      "floor": 3,
+      "width": 844,
+      "height": 390,
+      "sceneItems": 88,
+      "worldViewport": [
+        1002.34,
+        1002.34
+      ],
+      "movement": "screen-aligned",
+      "spawns": "offscreen",
+      "ultimate": "animated"
+    },
+    {
+      "hero": "sunwarden",
+      "floor": 4,
+      "width": 844,
+      "height": 390,
+      "sceneItems": 88,
+      "worldViewport": [
+        1002.34,
+        1002.34
+      ],
+      "movement": "screen-aligned",
+      "spawns": "offscreen",
+      "ultimate": "animated"
+    },
+    {
+      "hero": "sunwarden",
+      "floor": 5,
+      "width": 844,
+      "height": 390,
+      "sceneItems": 79,
+      "worldViewport": [
+        1002.34,
+        1002.34
+      ],
+      "movement": "screen-aligned",
+      "spawns": "offscreen",
+      "ultimate": "animated"
+    }
+  ],
+  "mechanics": "projected Dash versus actual slams, paused cosmetic timers, unchanged v2/v11/EC1 saves, transient visual reset, Endless state, Settings Classic fallback",
+  "native": [
+    {
+      "hero": "gravecaller",
+      "width": 390,
+      "height": 844,
+      "medianMs": 1.2,
+      "maxMs": 24.5
+    },
+    {
+      "hero": "ranger",
+      "width": 390,
+      "height": 844,
+      "medianMs": 0.9,
+      "maxMs": 3.4
+    },
+    {
+      "hero": "ember",
+      "width": 390,
+      "height": 844,
+      "medianMs": 1.5,
+      "maxMs": 24.4
+    },
+    {
+      "hero": "bloodknight",
+      "width": 390,
+      "height": 844,
+      "medianMs": 0.9,
+      "maxMs": 7.2
+    },
+    {
+      "hero": "sunwarden",
+      "width": 390,
+      "height": 844,
+      "medianMs": 1.2,
+      "maxMs": 6.4
+    },
+    {
+      "hero": "gravecaller",
+      "width": 844,
+      "height": 390,
+      "medianMs": 1.3,
+      "maxMs": 4
+    },
+    {
+      "hero": "ranger",
+      "width": 844,
+      "height": 390,
+      "medianMs": 1.1,
+      "maxMs": 28.6
+    },
+    {
+      "hero": "ember",
+      "width": 844,
+      "height": 390,
+      "medianMs": 0.8,
+      "maxMs": 5
+    },
+    {
+      "hero": "bloodknight",
+      "width": 844,
+      "height": 390,
+      "medianMs": 0.9,
+      "maxMs": 23.1
+    },
+    {
+      "hero": "sunwarden",
+      "width": 844,
+      "height": 390,
+      "medianMs": 1,
+      "maxMs": 1.5
+    }
+  ],
+  "browserErrors": []
+}

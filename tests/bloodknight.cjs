@@ -6,7 +6,7 @@ const path = require('node:path');
 const { chromium } = require('playwright');
 const root = path.resolve(__dirname, '..');
 const http = require('node:http');
-const source = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
+const source = require('./classic-camera-fixture.cjs')(fs.readFileSync(path.join(root, 'index.html'), 'utf8'));
 for (const m of source.matchAll(/<script[^>]*>([\s\S]*?)<\/script>/g)) new Function(m[1]);
 const hooks = `window.gameTest={begin,set selectedMode(v){selectedMode=v},selectSlot,applyProfile,saveProfile,restoreRun,readRun,saveRun,makeSaveCode,loadSaveCode,levelUp,renderMenu,renderHeroScreen,damageEnemy,swingBlade,updateBloodknight,update,draw,spawnEnemy,evolutionReady,juggernautActive,showBestiary,facingArt,wallAt,
 get hero(){return hero},get profile(){return profile},get enemies(){return enemies},set enemies(v){enemies=v},get shots(){return shots},get art(){return art},get effects(){return bloodEffects},get keys(){return keys},get joy(){return joy},get clock(){return clock},set clock(v){clock=v},get mode(){return mode},set mode(v){mode=v},get level(){return level},set level(v){level=v},get kills(){return kills},get runStats(){return runStats},get attack(){return attack},set attack(v){attack=v},get selectedHero(){return selectedHero},set selectedHero(v){selectedHero=v},set spawn(v){spawn=v},get slots(){return slots}};`;

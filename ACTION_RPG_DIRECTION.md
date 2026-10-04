@@ -1,0 +1,15 @@
+# Ember Crypt: action RPG direction
+
+The target is an original dark-fantasy mobile action RPG with an angled view, deliberate movement, readable skill windups, satisfying impacts, and equipment that changes how the character plays. Diablo Immortal is a reference for camera, responsiveness, animation quality and mobile skill controls.
+
+The current playable browser pass is on `codex/action-rpg-preview`. It keeps all five heroes, authored dungeon floors, Endless, arrivals, progression and save compatibility. Its isometric view, depth ordering, warm torchlight, upright actors, walking/casting motion, Dash trails and Ultimate effects are a concrete presentation prototype. Settings → GRAPHICS offers a Classic comparison. Automatic attacks and the existing two manual skill buttons remain in place.
+
+The next combat decision is whether to retain automatic basic attacks or move to a manually aimed action RPG scheme. A manual scheme would use a primary attack and a small set of cooldown skills, with drag-to-aim, release-to-cast and cancellation, plus enemy telegraphs and short recovery windows. Prototype that on one floor before replacing the current control scheme. Existing hero identities can map naturally to summoning, archery/traps, light/control, elemental casting and greatsword melee.
+
+For the requested level of 3D animation and equipment presentation, move to a game engine. Unity is the recommended production path for this target: mobile builds, rigged character animation, VFX, camera occlusion, animation events, lighting and profiling are established workflows. Godot is also viable if an open-source toolchain is preferred. An engine rebuild changes distribution and asset production as well as code; native mobile and browser delivery should be evaluated separately on actual phones.
+
+Start that rebuild with a small vertical slice: one authored floor, a fully rigged hero, a few enemies, one boss, movement/Dash, a primary attack, two aimed skills, loot and equipment, then measure touch responsiveness and sustained device performance. Use attack windup/contact/recovery animation events to drive damage, navigation to keep enemies out of walls, readable ground telegraphs and a camera that fades foreground scenery. A full 3D art pipeline needs original modular dungeon meshes/materials, character rigs, locomotion/blended combat clips and VFX; the current painted sheets can continue serving UI and concept reference.
+
+Preserve the progression contract when porting. Import exported EC1 codes, migrate the profile/run schemas explicitly, carry embers, shrine upgrades, achievements, hero unlocks, mode records and all three slots, and keep floor-checkpoint resumes. Do not replace the published browser build or reset existing profiles while the engine slice is being evaluated.
+
+The browser preview is unmerged and does not claim 3D model animation, manual attack targeting, destructible scenery, or a completed engine port. Its purpose is to playtest the camera, visual hierarchy and skill feedback while retaining a working game.

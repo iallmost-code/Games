@@ -35,3 +35,11 @@ The new atlas has transparent gutters at 25%, 50% and 72% of its width. The wide
 `assets/cinematic/new-heroes.png` is a generated transparent 1448 × 1086 painted atlas. Row one is the hooded blue-grey leather Storm Ranger with longbow in front/side/back/bow-draw poses. Row two is the white/gold armored Sunwarden priestess with sun-disc staff in front/side/back/cast poses. Row three is the frost wolf in front/side-run/back/bite poses. Runtime wolf gutters use 0%, 23%, 52%, 73.5%, 100% cuts to retain the wider running and biting silhouettes. Hero cells use equal quarters. `new-heroes.webp` uses quality 90 with alpha (about 535 KB), with the original PNG (about 2 MB) as fallback. Unique attack/cast poses are used during automatic attacks.
 
 Gravecaller reuses the original Crypt Mage row without modifying the original sheet. Friendly skeletons reuse the enemy skeleton poses with a cached violet tint, violet outline, friendly ground ring and health bar; bone giants scale those poses. New heroes retain the cached two-element hero ring and the 40 FPS limiter.
+
+## Action RPG camera and animation preview (v65)
+
+Existing original WebP-first/PNG-fallback painted sheets are retained. Ground tiles and skill telegraphs use a 45° camera rotation and 0.68 vertical projection. Actors, scenery, and heighted projectiles are sorted by projected ground depth; sprites cancel the camera transform at their feet to remain upright. Foreground stonework fades near the hero. Masonry cap textures, torchlight, shadows and outlines are cached.
+
+Walking now uses eight cached procedural phases derived from the painted poses, with bob, lean and attack follow-through. Summoned skeletons emerge over 0.3 seconds; Dash leaves short fading silhouettes. Firestorm adds upright falling comets, Earthsplitter radial cracks, Army a summoning rune, Arrow Storm lightning trails, and Solar Flare light columns. These are bounded cosmetic effects, not new damage sources or fully rigged 3D animations.
+
+The native 40 FPS limiter is unchanged. Headless canvas render timings are diagnostics, not physical-phone frame-rate measurements.
