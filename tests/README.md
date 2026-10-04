@@ -61,3 +61,16 @@ Recorded five-seed Floor 1 results (180-second cap):
 | Bloodknight | 39.90s | 180s | 1/5 → 5/5 |
 
 A 180s value is censored at the test limit. Tuned runs never exceeded three living Cinder Imps; peak simultaneous lava vents fell from three to two under the doubled activation interval. Seeds and individual runs are in `descent-tuning-results.json`.
+
+## Floor variety and doorway warnings
+
+```sh
+node tests/descent-variety.cjs
+BASELINE_COMMIT=f0b3ff9 RESULT_PATH=tests/descent-variety-survival.json node tests/descent-tuning.cjs
+```
+
+The variety suite checks all five authored layouts, room connectivity before/after opening the boss door, Sunken bypass loops, valid room-edge entrances, one-second announcements ahead of normal enemy approaches, timer pausing, approach, v10 checkpoint restart and unchanged Endless spawns. It captures all five maps and a mid-warning viewport in Chromium. The existing Descent suite covers all 20 floor/hero progression combinations.
+
+The normal-stat survival comparison uses the previously merged Descent/tuning build as its baseline and writes a separate historical report; it uses the same five seeds, movement policy and normal stats as the earlier diagnostic. `BASELINE_COMMIT` and `RESULT_PATH` optionally choose a baseline/report without overwriting the original tuning results.
+
+The final v63 comparison reproduces all 20 tuned Floor 1 outcomes exactly: three-minute survival stays Mage 3/5, Stormcaller 3/5, Emberweaver 2/5 and Bloodknight 5/5. Median survival stays 180s, 180s, 144.63s and 180s respectively (180s is the test cap). Arrival announcements do not delay, hide or make enemies invulnerable; combat timing and Floor 1's layout/spawn distribution are preserved. This is an automated normal-stat regression check, not a human playtest.

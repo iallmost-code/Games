@@ -1,6 +1,6 @@
 # Ember Crypt
 
-Current playable build: **v62 The Descent**
+Current playable build: **v63 Into the Depths**
 Play: https://iallmost-code.github.io/Games/ (GitHub Pages, deployed from `main`)
 ChatGPT Sites copy: https://ember-crypt.alpine0-0.chatgpt.site
 
@@ -39,3 +39,11 @@ Run saves now use v10. Existing v9 runs migrate to ENDLESS with their current st
 Boss doors open after 180 seconds or the floor kill goal. Defeat the guardian and walk onto the stairs. Ash Catacombs, Frost Vault, Venom Hollow, The Sunken Halls and The Heart Chamber culminate in the Crypt Heart victory. Walls block movement, projectiles and blade swings. See [tests/README.md](tests/README.md) for browser checks and the seeded Endless balance simulation.
 
 Floor 1 tuning reduces regular enemy arrivals by 25%, limits living Cinder Imps to three, and activates lava vents every 16 seconds instead of eight. Relative regular-spawn rates across floors are 75%, 85%, 95%, 100% and 105%; later floors keep their full hazard cadence. The minimap is approximately 30% smaller with 75% opacity. These changes leave Endless spawn and hazard pacing unchanged.
+
+## Floor variety and entrances
+
+Ash Catacombs keeps roomy introductory combat chambers with smaller side crypts. Frost Vault uses long halls, Venom Hollow branches from a large central hub, The Sunken Halls has upper/lower loops around its main rooms, and The Heart Chamber has a long approach to an enlarged final chamber. Each layout keeps a single locked boss entrance and connected rooms for its well, forge and vault.
+
+Ordinary Descent enemies arrive from dark room-edge entrances with a one-second warning: a growing glow, an extending shadow and a low audio cue. Up to three offscreen entrances are marked with small edge arrows. The doorway announces an offscreen pack as it starts approaching; creatures keep their normal movement and remain visible and attackable when they reach the viewport. Arrivals still begin outside the viewport. Ash retains its previously tuned map and room-edge spawn distribution so the warning adds advance notice without funneling packs through a handful of points. Floor 1's reduced spawn rate, three-Imp cap and halved lava cadence remain intact. Endless arrivals are unchanged.
+
+Existing v10 saves still resume from the current floor's entry checkpoint; layouts/entrances are rebuilt and arrival cues clear when the floor restarts. No profile or save reset is required.
