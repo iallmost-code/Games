@@ -30,3 +30,13 @@ The checked-in `bloodknight-balance-baseline.json` records the five-seed compari
 | Bloodknight | 2:44 | 3:11 |
 
 Bloodknight meets the requested 2.5–3-minute circling target in this policy's median and rewards aggressive play more than the other heroes. Other heroes retain their existing balance; their ranged attacks naturally favor this circling policy. Individual seeds vary substantially, and two aggressive Bloodknight runs reached the test limit. These are bot comparisons, not claims about human survival times.
+
+## The Descent checks
+
+```sh
+node tests/descent.cjs
+```
+
+This Chromium integration suite checks authored map connectivity and movement, locked doors, offscreen spawns, swept collisions for both projectile teams, Bloodknight swings through walls, timer/kill door triggers, floor-entry checkpoints, v9→v10 run migration, v9/v10 EC1 codes, Settings import, slot isolation and Reset Tips.
+
+It then plays all five floors with each of the four heroes (20 floor/hero combinations), using real joystick movement, automatic attacks, spawns, upgrades, bosses, stairs and victory. Health and base damage are increased for this progression check; this is an accelerated assisted browser playthrough, not a human difficulty or balance measurement. Screenshots and `descent-results.json` go to `/tmp`. The checked-in `descent-playthrough.json` records the passing progression run. The suite also verifies Endless wave-20 victory/tier continuation, independent mode records, and an unmodified live mobile animation loop with the minimap below the HUD. The Bloodknight suite explicitly selects ENDLESS so its original arena combat regression checks remain comparable.
