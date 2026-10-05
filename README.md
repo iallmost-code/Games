@@ -92,3 +92,9 @@ For a direct comparison, pause → Settings → GRAPHICS toggles between ISOMETR
 `tests/action-rpg.cjs` checks 50 hero/floor/orientation scenes, projected controls, walls, offscreen arrivals, all Ultimates, transient effects, saves and the native loop in both phone orientations. Historical combat/navigation bot suites explicitly use Classic through a shared preference fixture so their original world-axis routes remain valid.
 
 This remains a sprite-based browser prototype. [ACTION_RPG_DIRECTION.md](ACTION_RPG_DIRECTION.md) describes the route to fully rigged 3D characters, aimed combat and richer equipment/loot systems.
+
+## v66 · 2.5D polish
+
+`codex/25d-polish` builds on the unmerged isometric prototype. Cartesian collision, AI, combat, progression and save formats are retained. Stage 1 reuses tested projection, screen-depth sorting and grounded animation. Stage 2 adds deterministic floor cracks, markings, ice patches and lower edge trim, with foreground chains, ice and vines fading near the hero. Stage 3 adds bounded spell lights, rift cracks, pooled-effect ground mist and fixed-count atmosphere. Stage 4 gives each zone a separate decoration/lighting palette. Stage 5 retains the bronze HUD and existing controls, targets 60 FPS, caps canvas DPR at 1.5 and limits the canvas to 1.8 million pixels.
+
+Lighting is simulated with reusable glow sprites, not a per-enemy shadow engine. Environmental details and particles use deterministic hashes rather than combat random numbers. Fog and lights reuse active spell pools; there are no additional damage or collision objects. New controls and gameplay tuning are outside this change. Physical Android profiling is still required before claiming sustained 60 FPS.
