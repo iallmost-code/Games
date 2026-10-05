@@ -70,7 +70,7 @@ const server = http.createServer((req, res) => {
     for(const name of ['Bloodletting','Crimson Thirst','Berserk','Blood Pact','Blood Fairy','Stone Skin','Shockwave','Earth Spikes I','Quake Step','Earth Fairy'])check(cards.has(name),'Missing '+name);
     reset();g.hero.earthSpikes=2;g.hero.bloodletting=1;g.hero.swingCount=13;g.clock=44;g.saveRun(true);g.hero.hp=1;g.restoreRun();check(g.hero.hp===140&&g.hero.swingCount===13&&g.hero.earthSpikes===2,'Knight save roundtrip');
     const code=g.makeSaveCode();const imported=g.loadSaveCode(code);check(imported.run.hero.class==='bloodknight'&&imported.run.hero.earthSpikes===2&&imported.profile.bloodknight,'Save-code roundtrip');
-    const saved=g.readRun();saved.version=8;saved.balanceVersion=8;localStorage.removeItem('ember-crypt-slot-1-run-v11');localStorage.setItem('ember-crypt-slot-1-run-v10',JSON.stringify(saved));g.restoreRun();check(g.readRun().version===11,'Old run migration');
+    const saved=g.readRun();saved.version=8;saved.balanceVersion=8;localStorage.removeItem('ember-crypt-slot-1-run-v12');localStorage.setItem('ember-crypt-slot-1-run-v10',JSON.stringify(saved));g.restoreRun();check(g.readRun().version===12,'Old run migration');
     reset();g.hero.fairies=['blood','earth'];enemy(70,0);g.update(.025);check(!g.shots.length,'Knight fairies produced projectiles');g.draw();
     return {cards:[...cards],canvas:document.querySelector('canvas').width,repairRatio:repaired/g.hero.armor};
   });
