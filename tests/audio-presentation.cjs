@@ -33,7 +33,7 @@ for (const name of files) {
   assert(peak < .8 && peak > .3, name + ' peak/headroom');
   assert(Math.sqrt(square / ((bytes.length - 44) / 2)) > .015, name + ' silent');
 }
-assert.equal(files.length, 27);
+assert.equal(files.length, 29);
 assert(totalBytes < 610000, 'Audio download budget exceeded');
 
 function context() {
@@ -69,7 +69,7 @@ async function mockChecks() {
   let downloads = 0;
   const api = moduleWith(async url => {
     downloads++;
-    assert.equal(new URL(url).searchParams.get('v'), '69', 'Versioned URLs bypass stale CDN failures');
+    assert.equal(new URL(url).searchParams.get('v'), '73', 'Versioned URLs bypass stale CDN failures');
     const bytes = fs.readFileSync(path.join(audio, new URL(url).pathname.split('/').pop()));
     return { ok: true, arrayBuffer: async () => bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength) };
   });
@@ -77,7 +77,7 @@ async function mockChecks() {
   assert.equal(api.play('cast', ctx, 'gravecaller'), false, 'Must fall back during loading');
   assert.equal(await api.ensure(ctx), true);
   assert.equal(await api.ensure(ctx), true);
-  assert.equal(downloads, 27, 'Downloads cached'); assert.equal(ctx.decodes, 27, 'Decodes cached');
+  assert.equal(downloads, 29, 'Downloads cached'); assert.equal(ctx.decodes, 29, 'Decodes cached');
   assert.equal(api.play('unknown', ctx), false);
   assert.equal(api.play('cast', ctx, 'gravecaller'), true);
   assert.equal(api.play('cast', ctx, 'gravecaller'), false, 'Rate limit');
@@ -96,11 +96,11 @@ async function mockChecks() {
   for (const sample of ctx.sources) sample.end();
   assert.equal(api.stats(ctx).active, 0, 'Natural end releases nodes');
   assert(ctx.sources.every(sample => sample.disconnected));
-  for (const hero of ['gravecaller', 'ranger', 'ember', 'bloodknight', 'sunwarden']) {
+  for (const hero of ['gravecaller', 'ranger', 'ember', 'bloodknight', 'sunwarden', 'rogue', 'frostwarden']) {
     ctx.currentTime += 1; assert(api.play('shoot', ctx, hero)); api.stop(ctx);
   }
   const second = context(); await api.ensure(second);
-  assert.equal(downloads, 27, 'Raw files cached across contexts'); assert.equal(second.decodes, 27);
+  assert.equal(downloads, 29, 'Raw files cached across contexts'); assert.equal(second.decodes, 29);
   const failed = moduleWith(async () => { throw Error('Offline'); });
   const offline = context(); assert.equal(await failed.ensure(offline), false);
   assert.equal(failed.play('hurt', offline), false, 'Legacy fallback survives load failure');
@@ -128,7 +128,7 @@ async function browserChecks() {
     await page.goto('http://127.0.0.1:' + server.address().port);
     await page.click('#start');
     assert.equal(await page.evaluate(() => loaded), true);
-    assert.equal(await page.evaluate(() => EmberAudio.stats(ctx).decoded), 27);
+    assert.equal(await page.evaluate(() => EmberAudio.stats(ctx).decoded), 29);
     const kinds = ['start', 'cast', 'shoot', 'swing', 'hit', 'crit', 'hurt', 'block', 'dash',
       'ultimate', 'blast', 'death', 'pickup', 'loot', 'upgrade', 'door', 'warning', 'boss', 'bossDown'];
     const scheduled = await page.evaluate(kinds => kinds.map(kind => {
@@ -144,7 +144,7 @@ async function browserChecks() {
     assert.equal(await page.evaluate(() => EmberAudio.play('hurt', ctx)), false);
     assert.equal(await page.evaluate(() => EmberAudio.stats(ctx).active), 0);
     assert.equal(errors.length, 0, errors.join('\n'));
-    console.log('PASS: actual Chromium gesture/context, all 27 WAV decodes, 19 event schedules, natural cleanup and suspended fallback');
+    console.log('PASS: actual Chromium gesture/context, all 29 WAV decodes, 19 event schedules, natural cleanup and suspended fallback');
   } finally { await browser.close(); await new Promise(resolve => server.close(resolve)); }
 }
 

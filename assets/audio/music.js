@@ -16,7 +16,7 @@
       a = b.getChannelData(0);
     let seed = 937,
       low = 0;
-    const z = kind === "frost" ? 1 : kind === "venom" ? 2 : 0;
+    const z = kind === "frost" ? 1 : kind === "venom" ? 2 : kind === "cathedral" ? 3 : kind === "forge" ? 4 : 0;
     for (let i = 0; i < a.length; i++) {
       const t = i / rate;
       seed = (Math.imul(seed, 1664525) + 1013904223) >>> 0;
@@ -45,7 +45,7 @@
           Math.exp(-t * 3) *
           0.12;
       } else {
-        const root = kind === "menu" ? 110 : [55, 82, 65][z];
+        const root = kind === "menu" ? 110 : [55, 82, 65, 73.5, 49][z];
         v =
           (Math.sin(TAU * root * t) +
             0.4 * Math.sin(TAU * root * 1.5 * t) +
@@ -62,6 +62,8 @@
             0.04;
         if (z === 0 && kind !== "menu")
           v += noise * Math.exp(-(t % 0.37) * 80) * 0.018;
+        if(z===3)v+=Math.sin(TAU*root*3*t)*.035*Math.sin(TAU*t/8)+Math.sin(TAU*587*t)*Math.exp(-(t%1.6)*12)*.017;
+        if(z===4)v+=noise*Math.exp(-(t%.5)*30)*.032+Math.sin(TAU*98*t)*Math.exp(-(t%.8)*14)*.05;
         if (kind === "menu")
           v +=
             Math.sin(
@@ -154,7 +156,7 @@
       scene !== "pause" &&
       !document.hidden;
     const key =
-      scene === "menu" ? "menu" : ["ash", "frost", "venom"][zone] || "ash";
+      scene === "menu" ? "menu" : ["ash", "frost", "venom", "cathedral", "forge"][zone] || "ash";
     if (audible && s.last !== key) {
       stopLoops(s, ctx);
       s.last = key;

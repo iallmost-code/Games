@@ -1,7 +1,7 @@
 /* v72 rules: deterministic room assembly and additive slot-owned metadata. */
 (() => {
   "use strict";
-  const heroes = ["gravecaller", "ranger", "ember", "bloodknight", "sunwarden"];
+  const heroes = ["gravecaller", "ranger", "ember", "bloodknight", "sunwarden", "rogue", "frostwarden"];
   const integer = (n, max = 2147483647) =>
     Math.min(max, Math.max(0, Math.floor(Number(n) || 0)));
   function hash(text) {
@@ -85,10 +85,13 @@
   }
   function run(prior = {}) {
     const seed = integer(prior.seed, 4294967295);
-    const challenge =
+    let challenge =
       prior.daily && /^\d{4}-\d{2}-\d{2}$/.test(prior.daily.date || "")
         ? daily(prior.daily.date)
         : null;
+    // Existing daily runs retain their v72 hero/seed/modifier when the pool expands.
+    if (challenge && heroes.includes(prior.daily.hero) && ["relentless", "haunted", "blood-moon"].includes(prior.daily.modifier) && Number.isInteger(prior.daily.seed) && prior.daily.seed >= 0 && prior.daily.seed <= 4294967295)
+      challenge = {date: prior.daily.date, seed: prior.daily.seed, hero: prior.daily.hero, modifier: prior.daily.modifier};
     return {
       id: String(prior.id || "").slice(0, 80),
       seed: challenge?.seed ?? seed,
@@ -128,9 +131,11 @@
       [6, 4],
     ],
   };
+  // New zone-specific authored dimensions retain the old seeded pieces for Floors 1–5.
+  const deepPieces={cathedral:{hall:[[6,8],[7,10],[5,9],[7,7]],side:[[6,4],[5,5],[7,4]]},forge:{hall:[[5,6],[7,8],[6,7],[7,6]],side:[[5,4],[6,3],[7,4]]}};
   function layout(base, seed, floor) {
     const roll = random(hash(seed + ":floor:" + floor)),
-      pick = (key) => pieces[key][Math.floor(roll() * pieces[key].length)];
+      pick = (key) => {const choices=(floor>5&&deepPieces[base.deepZone]||pieces)[key];return choices[Math.floor(roll()*choices.length)];};
     const a = pick("hall"),
       b = pick("hall"),
       c = pick("side"),

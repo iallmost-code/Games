@@ -1,0 +1,318 @@
+{
+  "mechanics": {
+    "rogue": "single-target range/LOS, poison, decoy expiry/attack, Veil invulnerability/crits, own pools/evolutions",
+    "warden": "arc/LOS/rear swing, enemy-only ice/door/stairs/expiry, Fortress inside/outside, own pools/evolutions",
+    "palettes": "cached, alpha preserved"
+  },
+  "saves": {
+    "profileVersion": 2,
+    "runVersion": 12,
+    "codes": "EC1",
+    "credit": 392,
+    "idempotent": true
+  },
+  "scenes": [
+    {
+      "kind": "rogue",
+      "layout": false,
+      "size": {
+        "width": 390,
+        "height": 844
+      },
+      "scenes": [
+        {
+          "floor": 1,
+          "boss": "warden"
+        },
+        {
+          "floor": 2,
+          "boss": "tyrant"
+        },
+        {
+          "floor": 3,
+          "boss": "colossus"
+        },
+        {
+          "floor": 4,
+          "boss": "oracle"
+        },
+        {
+          "floor": 5,
+          "boss": "heart"
+        }
+      ]
+    },
+    {
+      "kind": "rogue",
+      "layout": true,
+      "size": {
+        "width": 390,
+        "height": 844
+      },
+      "scenes": [
+        {
+          "floor": 1,
+          "boss": "warden"
+        },
+        {
+          "floor": 2,
+          "boss": "tyrant"
+        },
+        {
+          "floor": 3,
+          "boss": "colossus"
+        },
+        {
+          "floor": 4,
+          "boss": "oracle"
+        },
+        {
+          "floor": 5,
+          "boss": "heart"
+        }
+      ]
+    },
+    {
+      "kind": "frostwarden",
+      "layout": false,
+      "size": {
+        "width": 390,
+        "height": 844
+      },
+      "scenes": [
+        {
+          "floor": 1,
+          "boss": "warden"
+        },
+        {
+          "floor": 2,
+          "boss": "tyrant"
+        },
+        {
+          "floor": 3,
+          "boss": "colossus"
+        },
+        {
+          "floor": 4,
+          "boss": "oracle"
+        },
+        {
+          "floor": 5,
+          "boss": "heart"
+        }
+      ]
+    },
+    {
+      "kind": "frostwarden",
+      "layout": true,
+      "size": {
+        "width": 390,
+        "height": 844
+      },
+      "scenes": [
+        {
+          "floor": 1,
+          "boss": "warden"
+        },
+        {
+          "floor": 2,
+          "boss": "tyrant"
+        },
+        {
+          "floor": 3,
+          "boss": "colossus"
+        },
+        {
+          "floor": 4,
+          "boss": "oracle"
+        },
+        {
+          "floor": 5,
+          "boss": "heart"
+        }
+      ]
+    },
+    {
+      "kind": "rogue",
+      "layout": false,
+      "size": {
+        "width": 844,
+        "height": 390
+      },
+      "scenes": [
+        {
+          "floor": 1,
+          "boss": "warden"
+        },
+        {
+          "floor": 2,
+          "boss": "tyrant"
+        },
+        {
+          "floor": 3,
+          "boss": "colossus"
+        },
+        {
+          "floor": 4,
+          "boss": "oracle"
+        },
+        {
+          "floor": 5,
+          "boss": "heart"
+        }
+      ]
+    },
+    {
+      "kind": "rogue",
+      "layout": true,
+      "size": {
+        "width": 844,
+        "height": 390
+      },
+      "scenes": [
+        {
+          "floor": 1,
+          "boss": "warden"
+        },
+        {
+          "floor": 2,
+          "boss": "tyrant"
+        },
+        {
+          "floor": 3,
+          "boss": "colossus"
+        },
+        {
+          "floor": 4,
+          "boss": "oracle"
+        },
+        {
+          "floor": 5,
+          "boss": "heart"
+        }
+      ]
+    },
+    {
+      "kind": "frostwarden",
+      "layout": false,
+      "size": {
+        "width": 844,
+        "height": 390
+      },
+      "scenes": [
+        {
+          "floor": 1,
+          "boss": "warden"
+        },
+        {
+          "floor": 2,
+          "boss": "tyrant"
+        },
+        {
+          "floor": 3,
+          "boss": "colossus"
+        },
+        {
+          "floor": 4,
+          "boss": "oracle"
+        },
+        {
+          "floor": 5,
+          "boss": "heart"
+        }
+      ]
+    },
+    {
+      "kind": "frostwarden",
+      "layout": true,
+      "size": {
+        "width": 844,
+        "height": 390
+      },
+      "scenes": [
+        {
+          "floor": 1,
+          "boss": "warden"
+        },
+        {
+          "floor": 2,
+          "boss": "tyrant"
+        },
+        {
+          "floor": 3,
+          "boss": "colossus"
+        },
+        {
+          "floor": 4,
+          "boss": "oracle"
+        },
+        {
+          "floor": 5,
+          "boss": "heart"
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "import": "Actual Settings EC1 import, replacement confirmation, resume credit and post-import slot isolation",
+  "endless": [
+    {
+      "kind": "rogue",
+      "first": 60,
+      "extended": 134
+    },
+    {
+      "kind": "frostwarden",
+      "first": 60,
+      "extended": 134
+    }
+  ],
+  "quality": [
+    {
+      "tier": "high",
+      "kind": "rogue",
+      "daggers": 32,
+      "iceWalls": 0
+    },
+    {
+      "tier": "high",
+      "kind": "frostwarden",
+      "daggers": 0,
+      "iceWalls": 2
+    },
+    {
+      "tier": "medium",
+      "kind": "rogue",
+      "daggers": 32,
+      "iceWalls": 0
+    },
+    {
+      "tier": "medium",
+      "kind": "frostwarden",
+      "daggers": 0,
+      "iceWalls": 2
+    },
+    {
+      "tier": "low",
+      "kind": "rogue",
+      "daggers": 32,
+      "iceWalls": 0
+    },
+    {
+      "tier": "low",
+      "kind": "frostwarden",
+      "daggers": 0,
+      "iceWalls": 2
+    }
+  ],
+  "dailyPool": [
+    "ember",
+    "frostwarden",
+    "sunwarden",
+    "gravecaller",
+    "rogue",
+    "bloodknight",
+    "ranger"
+  ],
+  "fallback": "Both new authored sheets loaded through PNG fallback"
+}

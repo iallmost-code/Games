@@ -5,8 +5,10 @@
       ["#a94123", "#bc5c2f"],
       ["#285065", "#9adbea"],
       ["#223d25", "#99ba66"],
+      ["#1b4b58", "#83d7de"],
+      ["#753617", "#ffb25b"],
     ],
-    names = ["ash", "frost", "venom"];
+    names = ["ash", "frost", "venom", "cathedral", "forge"];
   const caches = new Map();
   let lastCells = null,
     lastLinks = null,
@@ -98,7 +100,7 @@
       g.strokeStyle = p[1] + "77";
       g.lineWidth = i % 3 ? 1 : 2;
       g.beginPath();
-      if (zone === 2) g.ellipse(x, y, 9 + (i % 8), 4, 0, 0, 7);
+      if (zone === 2 || zone === 3) g.ellipse(x, y, 9 + (i % 8), 4, 0, 0, 7);
       else {
         g.moveTo(x, y);
         g.lineTo(x + 12, y - 4);
@@ -185,6 +187,8 @@
         ctx.save();
         ctx.globalAlpha = alpha;
         s.billboard(p.x, p.y, () => {
+          if(zone===4&&p.kind==="column")ctx.translate(0,Math.sin(s.clock*2+p.x)*3);
+          if(zone===4&&p.kind==="coffin")ctx.translate(Math.sin(s.clock*1.5+p.x)*2,0);
           if (p.kind === "chain") {
             ctx.translate(0, -p.height);
             ctx.rotate(Math.sin(s.clock * 0.65 + p.x) * 0.012);

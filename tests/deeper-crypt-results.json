@@ -1,0 +1,1499 @@
+{
+  "maps": 5005,
+  "playthroughs": [
+    {
+      "hero": "gravecaller",
+      "layout": "classic",
+      "torment": 2,
+      "assistance": "Instant boss damage / arrival teleport / invulnerability; progression and stairs use real game code",
+      "floors": [
+        {
+          "floor": 1,
+          "boss": "warden",
+          "phases": [],
+          "reward": 71
+        },
+        {
+          "floor": 2,
+          "boss": "tyrant",
+          "phases": [],
+          "reward": 22
+        },
+        {
+          "floor": 3,
+          "boss": "colossus",
+          "phases": [],
+          "reward": 23
+        },
+        {
+          "floor": 4,
+          "boss": "oracle",
+          "phases": [],
+          "reward": 22
+        },
+        {
+          "floor": 5,
+          "boss": "heart",
+          "phases": [],
+          "reward": 94
+        },
+        {
+          "floor": 6,
+          "boss": "bishop",
+          "phases": [
+            1,
+            2,
+            3
+          ],
+          "reward": 22
+        },
+        {
+          "floor": 7,
+          "boss": "bishop",
+          "phases": [
+            1,
+            2,
+            3
+          ],
+          "reward": 23
+        },
+        {
+          "floor": 8,
+          "boss": "foundry",
+          "phases": [
+            1,
+            2,
+            3
+          ],
+          "reward": 22
+        },
+        {
+          "floor": 9,
+          "boss": "foundry",
+          "phases": [
+            1,
+            2,
+            3
+          ],
+          "reward": 23
+        },
+        {
+          "floor": 10,
+          "boss": "cryptHeart",
+          "phases": [
+            1,
+            2,
+            3
+          ],
+          "reward": 128
+        }
+      ],
+      "floor": 10,
+      "masteryXP": 1561,
+      "bestFloor": 10
+    },
+    {
+      "hero": "ranger",
+      "layout": "classic",
+      "torment": 2,
+      "assistance": "Instant boss damage / arrival teleport / invulnerability; progression and stairs use real game code",
+      "floors": [
+        {
+          "floor": 1,
+          "boss": "warden",
+          "phases": [],
+          "reward": 71
+        },
+        {
+          "floor": 2,
+          "boss": "tyrant",
+          "phases": [],
+          "reward": 22
+        },
+        {
+          "floor": 3,
+          "boss": "colossus",
+          "phases": [],
+          "reward": 23
+        },
+        {
+          "floor": 4,
+          "boss": "oracle",
+          "phases": [],
+          "reward": 22
+        },
+        {
+          "floor": 5,
+          "boss": "heart",
+          "phases": [],
+          "reward": 94
+        },
+        {
+          "floor": 6,
+          "boss": "bishop",
+          "phases": [
+            1,
+            2,
+            3
+          ],
+          "reward": 22
+        },
+        {
+          "floor": 7,
+          "boss": "bishop",
+          "phases": [
+            1,
+            2,
+            3
+          ],
+          "reward": 23
+        },
+        {
+          "floor": 8,
+          "boss": "foundry",
+          "phases": [
+            1,
+            2,
+            3
+          ],
+          "reward": 22
+        },
+        {
+          "floor": 9,
+          "boss": "foundry",
+          "phases": [
+            1,
+            2,
+            3
+          ],
+          "reward": 23
+        },
+        {
+          "floor": 10,
+          "boss": "cryptHeart",
+          "phases": [
+            1,
+            2,
+            3
+          ],
+          "reward": 128
+        }
+      ],
+      "floor": 10,
+      "masteryXP": 1561,
+      "bestFloor": 10
+    },
+    {
+      "hero": "ember",
+      "layout": "classic",
+      "torment": 2,
+      "assistance": "Instant boss damage / arrival teleport / invulnerability; progression and stairs use real game code",
+      "floors": [
+        {
+          "floor": 1,
+          "boss": "warden",
+          "phases": [],
+          "reward": 71
+        },
+        {
+          "floor": 2,
+          "boss": "tyrant",
+          "phases": [],
+          "reward": 22
+        },
+        {
+          "floor": 3,
+          "boss": "colossus",
+          "phases": [],
+          "reward": 23
+        },
+        {
+          "floor": 4,
+          "boss": "oracle",
+          "phases": [],
+          "reward": 22
+        },
+        {
+          "floor": 5,
+          "boss": "heart",
+          "phases": [],
+          "reward": 94
+        },
+        {
+          "floor": 6,
+          "boss": "bishop",
+          "phases": [
+            1,
+            2,
+            3
+          ],
+          "reward": 22
+        },
+        {
+          "floor": 7,
+          "boss": "bishop",
+          "phases": [
+            1,
+            2,
+            3
+          ],
+          "reward": 23
+        },
+        {
+          "floor": 8,
+          "boss": "foundry",
+          "phases": [
+            1,
+            2,
+            3
+          ],
+          "reward": 22
+        },
+        {
+          "floor": 9,
+          "boss": "foundry",
+          "phases": [
+            1,
+            2,
+            3
+          ],
+          "reward": 23
+        },
+        {
+          "floor": 10,
+          "boss": "cryptHeart",
+          "phases": [
+            1,
+            2,
+            3
+          ],
+          "reward": 128
+        }
+      ],
+      "floor": 10,
+      "masteryXP": 1561,
+      "bestFloor": 10
+    },
+    {
+      "hero": "bloodknight",
+      "layout": "classic",
+      "torment": 2,
+      "assistance": "Instant boss damage / arrival teleport / invulnerability; progression and stairs use real game code",
+      "floors": [
+        {
+          "floor": 1,
+          "boss": "warden",
+          "phases": [],
+          "reward": 71
+        },
+        {
+          "floor": 2,
+          "boss": "tyrant",
+          "phases": [],
+          "reward": 22
+        },
+        {
+          "floor": 3,
+          "boss": "colossus",
+          "phases": [],
+          "reward": 23
+        },
+        {
+          "floor": 4,
+          "boss": "oracle",
+          "phases": [],
+          "reward": 22
+        },
+        {
+          "floor": 5,
+          "boss": "heart",
+          "phases": [],
+          "reward": 94
+        },
+        {
+          "floor": 6,
+          "boss": "bishop",
+          "phases": [
+            1,
+            2,
+            3
+          ],
+          "reward": 22
+        },
+        {
+          "floor": 7,
+          "boss": "bishop",
+          "phases": [
+            1,
+            2,
+            3
+          ],
+          "reward": 23
+        },
+        {
+          "floor": 8,
+          "boss": "foundry",
+          "phases": [
+            1,
+            2,
+            3
+          ],
+          "reward": 22
+        },
+        {
+          "floor": 9,
+          "boss": "foundry",
+          "phases": [
+            1,
+            2,
+            3
+          ],
+          "reward": 23
+        },
+        {
+          "floor": 10,
+          "boss": "cryptHeart",
+          "phases": [
+            1,
+            2,
+            3
+          ],
+          "reward": 128
+        }
+      ],
+      "floor": 10,
+      "masteryXP": 1561,
+      "bestFloor": 10
+    },
+    {
+      "hero": "sunwarden",
+      "layout": "classic",
+      "torment": 2,
+      "assistance": "Instant boss damage / arrival teleport / invulnerability; progression and stairs use real game code",
+      "floors": [
+        {
+          "floor": 1,
+          "boss": "warden",
+          "phases": [],
+          "reward": 71
+        },
+        {
+          "floor": 2,
+          "boss": "tyrant",
+          "phases": [],
+          "reward": 22
+        },
+        {
+          "floor": 3,
+          "boss": "colossus",
+          "phases": [],
+          "reward": 23
+        },
+        {
+          "floor": 4,
+          "boss": "oracle",
+          "phases": [],
+          "reward": 22
+        },
+        {
+          "floor": 5,
+          "boss": "heart",
+          "phases": [],
+          "reward": 94
+        },
+        {
+          "floor": 6,
+          "boss": "bishop",
+          "phases": [
+            1,
+            2,
+            3
+          ],
+          "reward": 22
+        },
+        {
+          "floor": 7,
+          "boss": "bishop",
+          "phases": [
+            1,
+            2,
+            3
+          ],
+          "reward": 23
+        },
+        {
+          "floor": 8,
+          "boss": "foundry",
+          "phases": [
+            1,
+            2,
+            3
+          ],
+          "reward": 22
+        },
+        {
+          "floor": 9,
+          "boss": "foundry",
+          "phases": [
+            1,
+            2,
+            3
+          ],
+          "reward": 23
+        },
+        {
+          "floor": 10,
+          "boss": "cryptHeart",
+          "phases": [
+            1,
+            2,
+            3
+          ],
+          "reward": 128
+        }
+      ],
+      "floor": 10,
+      "masteryXP": 1561,
+      "bestFloor": 10
+    },
+    {
+      "hero": "rogue",
+      "layout": "classic",
+      "torment": 2,
+      "assistance": "Instant boss damage / arrival teleport / invulnerability; progression and stairs use real game code",
+      "floors": [
+        {
+          "floor": 1,
+          "boss": "warden",
+          "phases": [],
+          "reward": 71
+        },
+        {
+          "floor": 2,
+          "boss": "tyrant",
+          "phases": [],
+          "reward": 22
+        },
+        {
+          "floor": 3,
+          "boss": "colossus",
+          "phases": [],
+          "reward": 23
+        },
+        {
+          "floor": 4,
+          "boss": "oracle",
+          "phases": [],
+          "reward": 22
+        },
+        {
+          "floor": 5,
+          "boss": "heart",
+          "phases": [],
+          "reward": 94
+        },
+        {
+          "floor": 6,
+          "boss": "bishop",
+          "phases": [
+            1,
+            2,
+            3
+          ],
+          "reward": 22
+        },
+        {
+          "floor": 7,
+          "boss": "bishop",
+          "phases": [
+            1,
+            2,
+            3
+          ],
+          "reward": 23
+        },
+        {
+          "floor": 8,
+          "boss": "foundry",
+          "phases": [
+            1,
+            2,
+            3
+          ],
+          "reward": 22
+        },
+        {
+          "floor": 9,
+          "boss": "foundry",
+          "phases": [
+            1,
+            2,
+            3
+          ],
+          "reward": 23
+        },
+        {
+          "floor": 10,
+          "boss": "cryptHeart",
+          "phases": [
+            1,
+            2,
+            3
+          ],
+          "reward": 128
+        }
+      ],
+      "floor": 10,
+      "masteryXP": 1561,
+      "bestFloor": 10
+    },
+    {
+      "hero": "frostwarden",
+      "layout": "classic",
+      "torment": 2,
+      "assistance": "Instant boss damage / arrival teleport / invulnerability; progression and stairs use real game code",
+      "floors": [
+        {
+          "floor": 1,
+          "boss": "warden",
+          "phases": [],
+          "reward": 71
+        },
+        {
+          "floor": 2,
+          "boss": "tyrant",
+          "phases": [],
+          "reward": 22
+        },
+        {
+          "floor": 3,
+          "boss": "colossus",
+          "phases": [],
+          "reward": 23
+        },
+        {
+          "floor": 4,
+          "boss": "oracle",
+          "phases": [],
+          "reward": 22
+        },
+        {
+          "floor": 5,
+          "boss": "heart",
+          "phases": [],
+          "reward": 94
+        },
+        {
+          "floor": 6,
+          "boss": "bishop",
+          "phases": [
+            1,
+            2,
+            3
+          ],
+          "reward": 22
+        },
+        {
+          "floor": 7,
+          "boss": "bishop",
+          "phases": [
+            1,
+            2,
+            3
+          ],
+          "reward": 23
+        },
+        {
+          "floor": 8,
+          "boss": "foundry",
+          "phases": [
+            1,
+            2,
+            3
+          ],
+          "reward": 22
+        },
+        {
+          "floor": 9,
+          "boss": "foundry",
+          "phases": [
+            1,
+            2,
+            3
+          ],
+          "reward": 23
+        },
+        {
+          "floor": 10,
+          "boss": "cryptHeart",
+          "phases": [
+            1,
+            2,
+            3
+          ],
+          "reward": 128
+        }
+      ],
+      "floor": 10,
+      "masteryXP": 1561,
+      "bestFloor": 10
+    },
+    {
+      "hero": "gravecaller",
+      "layout": "random",
+      "torment": 2,
+      "assistance": "Instant boss damage / arrival teleport / invulnerability; progression and stairs use real game code",
+      "floors": [
+        {
+          "floor": 1,
+          "boss": "warden",
+          "phases": [],
+          "reward": 71
+        },
+        {
+          "floor": 2,
+          "boss": "tyrant",
+          "phases": [],
+          "reward": 22
+        },
+        {
+          "floor": 3,
+          "boss": "colossus",
+          "phases": [],
+          "reward": 23
+        },
+        {
+          "floor": 4,
+          "boss": "oracle",
+          "phases": [],
+          "reward": 22
+        },
+        {
+          "floor": 5,
+          "boss": "heart",
+          "phases": [],
+          "reward": 94
+        },
+        {
+          "floor": 6,
+          "boss": "bishop",
+          "phases": [
+            1,
+            2,
+            3
+          ],
+          "reward": 22
+        },
+        {
+          "floor": 7,
+          "boss": "bishop",
+          "phases": [
+            1,
+            2,
+            3
+          ],
+          "reward": 23
+        },
+        {
+          "floor": 8,
+          "boss": "foundry",
+          "phases": [
+            1,
+            2,
+            3
+          ],
+          "reward": 22
+        },
+        {
+          "floor": 9,
+          "boss": "foundry",
+          "phases": [
+            1,
+            2,
+            3
+          ],
+          "reward": 23
+        },
+        {
+          "floor": 10,
+          "boss": "cryptHeart",
+          "phases": [
+            1,
+            2,
+            3
+          ],
+          "reward": 128
+        }
+      ],
+      "floor": 10,
+      "masteryXP": 1561,
+      "bestFloor": 10
+    },
+    {
+      "hero": "ranger",
+      "layout": "random",
+      "torment": 2,
+      "assistance": "Instant boss damage / arrival teleport / invulnerability; progression and stairs use real game code",
+      "floors": [
+        {
+          "floor": 1,
+          "boss": "warden",
+          "phases": [],
+          "reward": 71
+        },
+        {
+          "floor": 2,
+          "boss": "tyrant",
+          "phases": [],
+          "reward": 22
+        },
+        {
+          "floor": 3,
+          "boss": "colossus",
+          "phases": [],
+          "reward": 23
+        },
+        {
+          "floor": 4,
+          "boss": "oracle",
+          "phases": [],
+          "reward": 22
+        },
+        {
+          "floor": 5,
+          "boss": "heart",
+          "phases": [],
+          "reward": 94
+        },
+        {
+          "floor": 6,
+          "boss": "bishop",
+          "phases": [
+            1,
+            2,
+            3
+          ],
+          "reward": 22
+        },
+        {
+          "floor": 7,
+          "boss": "bishop",
+          "phases": [
+            1,
+            2,
+            3
+          ],
+          "reward": 23
+        },
+        {
+          "floor": 8,
+          "boss": "foundry",
+          "phases": [
+            1,
+            2,
+            3
+          ],
+          "reward": 22
+        },
+        {
+          "floor": 9,
+          "boss": "foundry",
+          "phases": [
+            1,
+            2,
+            3
+          ],
+          "reward": 23
+        },
+        {
+          "floor": 10,
+          "boss": "cryptHeart",
+          "phases": [
+            1,
+            2,
+            3
+          ],
+          "reward": 128
+        }
+      ],
+      "floor": 10,
+      "masteryXP": 1561,
+      "bestFloor": 10
+    },
+    {
+      "hero": "ember",
+      "layout": "random",
+      "torment": 2,
+      "assistance": "Instant boss damage / arrival teleport / invulnerability; progression and stairs use real game code",
+      "floors": [
+        {
+          "floor": 1,
+          "boss": "warden",
+          "phases": [],
+          "reward": 71
+        },
+        {
+          "floor": 2,
+          "boss": "tyrant",
+          "phases": [],
+          "reward": 22
+        },
+        {
+          "floor": 3,
+          "boss": "colossus",
+          "phases": [],
+          "reward": 23
+        },
+        {
+          "floor": 4,
+          "boss": "oracle",
+          "phases": [],
+          "reward": 22
+        },
+        {
+          "floor": 5,
+          "boss": "heart",
+          "phases": [],
+          "reward": 94
+        },
+        {
+          "floor": 6,
+          "boss": "bishop",
+          "phases": [
+            1,
+            2,
+            3
+          ],
+          "reward": 22
+        },
+        {
+          "floor": 7,
+          "boss": "bishop",
+          "phases": [
+            1,
+            2,
+            3
+          ],
+          "reward": 23
+        },
+        {
+          "floor": 8,
+          "boss": "foundry",
+          "phases": [
+            1,
+            2,
+            3
+          ],
+          "reward": 22
+        },
+        {
+          "floor": 9,
+          "boss": "foundry",
+          "phases": [
+            1,
+            2,
+            3
+          ],
+          "reward": 23
+        },
+        {
+          "floor": 10,
+          "boss": "cryptHeart",
+          "phases": [
+            1,
+            2,
+            3
+          ],
+          "reward": 128
+        }
+      ],
+      "floor": 10,
+      "masteryXP": 1561,
+      "bestFloor": 10
+    },
+    {
+      "hero": "bloodknight",
+      "layout": "random",
+      "torment": 2,
+      "assistance": "Instant boss damage / arrival teleport / invulnerability; progression and stairs use real game code",
+      "floors": [
+        {
+          "floor": 1,
+          "boss": "warden",
+          "phases": [],
+          "reward": 71
+        },
+        {
+          "floor": 2,
+          "boss": "tyrant",
+          "phases": [],
+          "reward": 22
+        },
+        {
+          "floor": 3,
+          "boss": "colossus",
+          "phases": [],
+          "reward": 23
+        },
+        {
+          "floor": 4,
+          "boss": "oracle",
+          "phases": [],
+          "reward": 22
+        },
+        {
+          "floor": 5,
+          "boss": "heart",
+          "phases": [],
+          "reward": 94
+        },
+        {
+          "floor": 6,
+          "boss": "bishop",
+          "phases": [
+            1,
+            2,
+            3
+          ],
+          "reward": 22
+        },
+        {
+          "floor": 7,
+          "boss": "bishop",
+          "phases": [
+            1,
+            2,
+            3
+          ],
+          "reward": 23
+        },
+        {
+          "floor": 8,
+          "boss": "foundry",
+          "phases": [
+            1,
+            2,
+            3
+          ],
+          "reward": 22
+        },
+        {
+          "floor": 9,
+          "boss": "foundry",
+          "phases": [
+            1,
+            2,
+            3
+          ],
+          "reward": 23
+        },
+        {
+          "floor": 10,
+          "boss": "cryptHeart",
+          "phases": [
+            1,
+            2,
+            3
+          ],
+          "reward": 128
+        }
+      ],
+      "floor": 10,
+      "masteryXP": 1561,
+      "bestFloor": 10
+    },
+    {
+      "hero": "sunwarden",
+      "layout": "random",
+      "torment": 2,
+      "assistance": "Instant boss damage / arrival teleport / invulnerability; progression and stairs use real game code",
+      "floors": [
+        {
+          "floor": 1,
+          "boss": "warden",
+          "phases": [],
+          "reward": 71
+        },
+        {
+          "floor": 2,
+          "boss": "tyrant",
+          "phases": [],
+          "reward": 22
+        },
+        {
+          "floor": 3,
+          "boss": "colossus",
+          "phases": [],
+          "reward": 23
+        },
+        {
+          "floor": 4,
+          "boss": "oracle",
+          "phases": [],
+          "reward": 22
+        },
+        {
+          "floor": 5,
+          "boss": "heart",
+          "phases": [],
+          "reward": 94
+        },
+        {
+          "floor": 6,
+          "boss": "bishop",
+          "phases": [
+            1,
+            2,
+            3
+          ],
+          "reward": 22
+        },
+        {
+          "floor": 7,
+          "boss": "bishop",
+          "phases": [
+            1,
+            2,
+            3
+          ],
+          "reward": 23
+        },
+        {
+          "floor": 8,
+          "boss": "foundry",
+          "phases": [
+            1,
+            2,
+            3
+          ],
+          "reward": 22
+        },
+        {
+          "floor": 9,
+          "boss": "foundry",
+          "phases": [
+            1,
+            2,
+            3
+          ],
+          "reward": 23
+        },
+        {
+          "floor": 10,
+          "boss": "cryptHeart",
+          "phases": [
+            1,
+            2,
+            3
+          ],
+          "reward": 128
+        }
+      ],
+      "floor": 10,
+      "masteryXP": 1561,
+      "bestFloor": 10
+    },
+    {
+      "hero": "rogue",
+      "layout": "random",
+      "torment": 2,
+      "assistance": "Instant boss damage / arrival teleport / invulnerability; progression and stairs use real game code",
+      "floors": [
+        {
+          "floor": 1,
+          "boss": "warden",
+          "phases": [],
+          "reward": 71
+        },
+        {
+          "floor": 2,
+          "boss": "tyrant",
+          "phases": [],
+          "reward": 22
+        },
+        {
+          "floor": 3,
+          "boss": "colossus",
+          "phases": [],
+          "reward": 23
+        },
+        {
+          "floor": 4,
+          "boss": "oracle",
+          "phases": [],
+          "reward": 22
+        },
+        {
+          "floor": 5,
+          "boss": "heart",
+          "phases": [],
+          "reward": 94
+        },
+        {
+          "floor": 6,
+          "boss": "bishop",
+          "phases": [
+            1,
+            2,
+            3
+          ],
+          "reward": 22
+        },
+        {
+          "floor": 7,
+          "boss": "bishop",
+          "phases": [
+            1,
+            2,
+            3
+          ],
+          "reward": 23
+        },
+        {
+          "floor": 8,
+          "boss": "foundry",
+          "phases": [
+            1,
+            2,
+            3
+          ],
+          "reward": 22
+        },
+        {
+          "floor": 9,
+          "boss": "foundry",
+          "phases": [
+            1,
+            2,
+            3
+          ],
+          "reward": 23
+        },
+        {
+          "floor": 10,
+          "boss": "cryptHeart",
+          "phases": [
+            1,
+            2,
+            3
+          ],
+          "reward": 128
+        }
+      ],
+      "floor": 10,
+      "masteryXP": 1561,
+      "bestFloor": 10
+    },
+    {
+      "hero": "frostwarden",
+      "layout": "random",
+      "torment": 2,
+      "assistance": "Instant boss damage / arrival teleport / invulnerability; progression and stairs use real game code",
+      "floors": [
+        {
+          "floor": 1,
+          "boss": "warden",
+          "phases": [],
+          "reward": 71
+        },
+        {
+          "floor": 2,
+          "boss": "tyrant",
+          "phases": [],
+          "reward": 22
+        },
+        {
+          "floor": 3,
+          "boss": "colossus",
+          "phases": [],
+          "reward": 23
+        },
+        {
+          "floor": 4,
+          "boss": "oracle",
+          "phases": [],
+          "reward": 22
+        },
+        {
+          "floor": 5,
+          "boss": "heart",
+          "phases": [],
+          "reward": 94
+        },
+        {
+          "floor": 6,
+          "boss": "bishop",
+          "phases": [
+            1,
+            2,
+            3
+          ],
+          "reward": 22
+        },
+        {
+          "floor": 7,
+          "boss": "bishop",
+          "phases": [
+            1,
+            2,
+            3
+          ],
+          "reward": 23
+        },
+        {
+          "floor": 8,
+          "boss": "foundry",
+          "phases": [
+            1,
+            2,
+            3
+          ],
+          "reward": 22
+        },
+        {
+          "floor": 9,
+          "boss": "foundry",
+          "phases": [
+            1,
+            2,
+            3
+          ],
+          "reward": 23
+        },
+        {
+          "floor": 10,
+          "boss": "cryptHeart",
+          "phases": [
+            1,
+            2,
+            3
+          ],
+          "reward": 128
+        }
+      ],
+      "floor": 10,
+      "masteryXP": 1561,
+      "bestFloor": 10
+    }
+  ],
+  "saves": {
+    "runVersion": 12,
+    "profileVersion": 2,
+    "checkpoints": [
+      6,
+      7,
+      8,
+      9,
+      10
+    ],
+    "code": "EC1",
+    "v11Migration": true,
+    "slotIsolation": true
+  },
+  "mechanics": {
+    "bestiarySaved": true,
+    "enemyOnlyWater": true,
+    "arrivals": [
+      "ghostChoir",
+      "drownedKnight",
+      "machineGolem",
+      "slagSpitter",
+      "furnaceImp"
+    ],
+    "choirWindup": true,
+    "invulnerability": true,
+    "finalPhases": 3,
+    "iceNavigationSafe": true
+  },
+  "scenes": [
+    {
+      "floor": 6,
+      "width": 390,
+      "height": 844,
+      "pixels": 2344
+    },
+    {
+      "floor": 7,
+      "width": 390,
+      "height": 844,
+      "pixels": 2345
+    },
+    {
+      "floor": 8,
+      "width": 390,
+      "height": 844,
+      "pixels": 2217
+    },
+    {
+      "floor": 9,
+      "width": 390,
+      "height": 844,
+      "pixels": 2131
+    },
+    {
+      "floor": 10,
+      "width": 390,
+      "height": 844,
+      "pixels": 2306
+    },
+    {
+      "floor": 6,
+      "width": 844,
+      "height": 390,
+      "pixels": 2604
+    },
+    {
+      "floor": 7,
+      "width": 844,
+      "height": 390,
+      "pixels": 2566
+    },
+    {
+      "floor": 8,
+      "width": 844,
+      "height": 390,
+      "pixels": 2463
+    },
+    {
+      "floor": 9,
+      "width": 844,
+      "height": 390,
+      "pixels": 2433
+    },
+    {
+      "floor": 10,
+      "width": 844,
+      "height": 390,
+      "pixels": 2320
+    }
+  ],
+  "errors": [],
+  "compatibility": {
+    "floors": [
+      {
+        "floor": 6,
+        "merchant": true,
+        "champion": true,
+        "secret": false
+      },
+      {
+        "floor": 7,
+        "merchant": true,
+        "champion": true,
+        "secret": true
+      },
+      {
+        "floor": 8,
+        "merchant": true,
+        "champion": true,
+        "secret": true
+      },
+      {
+        "floor": 9,
+        "merchant": true,
+        "champion": true,
+        "secret": true
+      },
+      {
+        "floor": 10,
+        "merchant": true,
+        "champion": true,
+        "secret": true
+      }
+    ],
+    "daily": true,
+    "decoyTargeting": true,
+    "lethalPulse": true
+  },
+  "actualCodeImport": {
+    "floor": 10,
+    "hero": "frostwarden",
+    "codes": "EC1",
+    "independentSlots": true
+  },
+  "pngFallback": true,
+  "native": [
+    {
+      "width": 390,
+      "height": 844,
+      "floor": 6,
+      "mode": "play",
+      "pixels": 740610,
+      "colors": 5109,
+      "dome": true,
+      "clock": 2.0499000000000005
+    },
+    {
+      "width": 390,
+      "height": 844,
+      "floor": 8,
+      "mode": "play",
+      "pixels": 513785,
+      "colors": 3587,
+      "dome": true,
+      "clock": 6.266099999999989
+    },
+    {
+      "width": 390,
+      "height": 844,
+      "floor": 10,
+      "mode": "play",
+      "pixels": 329160,
+      "colors": 2248,
+      "dome": true,
+      "clock": 10.732400000000005
+    },
+    {
+      "width": 844,
+      "height": 390,
+      "floor": 6,
+      "mode": "play",
+      "pixels": 740610,
+      "colors": 4912,
+      "dome": true,
+      "clock": 1.8787999999999994
+    },
+    {
+      "width": 844,
+      "height": 390,
+      "floor": 8,
+      "mode": "play",
+      "pixels": 329160,
+      "colors": 2373,
+      "dome": true,
+      "clock": 6.312199999999996
+    },
+    {
+      "width": 844,
+      "height": 390,
+      "floor": 10,
+      "mode": "play",
+      "pixels": 329160,
+      "colors": 2343,
+      "dome": true,
+      "clock": 10.895100000000024
+    }
+  ],
+  "zoneMusic": [
+    {
+      "zone": 3,
+      "loops": 4,
+      "buffers": 4
+    },
+    {
+      "zone": 4,
+      "loops": 6,
+      "buffers": 5
+    },
+    {
+      "zone": 3,
+      "loops": 6,
+      "buffers": 5
+    },
+    {
+      "zone": 4,
+      "loops": 6,
+      "buffers": 5
+    }
+  ]
+}
