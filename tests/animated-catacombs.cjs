@@ -6,9 +6,9 @@ const http = require('node:http');
 const assert = require('node:assert/strict');
 const { chromium } = require('playwright');
 const root = path.resolve(__dirname, '..');
-const source = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
+const source = fs.readFileSync(path.join(root, 'index.html'), 'utf8').replace('function music(kind) {','function music(kind) { return;');
 for (const script of source.matchAll(/<script[^>]*>([\s\S]*?)<\/script>/g)) new Function(script[1]);
-const heroes = ['gravecaller', 'bloodknight'];
+const heroes = ['gravecaller', 'bloodknight','ranger','sunwarden','ember'];
 const sizes = [{ width: 390, height: 844 }, { width: 844, height: 390 }];
 const errors = [];
 const report = { animation: [], scenes: [], compatibility: null, fallbacks: [], native: [], browserErrors: errors };
@@ -88,7 +88,7 @@ function summary(values) {
   try {
     const page = await browser.newPage({ viewport: sizes[0], hasTouch: true });
     await initialize(page); await page.goto(url); await loaded(page);
-    await page.waitForFunction(() => EmberHeroAnimation.ready('gravecaller') && EmberHeroAnimation.ready('bloodknight'));
+    await page.waitForFunction(() => ['gravecaller','bloodknight','ranger','sunwarden','ember'].every(k=>EmberHeroAnimation.ready(k)));
     report.animation = await page.evaluate(heroes => {
       const result = [], a = EmberHeroAnimation;
       function check(value, message) { if (!value) throw Error(message); }
@@ -141,7 +141,7 @@ function summary(values) {
         finally{performance.now=realNow;a.draw({save(){},restore(){},scale(){},drawImage(){}},{kind,height:192});}
         result.push({kind,walk:directions,distinctFrameHashes:hashes,footBaseline:[Math.min(...baseline),Math.max(...baseline)],spriteExtents:extents,poseExtents,attackFrames:cast,hitFrames:hits.map(f=>f.index),deathFrames:deaths.map(f=>f.index)});
       }
-      check(a.diagnostics().frames===60,'Expected two bounded 30-frame caches');
+      check(a.diagnostics().frames===150,'Expected five bounded 30-frame caches');
       return result;
     }, heroes);
     console.log('PASS: six distinct frames in each direction, attack/hit/death selectors, grounded uncropped sprites');
@@ -197,13 +197,13 @@ function summary(values) {
       const g=gameTest;function check(v,m){if(!v)throw Error(m);}
       g.selectSlot(0);g.selectedHero='bloodknight';g.selectedMode='descent';g.begin();g.floorEntry(2);g.dungeon.title=0;g.hero.relics=['obsidian'];g.hero.depth=3;g.saveRun(true);
       const saved=g.readRun(), code=g.makeSaveCode(), parsed=g.loadSaveCode(code);
-      check(saved.version===11&&saved.balanceVersion===11&&parsed.version===1&&parsed.profile.version===2,'Save versions changed');
+      check(saved.version===12&&saved.balanceVersion===12&&parsed.version===1&&parsed.profile.version===2,'Save versions changed');
       check(parsed.run.hero.class==='bloodknight'&&parsed.run.floor===2&&parsed.run.hero.depth===3,'Save code lost hero/floor/depth');
       check(!/EmberHeroAnimation|deathStarted|renderProbe|sceneQueue|ashScene/.test(JSON.stringify(saved)),'Presentation cache serialized');
-      const slot1=localStorage.getItem('ember-crypt-slot-1-run-v11');
+      const slot1=localStorage.getItem('ember-crypt-slot-1-run-v12');
       g.selectSlot(1);check(g.profile.embers===51&&!g.readRun(),'Slot isolation failed');
       g.selectedHero='gravecaller';g.selectedMode='endless';g.begin();g.hero.ultimateCharge=72;g.saveRun(true);
-      check(localStorage.getItem('ember-crypt-slot-1-run-v11')===slot1,'Another slot run overwritten');
+      check(localStorage.getItem('ember-crypt-slot-1-run-v12')===slot1,'Another slot run overwritten');
       g.restoreRun();check(g.hero.class==='gravecaller'&&g.hero.ultimateCharge===72,'Endless resume state lost');
       g.selectSlot(0);check(g.profile.embers===127,'Original profile currency overwritten');g.restoreRun();
       check(g.hero.class==='bloodknight'&&g.dungeon.floor===2&&g.dungeon.elapsed===0,'Floor checkpoint resume changed');

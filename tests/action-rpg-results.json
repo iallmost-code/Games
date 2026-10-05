@@ -5,10 +5,10 @@
       "floor": 1,
       "width": 390,
       "height": 844,
-      "sceneItems": 98,
+      "sceneItems": 90,
       "worldViewport": [
-        1153.42,
-        1153.42
+        1002.34,
+        1002.34
       ],
       "movement": "screen-aligned",
       "spawns": "offscreen",
@@ -19,7 +19,7 @@
       "floor": 2,
       "width": 390,
       "height": 844,
-      "sceneItems": 96,
+      "sceneItems": 97,
       "worldViewport": [
         1153.42,
         1153.42
@@ -33,7 +33,7 @@
       "floor": 3,
       "width": 390,
       "height": 844,
-      "sceneItems": 101,
+      "sceneItems": 98,
       "worldViewport": [
         1153.42,
         1153.42
@@ -47,7 +47,7 @@
       "floor": 4,
       "width": 390,
       "height": 844,
-      "sceneItems": 115,
+      "sceneItems": 114,
       "worldViewport": [
         1153.42,
         1153.42
@@ -61,7 +61,7 @@
       "floor": 5,
       "width": 390,
       "height": 844,
-      "sceneItems": 92,
+      "sceneItems": 87,
       "worldViewport": [
         1153.42,
         1153.42
@@ -73,20 +73,6 @@
     {
       "hero": "ranger",
       "floor": 1,
-      "width": 390,
-      "height": 844,
-      "sceneItems": 118,
-      "worldViewport": [
-        1153.42,
-        1153.42
-      ],
-      "movement": "screen-aligned",
-      "spawns": "offscreen",
-      "ultimate": "animated"
-    },
-    {
-      "hero": "ranger",
-      "floor": 2,
       "width": 390,
       "height": 844,
       "sceneItems": 120,
@@ -100,10 +86,24 @@
     },
     {
       "hero": "ranger",
+      "floor": 2,
+      "width": 390,
+      "height": 844,
+      "sceneItems": 122,
+      "worldViewport": [
+        1153.42,
+        1153.42
+      ],
+      "movement": "screen-aligned",
+      "spawns": "offscreen",
+      "ultimate": "animated"
+    },
+    {
+      "hero": "ranger",
       "floor": 3,
       "width": 390,
       "height": 844,
-      "sceneItems": 125,
+      "sceneItems": 128,
       "worldViewport": [
         1153.42,
         1153.42
@@ -117,7 +117,7 @@
       "floor": 4,
       "width": 390,
       "height": 844,
-      "sceneItems": 141,
+      "sceneItems": 135,
       "worldViewport": [
         1153.42,
         1153.42
@@ -131,7 +131,7 @@
       "floor": 5,
       "width": 390,
       "height": 844,
-      "sceneItems": 117,
+      "sceneItems": 113,
       "worldViewport": [
         1153.42,
         1153.42
@@ -159,7 +159,7 @@
       "floor": 2,
       "width": 390,
       "height": 844,
-      "sceneItems": 89,
+      "sceneItems": 90,
       "worldViewport": [
         1153.42,
         1153.42
@@ -173,7 +173,7 @@
       "floor": 3,
       "width": 390,
       "height": 844,
-      "sceneItems": 96,
+      "sceneItems": 93,
       "worldViewport": [
         1153.42,
         1153.42
@@ -187,7 +187,7 @@
       "floor": 4,
       "width": 390,
       "height": 844,
-      "sceneItems": 106,
+      "sceneItems": 102,
       "worldViewport": [
         1153.42,
         1153.42
@@ -201,7 +201,7 @@
       "floor": 5,
       "width": 390,
       "height": 844,
-      "sceneItems": 84,
+      "sceneItems": 82,
       "worldViewport": [
         1153.42,
         1153.42
@@ -215,7 +215,7 @@
       "floor": 1,
       "width": 390,
       "height": 844,
-      "sceneItems": 86,
+      "sceneItems": 87,
       "worldViewport": [
         1153.42,
         1153.42
@@ -243,7 +243,7 @@
       "floor": 3,
       "width": 390,
       "height": 844,
-      "sceneItems": 92,
+      "sceneItems": 94,
       "worldViewport": [
         1153.42,
         1153.42
@@ -257,7 +257,7 @@
       "floor": 4,
       "width": 390,
       "height": 844,
-      "sceneItems": 109,
+      "sceneItems": 105,
       "worldViewport": [
         1153.42,
         1153.42
@@ -271,7 +271,7 @@
       "floor": 5,
       "width": 390,
       "height": 844,
-      "sceneItems": 86,
+      "sceneItems": 81,
       "worldViewport": [
         1153.42,
         1153.42
@@ -285,7 +285,7 @@
       "floor": 1,
       "width": 390,
       "height": 844,
-      "sceneItems": 86,
+      "sceneItems": 87,
       "worldViewport": [
         1153.42,
         1153.42
@@ -299,7 +299,7 @@
       "floor": 2,
       "width": 390,
       "height": 844,
-      "sceneItems": 86,
+      "sceneItems": 84,
       "worldViewport": [
         1153.42,
         1153.42
@@ -313,7 +313,7 @@
       "floor": 3,
       "width": 390,
       "height": 844,
-      "sceneItems": 93,
+      "sceneItems": 92,
       "worldViewport": [
         1153.42,
         1153.42
@@ -327,7 +327,7 @@
       "floor": 4,
       "width": 390,
       "height": 844,
-      "sceneItems": 109,
+      "sceneItems": 101,
       "worldViewport": [
         1153.42,
         1153.42
@@ -341,7 +341,7 @@
       "floor": 5,
       "width": 390,
       "height": 844,
-      "sceneItems": 82,
+      "sceneItems": 79,
       "worldViewport": [
         1153.42,
         1153.42
@@ -369,7 +369,7 @@
       "floor": 2,
       "width": 844,
       "height": 390,
-      "sceneItems": 83,
+      "sceneItems": 89,
       "worldViewport": [
         1002.34,
         1002.34
@@ -381,6 +381,20 @@
     {
       "hero": "gravecaller",
       "floor": 3,
+      "width": 844,
+      "height": 390,
+      "sceneItems": 100,
+      "worldViewport": [
+        1002.34,
+        1002.34
+      ],
+      "movement": "screen-aligned",
+      "spawns": "offscreen",
+      "ultimate": "animated"
+    },
+    {
+      "hero": "gravecaller",
+      "floor": 4,
       "width": 844,
       "height": 390,
       "sceneItems": 95,
@@ -394,24 +408,10 @@
     },
     {
       "hero": "gravecaller",
-      "floor": 4,
-      "width": 844,
-      "height": 390,
-      "sceneItems": 99,
-      "worldViewport": [
-        1002.34,
-        1002.34
-      ],
-      "movement": "screen-aligned",
-      "spawns": "offscreen",
-      "ultimate": "animated"
-    },
-    {
-      "hero": "gravecaller",
       "floor": 5,
       "width": 844,
       "height": 390,
-      "sceneItems": 88,
+      "sceneItems": 96,
       "worldViewport": [
         1002.34,
         1002.34
@@ -439,48 +439,6 @@
       "floor": 2,
       "width": 844,
       "height": 390,
-      "sceneItems": 104,
-      "worldViewport": [
-        1002.34,
-        1002.34
-      ],
-      "movement": "screen-aligned",
-      "spawns": "offscreen",
-      "ultimate": "animated"
-    },
-    {
-      "hero": "ranger",
-      "floor": 3,
-      "width": 844,
-      "height": 390,
-      "sceneItems": 122,
-      "worldViewport": [
-        1002.34,
-        1002.34
-      ],
-      "movement": "screen-aligned",
-      "spawns": "offscreen",
-      "ultimate": "animated"
-    },
-    {
-      "hero": "ranger",
-      "floor": 4,
-      "width": 844,
-      "height": 390,
-      "sceneItems": 125,
-      "worldViewport": [
-        1002.34,
-        1002.34
-      ],
-      "movement": "screen-aligned",
-      "spawns": "offscreen",
-      "ultimate": "animated"
-    },
-    {
-      "hero": "ranger",
-      "floor": 5,
-      "width": 844,
-      "height": 390,
       "sceneItems": 114,
       "worldViewport": [
         1002.34,
@@ -491,39 +449,11 @@
       "ultimate": "animated"
     },
     {
-      "hero": "ember",
-      "floor": 1,
-      "width": 844,
-      "height": 390,
-      "sceneItems": 81,
-      "worldViewport": [
-        1002.34,
-        1002.34
-      ],
-      "movement": "screen-aligned",
-      "spawns": "offscreen",
-      "ultimate": "animated"
-    },
-    {
-      "hero": "ember",
-      "floor": 2,
-      "width": 844,
-      "height": 390,
-      "sceneItems": 74,
-      "worldViewport": [
-        1002.34,
-        1002.34
-      ],
-      "movement": "screen-aligned",
-      "spawns": "offscreen",
-      "ultimate": "animated"
-    },
-    {
-      "hero": "ember",
+      "hero": "ranger",
       "floor": 3,
       "width": 844,
       "height": 390,
-      "sceneItems": 89,
+      "sceneItems": 127,
       "worldViewport": [
         1002.34,
         1002.34
@@ -533,11 +463,25 @@
       "ultimate": "animated"
     },
     {
-      "hero": "ember",
+      "hero": "ranger",
       "floor": 4,
       "width": 844,
       "height": 390,
-      "sceneItems": 93,
+      "sceneItems": 118,
+      "worldViewport": [
+        1002.34,
+        1002.34
+      ],
+      "movement": "screen-aligned",
+      "spawns": "offscreen",
+      "ultimate": "animated"
+    },
+    {
+      "hero": "ranger",
+      "floor": 5,
+      "width": 844,
+      "height": 390,
+      "sceneItems": 120,
       "worldViewport": [
         1002.34,
         1002.34
@@ -548,20 +492,6 @@
     },
     {
       "hero": "ember",
-      "floor": 5,
-      "width": 844,
-      "height": 390,
-      "sceneItems": 82,
-      "worldViewport": [
-        1002.34,
-        1002.34
-      ],
-      "movement": "screen-aligned",
-      "spawns": "offscreen",
-      "ultimate": "animated"
-    },
-    {
-      "hero": "bloodknight",
       "floor": 1,
       "width": 844,
       "height": 390,
@@ -575,11 +505,11 @@
       "ultimate": "animated"
     },
     {
-      "hero": "bloodknight",
+      "hero": "ember",
       "floor": 2,
       "width": 844,
       "height": 390,
-      "sceneItems": 74,
+      "sceneItems": 78,
       "worldViewport": [
         1002.34,
         1002.34
@@ -589,22 +519,8 @@
       "ultimate": "animated"
     },
     {
-      "hero": "bloodknight",
+      "hero": "ember",
       "floor": 3,
-      "width": 844,
-      "height": 390,
-      "sceneItems": 90,
-      "worldViewport": [
-        1002.34,
-        1002.34
-      ],
-      "movement": "screen-aligned",
-      "spawns": "offscreen",
-      "ultimate": "animated"
-    },
-    {
-      "hero": "bloodknight",
-      "floor": 4,
       "width": 844,
       "height": 390,
       "sceneItems": 91,
@@ -617,11 +533,11 @@
       "ultimate": "animated"
     },
     {
-      "hero": "bloodknight",
-      "floor": 5,
+      "hero": "ember",
+      "floor": 4,
       "width": 844,
       "height": 390,
-      "sceneItems": 81,
+      "sceneItems": 85,
       "worldViewport": [
         1002.34,
         1002.34
@@ -631,7 +547,21 @@
       "ultimate": "animated"
     },
     {
-      "hero": "sunwarden",
+      "hero": "ember",
+      "floor": 5,
+      "width": 844,
+      "height": 390,
+      "sceneItems": 85,
+      "worldViewport": [
+        1002.34,
+        1002.34
+      ],
+      "movement": "screen-aligned",
+      "spawns": "offscreen",
+      "ultimate": "animated"
+    },
+    {
+      "hero": "bloodknight",
       "floor": 1,
       "width": 844,
       "height": 390,
@@ -645,11 +575,81 @@
       "ultimate": "animated"
     },
     {
+      "hero": "bloodknight",
+      "floor": 2,
+      "width": 844,
+      "height": 390,
+      "sceneItems": 81,
+      "worldViewport": [
+        1002.34,
+        1002.34
+      ],
+      "movement": "screen-aligned",
+      "spawns": "offscreen",
+      "ultimate": "animated"
+    },
+    {
+      "hero": "bloodknight",
+      "floor": 3,
+      "width": 844,
+      "height": 390,
+      "sceneItems": 92,
+      "worldViewport": [
+        1002.34,
+        1002.34
+      ],
+      "movement": "screen-aligned",
+      "spawns": "offscreen",
+      "ultimate": "animated"
+    },
+    {
+      "hero": "bloodknight",
+      "floor": 4,
+      "width": 844,
+      "height": 390,
+      "sceneItems": 87,
+      "worldViewport": [
+        1002.34,
+        1002.34
+      ],
+      "movement": "screen-aligned",
+      "spawns": "offscreen",
+      "ultimate": "animated"
+    },
+    {
+      "hero": "bloodknight",
+      "floor": 5,
+      "width": 844,
+      "height": 390,
+      "sceneItems": 89,
+      "worldViewport": [
+        1002.34,
+        1002.34
+      ],
+      "movement": "screen-aligned",
+      "spawns": "offscreen",
+      "ultimate": "animated"
+    },
+    {
+      "hero": "sunwarden",
+      "floor": 1,
+      "width": 844,
+      "height": 390,
+      "sceneItems": 81,
+      "worldViewport": [
+        1002.34,
+        1002.34
+      ],
+      "movement": "screen-aligned",
+      "spawns": "offscreen",
+      "ultimate": "animated"
+    },
+    {
       "hero": "sunwarden",
       "floor": 2,
       "width": 844,
       "height": 390,
-      "sceneItems": 74,
+      "sceneItems": 81,
       "worldViewport": [
         1002.34,
         1002.34
@@ -677,7 +677,7 @@
       "floor": 4,
       "width": 844,
       "height": 390,
-      "sceneItems": 91,
+      "sceneItems": 86,
       "worldViewport": [
         1002.34,
         1002.34
@@ -691,7 +691,7 @@
       "floor": 5,
       "width": 844,
       "height": 390,
-      "sceneItems": 82,
+      "sceneItems": 88,
       "worldViewport": [
         1002.34,
         1002.34
@@ -707,71 +707,71 @@
       "hero": "gravecaller",
       "width": 390,
       "height": 844,
-      "medianMs": 7.5,
-      "maxMs": 60.9
+      "medianMs": 1.6,
+      "maxMs": 24.3
     },
     {
       "hero": "ranger",
       "width": 390,
       "height": 844,
-      "medianMs": 5.4,
-      "maxMs": 102.4
+      "medianMs": 1.5,
+      "maxMs": 33
     },
     {
       "hero": "ember",
       "width": 390,
       "height": 844,
-      "medianMs": 1.8,
-      "maxMs": 59.3
+      "medianMs": 1.3,
+      "maxMs": 40.8
     },
     {
       "hero": "bloodknight",
       "width": 390,
       "height": 844,
-      "medianMs": 1.5,
-      "maxMs": 34.3
+      "medianMs": 3.2,
+      "maxMs": 41.8
     },
     {
       "hero": "sunwarden",
       "width": 390,
       "height": 844,
-      "medianMs": 1.6,
-      "maxMs": 43.7
+      "medianMs": 3.9,
+      "maxMs": 43
     },
     {
       "hero": "gravecaller",
       "width": 844,
       "height": 390,
-      "medianMs": 2,
-      "maxMs": 28.7
+      "medianMs": 2.4,
+      "maxMs": 52.1
     },
     {
       "hero": "ranger",
       "width": 844,
       "height": 390,
       "medianMs": 1.2,
-      "maxMs": 2.1
+      "maxMs": 4.6
     },
     {
       "hero": "ember",
       "width": 844,
       "height": 390,
-      "medianMs": 1.1,
-      "maxMs": 1.7
+      "medianMs": 2.9,
+      "maxMs": 30.7
     },
     {
       "hero": "bloodknight",
       "width": 844,
       "height": 390,
-      "medianMs": 1.2,
-      "maxMs": 1.7
+      "medianMs": 1.3,
+      "maxMs": 28.7
     },
     {
       "hero": "sunwarden",
       "width": 844,
       "height": 390,
-      "medianMs": 1.9,
-      "maxMs": 12.2
+      "medianMs": 4,
+      "maxMs": 47.1
     }
   ],
   "browserErrors": [],

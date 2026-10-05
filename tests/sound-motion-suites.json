@@ -1,0 +1,64 @@
+[
+  {
+    "suite": "visual-invariants",
+    "exit": 0,
+    "seconds": 0.1
+  },
+  {
+    "suite": "action-rpg",
+    "exit": 0,
+    "seconds": 165.3
+  },
+  {
+    "suite": "landscape-skills",
+    "exit": 0,
+    "seconds": 146.1
+  },
+  {
+    "suite": "new-heroes",
+    "exit": 0,
+    "seconds": 57.4
+  },
+  {
+    "suite": "bloodknight",
+    "exit": 0,
+    "seconds": 12.7
+  },
+  {
+    "suite": "descent",
+    "exit": 0,
+    "seconds": 53.6
+  },
+  {
+    "suite": "descent-variety",
+    "exit": 0,
+    "seconds": 10.5
+  },
+  {
+    "suite": "descent-tuning",
+    "exit": 0,
+    "seconds": 129.6
+  },
+  {
+    "suite": "animated-catacombs",
+    "exit": 0,
+    "seconds": 123.9
+  },
+  {
+    "suite": "audio-presentation",
+    "exit": 0,
+    "seconds": 4.1,
+    "rerun": "Passed independently with cleanup assertions polling natural onended completion rather than wall-clock sleep."
+  },
+  {
+    "suite": "ash-environment",
+    "exit": 0,
+    "seconds": 0.1
+  },
+  {
+    "suite": "sound-motion",
+    "exit": 0,
+    "seconds": 15.9,
+    "rerun": "Passed independently with cleanup assertions polling natural onended completion rather than wall-clock sleep."
+  }
+]

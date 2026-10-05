@@ -9,7 +9,7 @@ function decode(kind,image){
  probe.width=probe.height=1;sheets.set(kind,frames);pending.delete(kind);
 }
 function load(kind){if(sheets.has(kind)||pending.has(kind))return;pending.add(kind);let fallback=false;const image=new Image();image.onload=()=>{try{decode(kind,image);}catch{pending.delete(kind);}};image.onerror=()=>{if(!fallback){fallback=true;image.src='assets/cinematic/'+kind+'-animation.png';}else pending.delete(kind);};image.src='assets/cinematic/'+kind+'-animation.webp';}
-function ensure(){load('gravecaller');load('bloodknight');}
+function ensure(){for(const kind of ['gravecaller','bloodknight','ranger','sunwarden','ember'])load(kind);}
 function choose(o){const dir=o.direction||{x:0,y:1},side=Math.abs(dir.x)>Math.abs(dir.y)*.72;let row=side?1:dir.y<-.15?2:0,col=0,flip=side&&dir.x<0;
  if(o.dead){row=4;col=3+Math.min(2,Math.floor(Math.max(0,o.deathProgress||0)*3));flip=false;}
  else if(o.hit>0){row=4;col=Math.min(2,Math.floor((1-o.hit)*3));flip=false;}

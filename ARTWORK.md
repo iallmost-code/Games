@@ -51,3 +51,11 @@ New original image-generated transparent atlases: `gravecaller-animation.png` an
 `ash-props.png` is a 1774×887 transparent four-by-two painted atlas: broken column, ruined arch, chain set, sarcophagus, floor seal, hooded statue, coal brazier and bone pile. Ash's scenery module prefers these painted images and retains cached canvas fallbacks. All new WebPs use quality 88 and full alpha quality. Additional WebP download size is approximately 1.9 MB; PNG fallback approximately 6.5 MB. The generated source images are retained unchanged.
 
 Original layered audio source and regeneration instructions are documented in `assets/audio/README.md`. No borrowed commercial-game artwork or sounds are used.
+
+## SOUND & MOTION (v69)
+
+Original image-generated `ranger-animation`, `sunwarden-animation` and `ember-animation` sheets match the v68 six-by-five layout (1374×1145). Each contains 18 distinct walking poses, six attack/cast poses and three hit/three death poses. The existing decoder supplies 150 cached foot-anchored frames across five heroes. Sunwarden's continuous beam receives a cosmetic staff pulse; its damage ticks, beam direction/range and game cast clock are unchanged.
+
+`frost-props` and `venom-props` are transparent 1774×887 four-by-two atlases. Frost includes fractured ice columns, frozen arches, icicles, tombs, ice seals, statues, cold braziers and ice/bones. Venom includes root pillars/arches, hanging vines, giant fungi, toxic pools, overgrown statues, spore lanterns and bone piles. PNG files are unchanged generation outputs; WebP conversions use quality 76, preserving alpha. Additional WebP bytes: 2,708,874 (2.58 MiB). Generated originals remain in the workspace generation directory.
+
+These are original project assets, without borrowed commercial-game art or sound. See assets/audio/README.md for original sample recipes and procedural music details. Native browser timings are diagnostics, not sustained Android hardware FPS measurements.

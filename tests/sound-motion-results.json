@@ -1,0 +1,507 @@
+{
+  "scenes": [
+    {
+      "hero": "gravecaller",
+      "floor": 1,
+      "zone": 0,
+      "voids": 22,
+      "props": 0,
+      "width": 390,
+      "height": 844
+    },
+    {
+      "hero": "gravecaller",
+      "floor": 2,
+      "zone": 1,
+      "voids": 22,
+      "props": 12,
+      "width": 390,
+      "height": 844
+    },
+    {
+      "hero": "gravecaller",
+      "floor": 3,
+      "zone": 2,
+      "voids": 22,
+      "props": 13,
+      "width": 390,
+      "height": 844
+    },
+    {
+      "hero": "gravecaller",
+      "floor": 4,
+      "zone": 1,
+      "voids": 28,
+      "props": 15,
+      "width": 390,
+      "height": 844
+    },
+    {
+      "hero": "gravecaller",
+      "floor": 5,
+      "zone": 0,
+      "voids": 28,
+      "props": 14,
+      "width": 390,
+      "height": 844
+    },
+    {
+      "hero": "bloodknight",
+      "floor": 1,
+      "zone": 0,
+      "voids": 22,
+      "props": 14,
+      "width": 390,
+      "height": 844
+    },
+    {
+      "hero": "bloodknight",
+      "floor": 2,
+      "zone": 1,
+      "voids": 22,
+      "props": 12,
+      "width": 390,
+      "height": 844
+    },
+    {
+      "hero": "bloodknight",
+      "floor": 3,
+      "zone": 2,
+      "voids": 22,
+      "props": 13,
+      "width": 390,
+      "height": 844
+    },
+    {
+      "hero": "bloodknight",
+      "floor": 4,
+      "zone": 1,
+      "voids": 28,
+      "props": 15,
+      "width": 390,
+      "height": 844
+    },
+    {
+      "hero": "bloodknight",
+      "floor": 5,
+      "zone": 0,
+      "voids": 28,
+      "props": 14,
+      "width": 390,
+      "height": 844
+    },
+    {
+      "hero": "ranger",
+      "floor": 1,
+      "zone": 0,
+      "voids": 22,
+      "props": 14,
+      "width": 390,
+      "height": 844
+    },
+    {
+      "hero": "ranger",
+      "floor": 2,
+      "zone": 1,
+      "voids": 22,
+      "props": 12,
+      "width": 390,
+      "height": 844
+    },
+    {
+      "hero": "ranger",
+      "floor": 3,
+      "zone": 2,
+      "voids": 22,
+      "props": 13,
+      "width": 390,
+      "height": 844
+    },
+    {
+      "hero": "ranger",
+      "floor": 4,
+      "zone": 1,
+      "voids": 28,
+      "props": 15,
+      "width": 390,
+      "height": 844
+    },
+    {
+      "hero": "ranger",
+      "floor": 5,
+      "zone": 0,
+      "voids": 28,
+      "props": 14,
+      "width": 390,
+      "height": 844
+    },
+    {
+      "hero": "sunwarden",
+      "floor": 1,
+      "zone": 0,
+      "voids": 22,
+      "props": 14,
+      "width": 390,
+      "height": 844
+    },
+    {
+      "hero": "sunwarden",
+      "floor": 2,
+      "zone": 1,
+      "voids": 22,
+      "props": 12,
+      "width": 390,
+      "height": 844
+    },
+    {
+      "hero": "sunwarden",
+      "floor": 3,
+      "zone": 2,
+      "voids": 22,
+      "props": 13,
+      "width": 390,
+      "height": 844
+    },
+    {
+      "hero": "sunwarden",
+      "floor": 4,
+      "zone": 1,
+      "voids": 28,
+      "props": 15,
+      "width": 390,
+      "height": 844
+    },
+    {
+      "hero": "sunwarden",
+      "floor": 5,
+      "zone": 0,
+      "voids": 28,
+      "props": 14,
+      "width": 390,
+      "height": 844
+    },
+    {
+      "hero": "ember",
+      "floor": 1,
+      "zone": 0,
+      "voids": 22,
+      "props": 14,
+      "width": 390,
+      "height": 844
+    },
+    {
+      "hero": "ember",
+      "floor": 2,
+      "zone": 1,
+      "voids": 22,
+      "props": 12,
+      "width": 390,
+      "height": 844
+    },
+    {
+      "hero": "ember",
+      "floor": 3,
+      "zone": 2,
+      "voids": 22,
+      "props": 13,
+      "width": 390,
+      "height": 844
+    },
+    {
+      "hero": "ember",
+      "floor": 4,
+      "zone": 1,
+      "voids": 28,
+      "props": 15,
+      "width": 390,
+      "height": 844
+    },
+    {
+      "hero": "ember",
+      "floor": 5,
+      "zone": 0,
+      "voids": 28,
+      "props": 14,
+      "width": 390,
+      "height": 844
+    },
+    {
+      "hero": "gravecaller",
+      "floor": 1,
+      "zone": 0,
+      "voids": 22,
+      "props": 14,
+      "width": 844,
+      "height": 390
+    },
+    {
+      "hero": "gravecaller",
+      "floor": 2,
+      "zone": 1,
+      "voids": 22,
+      "props": 14,
+      "width": 844,
+      "height": 390
+    },
+    {
+      "hero": "gravecaller",
+      "floor": 3,
+      "zone": 2,
+      "voids": 22,
+      "props": 14,
+      "width": 844,
+      "height": 390
+    },
+    {
+      "hero": "gravecaller",
+      "floor": 4,
+      "zone": 1,
+      "voids": 28,
+      "props": 14,
+      "width": 844,
+      "height": 390
+    },
+    {
+      "hero": "gravecaller",
+      "floor": 5,
+      "zone": 0,
+      "voids": 28,
+      "props": 13,
+      "width": 844,
+      "height": 390
+    },
+    {
+      "hero": "bloodknight",
+      "floor": 1,
+      "zone": 0,
+      "voids": 22,
+      "props": 13,
+      "width": 844,
+      "height": 390
+    },
+    {
+      "hero": "bloodknight",
+      "floor": 2,
+      "zone": 1,
+      "voids": 22,
+      "props": 14,
+      "width": 844,
+      "height": 390
+    },
+    {
+      "hero": "bloodknight",
+      "floor": 3,
+      "zone": 2,
+      "voids": 22,
+      "props": 14,
+      "width": 844,
+      "height": 390
+    },
+    {
+      "hero": "bloodknight",
+      "floor": 4,
+      "zone": 1,
+      "voids": 28,
+      "props": 14,
+      "width": 844,
+      "height": 390
+    },
+    {
+      "hero": "bloodknight",
+      "floor": 5,
+      "zone": 0,
+      "voids": 28,
+      "props": 13,
+      "width": 844,
+      "height": 390
+    },
+    {
+      "hero": "ranger",
+      "floor": 1,
+      "zone": 0,
+      "voids": 22,
+      "props": 13,
+      "width": 844,
+      "height": 390
+    },
+    {
+      "hero": "ranger",
+      "floor": 2,
+      "zone": 1,
+      "voids": 22,
+      "props": 14,
+      "width": 844,
+      "height": 390
+    },
+    {
+      "hero": "ranger",
+      "floor": 3,
+      "zone": 2,
+      "voids": 22,
+      "props": 14,
+      "width": 844,
+      "height": 390
+    },
+    {
+      "hero": "ranger",
+      "floor": 4,
+      "zone": 1,
+      "voids": 28,
+      "props": 14,
+      "width": 844,
+      "height": 390
+    },
+    {
+      "hero": "ranger",
+      "floor": 5,
+      "zone": 0,
+      "voids": 28,
+      "props": 13,
+      "width": 844,
+      "height": 390
+    },
+    {
+      "hero": "sunwarden",
+      "floor": 1,
+      "zone": 0,
+      "voids": 22,
+      "props": 13,
+      "width": 844,
+      "height": 390
+    },
+    {
+      "hero": "sunwarden",
+      "floor": 2,
+      "zone": 1,
+      "voids": 22,
+      "props": 14,
+      "width": 844,
+      "height": 390
+    },
+    {
+      "hero": "sunwarden",
+      "floor": 3,
+      "zone": 2,
+      "voids": 22,
+      "props": 14,
+      "width": 844,
+      "height": 390
+    },
+    {
+      "hero": "sunwarden",
+      "floor": 4,
+      "zone": 1,
+      "voids": 28,
+      "props": 14,
+      "width": 844,
+      "height": 390
+    },
+    {
+      "hero": "sunwarden",
+      "floor": 5,
+      "zone": 0,
+      "voids": 28,
+      "props": 13,
+      "width": 844,
+      "height": 390
+    },
+    {
+      "hero": "ember",
+      "floor": 1,
+      "zone": 0,
+      "voids": 22,
+      "props": 13,
+      "width": 844,
+      "height": 390
+    },
+    {
+      "hero": "ember",
+      "floor": 2,
+      "zone": 1,
+      "voids": 22,
+      "props": 14,
+      "width": 844,
+      "height": 390
+    },
+    {
+      "hero": "ember",
+      "floor": 3,
+      "zone": 2,
+      "voids": 22,
+      "props": 14,
+      "width": 844,
+      "height": 390
+    },
+    {
+      "hero": "ember",
+      "floor": 4,
+      "zone": 1,
+      "voids": 28,
+      "props": 14,
+      "width": 844,
+      "height": 390
+    },
+    {
+      "hero": "ember",
+      "floor": 5,
+      "zone": 0,
+      "voids": 28,
+      "props": 13,
+      "width": 844,
+      "height": 390
+    }
+  ],
+  "music": {
+    "menu": {
+      "loops": 1,
+      "stings": 0,
+      "events": 0,
+      "scene": "menu",
+      "zone": 0,
+      "near": 0,
+      "boss": false,
+      "enabled": true,
+      "unlocked": true,
+      "buffers": 1,
+      "musicLevel": 0,
+      "combatLevel": 0,
+      "bossLevel": 0
+    },
+    "afterPauseResume": {
+      "loops": 3,
+      "stings": 1,
+      "events": 4,
+      "scene": "play",
+      "zone": 2,
+      "near": 14,
+      "boss": true,
+      "enabled": false,
+      "unlocked": true,
+      "buffers": 10,
+      "musicLevel": 0,
+      "combatLevel": 0,
+      "bossLevel": 0.529965341091156
+    }
+  },
+  "motion": {
+    "cachedTint": true,
+    "immediateDeath": true,
+    "bossCard": true,
+    "effectCap": {
+      "effects": 7,
+      "particles": 64,
+      "queued": 7,
+      "intro": true
+    }
+  },
+  "settings": {
+    "musicIndependent": true,
+    "shakeStored": true,
+    "profile": 2,
+    "run": 11,
+    "code": "EC1",
+    "controls": 2
+  },
+  "errors": [],
+  "webpBytes": 2708874
+}

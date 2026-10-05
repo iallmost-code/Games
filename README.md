@@ -1,6 +1,6 @@
 # Ember Crypt
 
-**v68 Animated Catacombs — branch `codex/animated-catacombs`, awaiting owner playtest.**
+**v72 · ENDLESS NIGHTS (includes v69 SOUND & MOTION).**
 The public links below still serve the published main build.
 Play: https://iallmost-code.github.io/Games/ (GitHub Pages, deployed from `main`)
 ChatGPT Sites copy: https://ember-crypt.alpine0-0.chatgpt.site
@@ -108,3 +108,27 @@ Ash Catacombs gains original painted basalt columns, gothic arches, chains, tomb
 Fifteen original short WAV layers add class-specific attack sounds, sword air, metal/stone impacts, spells, skill cues and loot tones. Samples are offline-authored noise/modal synthesis, not recorded Foley. Decoding is cached, voices cap at twelve, mute immediately stops sample tails, and the original oscillator sounds remain a failure/loading fallback. No additional controls or external runtime dependencies.
 
 Run `node tests/visual-invariants.cjs`, `node tests/ash-environment.cjs`, `node tests/audio-presentation.cjs` and `node tests/animated-catacombs.cjs`. Existing camera/hero/migration/Descent suites remain applicable. Browser diagnostics do not establish physical Android FPS.
+
+## SOUND & MOTION (v69)
+
+All five heroes now use original 30-cell authored animations, with the existing sprites as failure fallback. Frost and Venom receive painted eight-prop atlases; scenery follows existing zones through all five Descent floors and Endless. Raised voids remain solid, props fade near the hero and new work scales with Auto quality.
+
+Original procedural music supplies a menu motif, Ash/Frost/Venom ambient beds, enemy-density combat percussion, boss drums and four event stings. MUSIC is independent of SOUND; both unlock through a user gesture. Pausing/hidden tabs fades the music, and hidden-tab return waits for another gesture. Settings also offers SCREEN SHAKE. Preferences are local only; profiles v2, runs v11 and EC1 codes are unchanged.
+
+Twelve additional original samples bring combat audio to 27 layers. Cached zone-tinted hit flashes, dissolving enemies, damage-number pops, level-up pillars, boss introductions/death bursts, opening chests, well ripples, forge sparks, door unlocks and glowing stairs are presentation only. New WebP art totals 2,708,874 bytes; additional samples 279,408 bytes; music needs no downloads. PNG fallbacks retain the unchanged generated originals.
+
+`tests/sound-motion.cjs` covers zone/mode integration, physics safety, quality caps, transient effects, independent settings and real Web Audio lifecycle. Every game simulation separately stubs `music(kind)`; music is exercised directly in its focused browser harness. The invariant baseline remains `c588c3f`, allowing only the exact marked enemy-death `fx` call to be stripped. Physical Android FPS and subjective listening quality still require owner playtesting.
+
+## Endless Nights (v72)
+
+Torment 1–10 unlocks after clearing The Descent. Crypt Depths remain a separate ladder: their existing modifiers are preserved and can be combined with Torment. Per Torment rank, enemy HP gains 35%, incoming damage 12%, arrival density 6.5%, embers 20%, champion chance 0.2 percentage points and boss bonus-relic chance 4.5 percentage points. Both modes use the ladder, and the highest Torment cleared is recorded for each hero. A saved Descent victory or positive Descent depth record also unlocks it. Old zero-filled records default safely to locked until a clear is recorded; existing progress is preserved.
+
+Play offers Random layouts and Classic layouts. Random floors assemble authored room pieces around a two-cell spine with side-room necks and the existing locked boss chamber; their seed is stored. Classic preserves the original maps. Random becomes the default after a first clear. From Floor 2 onward, some floors have a cracked secret wall on the entry room's west edge; walk into it to reveal a relic room. From Floor 3 onward, one side room contains the merchant's heal (18 gold), reroll (24 gold), and relic (60 gold) pads. Stop on a pad for 1.25 seconds to buy; purchases wait until nearby enemies are gone. Each pad sells once per floor. Enemies drop run gold; it resets on a new run.
+
+Named rare champions start on Floor 2 (Endless wave 4), or immediately in Torment/daily challenges. They use shielded, hasted, splitting or vampiric modifiers with distinct auras and guaranteed relic chests. Ordinary arrival warnings, wall collision and enemy limits still apply. Torment increases their chance. Gold piles cap at 64, champion auras at two, and additions use cached glows and simple geometry rather than per-enemy filters.
+
+Daily Challenge starts directly from Play: the UTC date fixes the seed, hero and modifier, including gameplay RNG. Daily heroes are trial choices even if locked. Shrine upgrades still apply; scores and bests are local to the character, not a competitive online leaderboard. Score = kills + 500 per floor reached + 1,000 per boss + 5,000 for a clear. Run History lists the last 20 completed/abandoned runs for the active save slot. The same run updates its existing entry when continued in Endless.
+
+Profiles stay v2 with additive defaults. Runs become v12: v9/v10/v11 and legacy EC1 codes migrate without discarding progress. Continue restarts the current floor using the same seed, hero, gold and RNG from its entry checkpoint; purchases and secret discoveries made later on that floor restart too. Endless restores the current saved state. All fields remain slot-isolated and travel in EC1 codes.
+
+This PR starts independently from the current main (v68, five heroes/five floors), as requested. It does not merge the separate v69–v71 branches. The room assembler accepts the floor specification supplied by the game so later floor releases can extend it.

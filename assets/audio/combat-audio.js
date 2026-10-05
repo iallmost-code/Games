@@ -6,19 +6,23 @@
     new URL('assets/audio/combat-audio.js', root.document ? root.document.baseURI : 'http://localhost/').href);
   const contexts = new WeakMap(), downloads = new Map();
   const MAX_VOICES = 12;
-  const SAMPLE_VERSION = '68';
+  const SAMPLE_VERSION = '69';
   const names = ['blade-air', 'dash-air', 'stone-impact', 'metal-impact', 'armor-hit',
     'shield-ring', 'bow-release', 'soul-cast', 'fire-crackle', 'crystal-chime',
-    'pickup-gem', 'ember-blast', 'ultimate-rise', 'soul-fall', 'stone-door'];
+    'pickup-gem', 'ember-blast', 'ultimate-rise', 'soul-fall', 'stone-door',
+    'thunder-string','holy-chime','fire-whoosh','death-bones','death-flesh','death-stone','death-spirit','chest-open','well-drink','forge-anvil','stairs-step','boss-roar'];
   const layer = (name, gain, pitch = 1, delay = 0) => ({ name, gain, pitch, delay });
   const casts = {
     gravecaller: [layer('soul-cast', .24, .90), layer('blade-air', .09, .75, .018)],
     bloodknight: [layer('blade-air', .25, .84), layer('armor-hit', .08, 1.13, .016)],
-    ranger: [layer('bow-release', .25), layer('blade-air', .09, 1.32, .018)],
-    ember: [layer('fire-crackle', .23), layer('blade-air', .11, .86, .016)],
-    sunwarden: [layer('crystal-chime', .14, .78), layer('blade-air', .14, 1.10)]
+    ranger: [layer('bow-release', .21), layer('thunder-string', .13, 1, .018)],
+    ember: [layer('fire-whoosh', .22), layer('fire-crackle', .10, .86, .016)],
+    sunwarden: [layer('holy-chime', .19), layer('blade-air', .10, 1.10)]
   };
   const events = {
+    chest:[layer('chest-open',.23),layer('pickup-gem',.1,1,.08)],
+    well:[layer('well-drink',.23)],forge:[layer('forge-anvil',.23)],
+    unlock:[layer('stone-door',.23),layer('metal-impact',.11)],stairs:[layer('stairs-step',.24)],
     start: [layer('crystal-chime', .14, .85), layer('pickup-gem', .12, .89, .08)],
     cast: casts.gravecaller,
     shoot: casts.gravecaller,
@@ -36,7 +40,7 @@
     upgrade: [layer('crystal-chime', .20, .81), layer('pickup-gem', .16, 1.08, .10)],
     door: [layer('stone-door', .21), layer('armor-hit', .09, .66, .045)],
     warning: [layer('soul-cast', .16, .64), layer('shield-ring', .09, .59)],
-    boss: [layer('soul-fall', .25, .67), layer('stone-door', .17, .79)],
+    boss: [layer('boss-roar', .25), layer('stone-door', .12, .79)],
     bossDown: [layer('ember-blast', .20, .82), layer('crystal-chime', .22, .80, .11)]
   };
   // Admission is cosmetic. Only a bounded number of nodes is active even in dense fights.
@@ -48,6 +52,7 @@
     ultimate: 3, death: 3, boss: 3, bossDown: 3 };
 
   function definitions(kind, heroClass) {
+    if(kind.startsWith('enemy-')){const type=kind.slice(6),family=['skeleton','sentinel'].includes(type)?'bones':['frostGolem','burrower','heart'].includes(type)?'stone':['wraith','caster','oracle'].includes(type)?'spirit':'flesh';return [layer('death-'+family,.16,type==='brute'?.8:type==='cinderImp'?1.25:1)];}
     return (kind === 'cast' || kind === 'shoot') ? casts[heroClass] || events[kind] : events[kind];
   }
   function raw(name) {

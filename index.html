@@ -755,11 +755,15 @@
     <canvas id="dungeonMap" width="144" height="94" hidden aria-label="Dungeon minimap"></canvas><div id="firstRunTip" hidden role="status"></div>
     <script src="assets/cinematic/hero-animation.js"></script>
     <script src="assets/cinematic/ash-environment.js"></script>
+    <script src="assets/cinematic/zone-environment.js"></script>
+    <script src="assets/cinematic/motion.js"></script>
     <script src="assets/audio/combat-audio.js"></script>
+    <script src="assets/audio/music.js"></script>
+    <script src="assets/endgame/endless-nights.js"></script>
     <script>
       (() => {
         "use strict";
-        const GAME_VERSION = "v68 · ANIMATED CATACOMBS";
+        const GAME_VERSION = "v72 · ENDLESS NIGHTS";
         // Recent script errors for Pause → REPORT A BUG. Never saved.
         const recentErrors = [];
         function noteError(kind, detail) {
@@ -905,6 +909,7 @@
           loadAtlas("bosses",4,4,["warden","warden-back","tyrant","tyrant-back","colossus","colossus-back","oracle","oracle-back",
             "heart","heart-back","cinderImp","cinderImp-back","frostGolem","frostGolem-back","sporeSpitter","sporeSpitter-back"]);
           loadAtlas("ash-props",4,2,["prop-ash-column","prop-ash-arch","prop-ash-chain","prop-ash-coffin","prop-ash-seal","prop-ash-statue","prop-ash-brazier","prop-ash-bones"]);
+          for(const zone of ["frost","venom"])loadAtlas(zone+"-props",4,2,["column","arch","chain","coffin","seal","statue","brazier","bones"].map(k=>"prop-"+zone+"-"+k));
           loadAtlas("props",4,2,["prop-tomb-0","prop-tomb-1","prop-tomb-2","prop-statue","prop-brazier","prop-well","prop-chest","prop-pillar"]);
           let floors=new Image();floors.onload=()=>{
             for(let z=0;z<3;z++){let tile=surface(384,384);
@@ -1098,7 +1103,7 @@
           profile = blankProfile(), selectedHero = "gravecaller", selectedDepth = 0, runEmbers = 0, pickupBonus = 0,
           best = 0;
         const slotProfileKey = (n) => "ember-crypt-slot-" + (n+1) + "-profile";
-        const slotRunKey = (n) => "ember-crypt-slot-" + (n+1) + "-run-v11";
+        const slotRunKey = (n) => "ember-crypt-slot-" + (n+1) + "-run-v12";
         const slotBestKey = (n) => "ember-crypt-slot-" + (n+1) + "-best";
         function persistSlots() { try { localStorage.setItem(slotsKey,JSON.stringify(slots)); } catch {} }
         function migrateSingleSave() {
@@ -1132,6 +1137,7 @@
         function applyProfile(prior) {
           prior=migrateHeroProfile(prior);
           profile=blankProfile(); selectedHero="gravecaller"; selectedDepth=0;
+          /* endgame-v72 */ Object.assign(profile, EmberEndgame.profile(prior || {}));
           profile.tips={};profile.records={descent:{kills:0,bestDepth:{}},endless:{kills:0,bestDepth:{}}};
           if (!prior || typeof prior!=="object") return;
           profile.tips=prior.tips&&typeof prior.tips==="object"?{...prior.tips}:{};
@@ -1284,7 +1290,7 @@
                 del.onclick=()=>{del.textContent="DELETE FOREVER";
                   let warning=menuText("p","Delete "+slots[i].name+"? This can't be undone.","menu-error");
                   card.append(warning);
-                  del.onclick=()=>{for(const key of [slotProfileKey(i),slotRunKey(i),slotRunKey(i).replace(/-v11$/, "-v10"),slotRunKey(i).replace(/-v11$/, "-v9"),slotBestKey(i)])localStorage.removeItem(key);
+                  del.onclick=()=>{for(const key of [slotProfileKey(i),slotRunKey(i),slotRunKey(i).replace(/-v12$/, "-v11"),slotRunKey(i).replace(/-v12$/, "-v10"),slotRunKey(i).replace(/-v12$/, "-v9"),slotBestKey(i)])localStorage.removeItem(key);
                     slots[i]=null; persistSlots();if(activeSlot===i){activeSlot=-1;hero=null;localStorage.removeItem(activeSlotKey);}
                     renderMenu("slots");};};card.append(del);
               }body.append(card);
@@ -1298,11 +1304,13 @@
               menuButton("SHRINE",()=>renderMenu("shrine")),
               menuButton("BESTIARY",()=>renderMenu("bestiary")),
               menuButton("ACHIEVEMENTS",()=>renderMenu("achievements")),
+              menuButton("RUN HISTORY",()=>renderMenu("history")),
               menuButton("SETTINGS",()=>{settingsReturn="hub";renderMenu("settings");}));
             if(fullscreenSupported())body.append(fullscreenButton());return;
           }
+          if(screen==="history"){renderRunHistory();return;}
           if(screen==="modes") {let body=menuBase("PLAY","hub","Choose your journey.");
-            body.append(menuButton("THE DESCENT",()=>{selectedMode="descent";renderMenu("heroes");},"Five dungeon floors. Defeat their guardians and descend.","primary"),menuButton("ENDLESS",()=>{selectedMode="endless";renderMenu("heroes");},"The original arena, Crypt Heart at wave 20 and endless tiers."));return;}
+            body.append(menuButton("THE DESCENT",()=>{selectedMode="descent";renderMenu("heroes");},"Five dungeon floors. Defeat their guardians and descend.","primary"),menuButton("ENDLESS",()=>{selectedMode="endless";renderMenu("heroes");},"The original arena, Crypt Heart at wave 20 and endless tiers."));renderEndgameOptions(body);return;}
           if(screen==="heroes") {renderHeroScreen();return;}
           if(screen==="shrine") {
             let body=menuBase("UPGRADE SHRINE","hub","✦ "+profile.embers+" EMBERS · permanent upgrades");
@@ -1331,7 +1339,7 @@
             if(fullscreenSupported())body.append(fullscreenButton());
             body.append(menuButton("REPORT A BUG",()=>renderMenu("report"),"Copies recent errors and your game state."));
             let quit=menuButton("QUIT RUN",()=>{quit.textContent="QUIT RUN · CONFIRM";
-              quit.onclick=()=>{saveSlotClock();clearRun();hero=null;showTitleMenu();};},
+              quit.onclick=()=>{recordEndgameResult(false,"Abandoned");saveSlotClock();clearRun();hero=null;showTitleMenu();};},
               "Embers earned stay with this character.");body.append(quit);return;
           }
           if(screen==="settings") {renderSettings();return;}
@@ -1393,7 +1401,7 @@
         function pauseRun(background=false) {
           if(mode!=="play")return;
           saveRun(true);saveSlotClock();mode="paused";resetJoy();
-          game.classList.remove("playing");renderMenu("pause");
+          game.classList.remove("playing");renderMenu("pause");music("pause");
           if(background) last=performance.now();
         }
         function resumePaused() {
@@ -1426,7 +1434,7 @@
           }
           if(data.version!==1||!validName(data.name)||!data.profile||typeof data.profile!=="object"||
             !Number.isFinite(Number(data.profile.embers))||
-            data.run&&!([9,10,11].includes(data.run.version)&&compatibleRun(data.run,data.run.version)&&(data.run.version===9||validRunMode(data.run))&&
+            data.run&&!([9,10,11,12].includes(data.run.version)&&compatibleRun(data.run,data.run.version)&&(data.run.version===9||validRunMode(data.run))&&
               Number.isFinite(data.run.hero.maxHp)&&data.run.hero.maxHp>0&&
               Number.isFinite(data.run.hero.maxArmor)&&data.run.hero.maxArmor>=0&&
               data.run.enemies.every(e=>Number.isFinite(e.x)&&Number.isFinite(e.y)&&
@@ -1434,12 +1442,15 @@
               data.run.drops.every(d=>Number.isFinite(d.x)&&Number.isFinite(d.y))))
             throw Error("This save code is incompatible.");
           data.profile=migrateHeroProfile(data.profile);
-          if(data.run&&(data.run.version!==11||["mage","storm"].includes(data.run.hero.class)))data.run=migrateLineupRun(data.run);
+          if(data.run&&(data.run.version<11||["mage","storm"].includes(data.run.hero.class)))data.run=migrateLineupRun(data.run);
+          if(data.run)data.run=migrateEndgameRun(data.run);
           return data;
         }
         function renderSettings(){
           let body=menuBase("SETTINGS",settingsReturn,slots[activeSlot]?.name||"");
           body.append(menuButton("SOUND · "+(soundEnabled?"ON":"OFF"),()=>{soundToggle.click();renderMenu("settings");}),
+            menuButton("MUSIC · "+(musicEnabled?"ON":"OFF"),()=>{musicEnabled=!musicEnabled;try{localStorage.setItem("ember-crypt-music-muted",musicEnabled?"0":"1");}catch{}ensureAudio();music("setting");renderMenu("settings");}),
+            menuButton("SCREEN SHAKE · "+(shakeEnabled?"ON":"OFF"),()=>{shakeEnabled=!shakeEnabled;try{localStorage.setItem("ember-crypt-screen-shake",shakeEnabled?"1":"0");}catch{}renderMenu("settings");}),
             menuButton("SPEED · "+gameSpeed+"×",()=>{speedToggle.click();renderMenu("settings");},"1× · 1.25× · 1.5×"),
             menuButton("VIBRATION · "+(vibrationEnabled?"ON":"OFF"),()=>{
               vibrationEnabled=!vibrationEnabled;localStorage.setItem("ember-crypt-vibrate-"+activeSlot,vibrationEnabled?"1":"0");
@@ -1493,6 +1504,7 @@
           body.append(menuText("p",unlocked?heroTraits[selectedHero]:
             "LOCKED · "+(selectedHero==="sunwarden"?"Reach floor 3 in The Descent":selectedHero==="bloodknight"?"Defeat 3 bosses total · "+Math.min(3,profile.bosses)+"/3":selectedHero==="ranger"?"Defeat a boss":"Reach wave 10 or earn 600 lifetime embers"),"menu-sub"),
             menuText("p",selectedMode.toUpperCase()+" · BEST DEPTH "+(profile.records?.[selectedMode]?.bestDepth[selectedHero]||0)+" · BEST KILLS "+(profile.records?.[selectedMode]?.kills||0),"menu-sub"));
+          body.append(menuText("p","BEST TORMENT CLEARED · "+(profile.bestTorment?.[selectedHero]||0),"menu-sub"));
           let touch=0;portrait.addEventListener("touchstart",e=>{touch=e.touches[0].clientX;},{passive:true});
           portrait.addEventListener("touchend",e=>{let shift=e.changedTouches[0].clientX-touch;if(Math.abs(shift)>35)cycle(shift<0?1:-1);},{passive:true});
           body.append(menuText("label","CRYPT DEPTH · "+selectedDepth+" · +"+(selectedDepth*25)+"% EMBERS","menu-label"));
@@ -1510,7 +1522,7 @@
         }
         function awardEmbers(n) {
           if (hero) {
-            let scaled = n * (1 + 0.25 * (hero.depth || 0)) + (hero.emberFraction || 0);
+            let scaled = n * endgameFactors().reward * (1 + 0.25 * (hero.depth || 0)) + (hero.emberFraction || 0);
             n = Math.floor(scaled + 1e-8);
             hero.emberFraction = scaled - n;
           }
@@ -1794,6 +1806,8 @@
           updateSpeedButton();
         });
         updateSpeedButton();
+        let musicEnabled=true,shakeEnabled=true,lastMusicAt=0;
+        try{musicEnabled=localStorage.getItem("ember-crypt-music-muted")!=="1";shakeEnabled=localStorage.getItem("ember-crypt-screen-shake")!=="0";}catch{}
         let soundEnabled = true,
           audioCtx = null,
           lastPlayed = {};
@@ -1805,17 +1819,32 @@
           soundToggle.setAttribute("aria-label", soundEnabled ? "Mute game audio" : "Unmute game audio");
         }
         function ensureAudio() {
-          if (!soundEnabled) return;
+          if (!soundEnabled && !musicEnabled) return;
           let C = globalThis.AudioContext || globalThis.webkitAudioContext;
           if (!C) return;
           try {
             if (!audioCtx) audioCtx = new C();
             if (audioCtx.state === "suspended") audioCtx.resume().catch(() => {});
-            window.EmberAudio?.ensure(audioCtx);
+            if(soundEnabled)window.EmberAudio?.ensure(audioCtx);
+            music("unlock");
           } catch {}
         }
+        // Stubbable independently of sfx: simulation suites never synthesize music.
+        function music(kind) {
+          const m=window.EmberMusic;if(!m||!audioCtx)return;
+          if(kind==="unlock")m.unlock(audioCtx);
+          else if(["Level","Clear","Victory","Death"].includes(kind))m.sting(audioCtx,kind);
+          const now=performance.now();if(!kind&&now-lastMusicAt<250)return;lastMusicAt=now;
+          const scene=document.hidden||mode==="paused"||mode==="error"?"pause":mode==="play"?"play":hero&&["upgrade","loot","trial","relic"].includes(mode)?"ambient":"menu";
+          const near=hero?enemies.reduce((n,e)=>n+(Math.hypot(e.x-hero.x,e.y-hero.y)<430?1:0),0):0;
+          m.update(audioCtx,{scene,zone:hero?currentZone():0,near,boss:!!(boss&&boss.hp>0),enabled:musicEnabled,lock:document.hidden});
+        }
         function sfx(kind) {
+          if(kind==="upgrade")music("Level");
+          if(kind==="bossDown")music(mode==="victory"?"Victory":"Clear");
+          if(kind==="death")music("Death");
           if (!soundEnabled || !audioCtx || audioCtx.state !== "running") return;
+          if(["chest","well","forge","unlock","stairs"].includes(kind)||kind.startsWith("enemy-")){window.EmberAudio?.play(kind,audioCtx,hero?.class);return;}
           const sounds = {
             start: [410, 700, 0.17, 0.026, "sine", 0],
             cast: [350, 580, 0.07, 0.012, "triangle", 90],
@@ -1871,8 +1900,9 @@
           sfx("start");
         });
         game.addEventListener("pointerdown", ensureAudio, { passive: true });
+        addEventListener("keydown",e=>{if(e.isTrusted&&!e.repeat)ensureAudio();});
         updateSoundButton();
-        const currentRunVersion = 11;
+        const currentRunVersion = 12;
         const legacySaveKeys = [];
         const xpNeeded = (rank) => Math.round(10 + 6 * rank + 2 * rank * rank);
         function compatibleRun(saved, balance) {
@@ -1940,14 +1970,16 @@
         function readRun() {
           try {
             let saved=null,usedKey=saveKey;
-            for(const key of [saveKey,saveKey.replace(/-v11$/,"-v10"),saveKey.replace(/-v11$/,"-v9"),...legacySaveKeys]){
+            for(const key of [saveKey,saveKey.replace(/-v12$/,"-v11"),saveKey.replace(/-v12$/,"-v10"),saveKey.replace(/-v12$/,"-v9"),...legacySaveKeys]){
               const raw=localStorage.getItem(key);if(!raw)continue;
               let candidate=JSON.parse(raw);
-              if([9,10,11].includes(candidate.version)&&compatibleRun(candidate,candidate.version)&&(candidate.version===9||validRunMode(candidate))){saved=candidate;usedKey=key;break;}
+              if([9,10,11,12].includes(candidate.version)&&compatibleRun(candidate,candidate.version)&&(candidate.version===9||validRunMode(candidate))){saved=candidate;usedKey=key;break;}
               if(candidate.version<=8&&(candidate.version>=3&&compatibleRun(candidate,candidate.version)||(candidate.version===1||candidate.version===2)&&migrateRun(candidate))){candidate.runMode="endless";candidate.floor=0;candidate.hero.depth ||=0;candidate.hero.relics ||= [];saved=candidate;usedKey=key;break;}
             }
             if(!saved)return null;
-            if(saved.version!==11||["mage","storm"].includes(saved.hero.class))saved=migrateLineupRun(saved);
+            if(saved.version<11||["mage","storm"].includes(saved.hero.class))saved=migrateLineupRun(saved);
+            saved=migrateEndgameRun(saved);
+            if(saved.runMode==="descent"&&saved.hero.victoryPaid&&!profile.descentCleared){profile.descentCleared=true;profile.randomLayouts=true;saveProfile();}
             if(!["gravecaller","ranger","ember","bloodknight","sunwarden"].includes(saved.hero.class))return null;
             if(saved.runMode==="descent"&&saved.floor>=3&&!profile.sunwarden){profile.bestFloor=Math.max(profile.bestFloor||0,saved.floor);profile.sunwarden=true;saveProfile();}
             localStorage.setItem(saveKey,JSON.stringify(saved));if(usedKey!==saveKey)localStorage.removeItem(usedKey);
@@ -1955,19 +1987,21 @@
           }catch{return null;}
         }
         function clearRun() {
-          try {for(const key of [saveKey,saveKey.replace(/-v11$/,"-v10"),saveKey.replace(/-v11$/,"-v9"),...legacySaveKeys])localStorage.removeItem(key);}catch{}
+          try {for(const key of [saveKey,saveKey.replace(/-v12$/,"-v11"),saveKey.replace(/-v12$/,"-v10"),saveKey.replace(/-v12$/,"-v9"),...legacySaveKeys])localStorage.removeItem(key);}catch{}
         }
         function saveRun(force = false) {
+          /* endgame-v72 */ if (endgameRun && isDescent()) endgameRun.floor = dungeon.floor;
           if (mode !== "play" || !hero || !Number.isFinite(clock) || (!force && clock - lastSavedClock < 4))
             return;
           try {
             localStorage.setItem(
               saveKey,
               JSON.stringify({
-                version: 11,
-                balanceVersion: 11,
+                version: 12,
+                balanceVersion: 12,
                 companions,heroTraps,heroSpirits,heroZones,
                 runMode, floor: dungeon?.floor || 0, floorCheckpoint,
+                /* endgame-v72 */ endgameRun,
                 hero,
                 enemies,
                 drops,
@@ -2012,6 +2046,7 @@
           bloodEffects = [];
           runMode=saved.runMode||"endless";best=profile.records?.[runMode]?.kills||0;dungeon=null;floorCheckpoint=saved.floorCheckpoint||null;
           hero = saved.hero;
+          /* endgame-v72 */ endgameRun=EmberEndgame.run(saved.endgameRun || {});
           ensureSkills(hero,saved.clock);hero.dashTime=0;
           companions=Array.isArray(saved.companions)?saved.companions.slice(0,24):[];heroTraps=Array.isArray(saved.heroTraps)?saved.heroTraps.slice(0,8):[];heroSpirits=Array.isArray(saved.heroSpirits)?saved.heroSpirits.slice(0,24):[];heroZones=Array.isArray(saved.heroZones)?saved.heroZones.slice(0,8):[];
           if(hero.class === "bloodknight") {
@@ -2227,6 +2262,7 @@
           };
           ensureSkills(hero);
           resetHeroActors();
+          /* endgame-v72 */ startEndgameRun();
           runStats = { damage: 0, hpLost: 0, armorBlocked: 0, bosses: 0 };
           weaponDryStreak = 0;
           enemies = [];
@@ -2313,9 +2349,9 @@
             "% ×" +
             hero.critMultiplier.toFixed(2);
           zoneEl.textContent = isDescent()?"FLOOR "+dungeon.floor+" · "+floorSpec().name:zoneNames[currentZone()];
-          killsEl.textContent = kills + " KILLS";
+          killsEl.textContent = kills + " KILLS · "+(endgameRun?.gold||0)+" GOLD";
           levelEl.textContent = "LEVEL " + level + (isDescent()?" · "+Math.min(floorSpec().goal,kills-dungeon.startKills)+"/"+floorSpec().goal+" KILLS":" · WAVE " + wave) +
-            (hero.depth ? " · D" + hero.depth : "");
+            (hero.depth ? " · D" + hero.depth : "") + (endgameRun?.torment ? " · T"+endgameRun.torment : "");
           bonusEl.textContent = (hero.endless ? "ENDLESS TIER " + endlessTier() : "") +
             (hero.relics?.length ? (hero.endless ? " · " : "") + "RELICS " + hero.relics.length : "");
           effectsEl.textContent =
@@ -2664,7 +2700,7 @@
             choicesEl.replaceChildren();
             let pool = options.filter((o) => !previous.has(o.name));
             if (pool.length < 3) pool = options;
-            let picks = pool.sort(() => Math.random() - 0.5).slice(0, 3);
+            let picks = pool.sort(() => gameRandom() - 0.5).slice(0, 3);
             if (evolutionChoices.length) {
               let featured = evolutionChoices[0];
               picks = [featured, ...picks.filter((o) => o !== featured)].slice(0, 3);
@@ -2827,6 +2863,7 @@
           panel.classList.remove("hidden");
         }
         function offerLoot(drop) {
+          fx("chest",drop);
           mode = "loot";
           bestiaryEl.hidden = true;
           resetJoy();
@@ -2853,7 +2890,7 @@
             { name: "Legendary", mult: 2.7, color: "#ffd887" },
           ];
           function rollRarity(slot) {
-            let n = Math.random() * 100;
+            let n = gameRandom() * 100;
             if (ancient) n = Math.min(99, n + 11);
             let common = slot === "weapon" ? Math.max(8, 43 - dropWave * 1.5) : 43,
               uncommon = slot === "weapon" ? Math.max(common + 19, 73 - dropWave * 0.5) : 73;
@@ -2873,7 +2910,7 @@
             firstWeaponRarity = null,
             firstArmorStyle = null;
           for (let i = 0; i < 3; i++) {
-            let slotRoll = Math.random(),
+            let slotRoll = gameRandom(),
               slot = i === 0 ? "weapon" : i === 1 ? "armor" : slotRoll < 0.44 ? "weapon" : "armor",
               rarity = rollRarity(slot);
             if (slot === "weapon" && i === 0 && weaponDryStreak >= 2)
@@ -2899,7 +2936,7 @@
                 (slot === "weapon" ? weaponBase : armorBase * (style === "heavy" ? 1.3 : 0.85)) * rarity.mult,
               ),
               effect = slot === "weapon" ? ({ gravecaller: ["pierce", "shadow"], ranger: ["arc", "frost"], sunwarden:["light","wind"],
-                ember: ["ember", "venom"], bloodknight: ["blood", "earth"] }[hero.class] || ["pierce"])[Math.floor(Math.random() * 2)] : null,
+                ember: ["ember", "venom"], bloodknight: ["blood", "earth"] }[hero.class] || ["pierce"])[Math.floor(gameRandom() * 2)] : null,
               effectRank = slot === "weapon" ? Math.max(1, rarities.indexOf(rarity) - 1) : 0,
               baseName =
                 slot === "weapon"
@@ -3025,7 +3062,7 @@
           let existing = enemies.find((e) => e.type === "boss"),
             a = existing
               ? Math.atan2(existing.y - hero.y, existing.x - hero.x) + Math.PI
-              : Math.random() * Math.PI * 2,
+              : gameRandom() * Math.PI * 2,
             r = wave >= 12 || level >= 25 ? Math.min(w, h) * 0.62 + 55 : Math.max(w, h) * 0.65 + 100,
             variants = ["warden", "tyrant", "colossus", "oracle"],
             variant =
@@ -3060,12 +3097,14 @@
           clearWall(boss);
           bossname.textContent = bossNames[variant];
           enemies.push(boss);
+          /* endgame-v72 */ enhanceEndgameEnemy(boss, false);
           noteEnemy(variant);
           showToast(matchupToast(boss, bossNames[variant]));
           updateHud();
         }
         function recordModeResult(){profile.records ||= {descent:{kills:0,bestDepth:{}},endless:{kills:0,bestDepth:{...profile.bestDepth}}};const record=profile.records[runMode];record.kills=Math.max(record.kills,kills);if(hero.victoryPaid)record.bestDepth[hero.class]=Math.max(record.bestDepth[hero.class]||0,hero.depth);saveProfile();}
         function gameOver() {
+          recordEndgameResult(false);
           clearRun();
           resumeBtn.hidden = true;
           updateMeta();
@@ -3138,6 +3177,7 @@
             saveProfile(); saveRun(true);
           }
           recordModeResult();
+          recordEndgameResult(true);
           if (kills > best) {
             best = kills;
             try { if(runMode==="endless")localStorage.setItem(bestKey, best); } catch {}
@@ -3164,7 +3204,7 @@
           let retire = document.createElement("button");
           retire.className = "choice";
           retire.textContent = "END RUN · KEEP REWARDS";
-          retire.onclick = () => { clearRun(); showTitleMenu(); };
+          retire.onclick = () => { recordEndgameResult(true);clearRun(); showTitleMenu(); };
           choicesEl.append(retire);
           start.textContent = "ENDLESS MODE";
           start.hidden = isDescent();
@@ -3262,11 +3302,11 @@
         addEventListener("keyup",e=>{delete keys[e.key.toLowerCase()];});
         addEventListener("blur",()=>{resetJoy();for(const key of Object.keys(keys))delete keys[key];});
         function spawnEnemy(forcedType) {
-          let side = Math.floor(Math.random() * 4),
-            offset = Math.random() - 0.5,
+          let side = Math.floor(gameRandom() * 4),
+            offset = gameRandom() - 0.5,
             x = hero.x + (side < 2 ? offset * (w + 60) : (side === 2 ? -1 : 1) * (w / 2 + 55)),
             y = hero.y + (side < 2 ? (side === 0 ? -1 : 1) * (h / 2 + 55) : offset * (h + 60)),
-            roll = Math.random();
+            roll = gameRandom();
           let entrance=null;
           if(rpgPreview&&!isDescent()){const point=inputVector(x-hero.x,y-hero.y);x=hero.x+point.x;y=hero.y+point.y;}
           if(isDescent()){entrance=dungeonSpawn();if(!entrance)return null;x=entrance.x;y=entrance.y;}
@@ -3292,12 +3332,12 @@
                               : roll < 0.58
                                 ? "runner"
                         : "ghoul");
-          if (!forcedType && Math.random() < 0.13) type = ["cinderImp", "frostGolem", "sporeSpitter"][zone];
+          if (!forcedType && gameRandom() < 0.13) type = ["cinderImp", "frostGolem", "sporeSpitter"][zone];
           if(isDescent()&&dungeon.floor===1&&type==="cinderImp"&&enemies.filter(e=>e.type==="cinderImp"&&e.hp>0).length>=3){
             if(forcedType)return null;type="ghoul";
           }
           if (!forcedType && wave >= 2) {
-            let danger = Math.random();
+            let danger = gameRandom();
             if (danger < 0.11) type = "charger";
             else if (danger < 0.18) type = "caster";
           }
@@ -3373,17 +3413,18 @@
                             ? 11
                             : 15,
             attack: 0,
-            cast: 2.1 + Math.random(),
-            burrowCd: 2 + Math.random() * 3,
-            blinkCd: 3 + Math.random() * 2,
+            cast: 2.1 + gameRandom(),
+            burrowCd: 2 + gameRandom() * 3,
+            blinkCd: 3 + gameRandom() * 2,
             guard: 0,
-            chargeClock: type === "charger" ? 1.3 + Math.random() : 0,
+            chargeClock: type === "charger" ? 1.3 + gameRandom() : 0,
             windup: null,
             dash: null,
           });
           if (hero.depth >= 5) enemies[enemies.length - 1].r *= 1 + 0.1 * depthStacks(5);
           clearWall(enemies[enemies.length - 1]);
           const newcomer=enemies[enemies.length-1];
+          /* endgame-v72 */ enhanceEndgameEnemy(newcomer, !forcedType);
           if(entrance){
             newcomer.arrivingUntil=clock+1;
             newcomer.entryId=entrance.id;newcomer.entryX=newcomer.x;newcomer.entryY=newcomer.y;newcomer.entryAngle=entrance.angle;
@@ -3495,11 +3536,11 @@
           }
         }
         function updateZoneHazards(dt) {
-          let zone = isDescent()&&dungeon.floor===4?Math.floor(Math.random()*3):currentZone();
+          let zone = isDescent()&&dungeon.floor===4?Math.floor(gameRandom()*3):currentZone();
           if (clock >= zoneHazardNext) {
             zoneHazardNext = clock + (zone === 0 ? (isDescent()&&dungeon.floor===1?16:8) : 11);
             zoneHazards = zoneHazards.filter((z) => (isDescent()&&dungeon.floor===4||z.zone === zone) && z.life > 0).slice(-5);
-            let a = Math.random() * Math.PI * 2, dist = 145 + Math.random() * 95;
+            let a = gameRandom() * Math.PI * 2, dist = 145 + gameRandom() * 95;
             let z = { x: hero.x + Math.cos(a) * dist, y: hero.y + Math.sin(a) * dist,
               zone, kind: ["lava", "ice", "spore"][zone], r: zone === 1 ? 76 : 51,
               life: zone === 1 ? 18 : 22, state: "idle", timer: 0, cooldown: 0 };
@@ -3575,6 +3616,7 @@
             let d = Math.hypot(hero.x - site.x, hero.y - site.y);
             if (d < 44) {
               site.used = true;
+              fx(site.kind==="cache"?"chest":site.kind,site);
               let col = siteColors[site.kind];
               rings.push({ x: site.x, y: site.y, r: 12, life: 0.7, speed: 240, color: col });
               burst(site.x, site.y, col, 28);
@@ -3625,7 +3667,7 @@
           tipOnce("imp","Catch the imp before it escapes for a gear chest.");
           if (!makeRoomFor(1)) return;
           let e=spawnEnemy("runner");if(!e)return;
-          let a = Math.random() * Math.PI * 2;
+          let a = gameRandom() * Math.PI * 2;
           if(!isDescent()){e.x = hero.x + Math.cos(a) * 230;
           e.y = hero.y + Math.sin(a) * 230;}
           clearWall(e);
@@ -3657,7 +3699,7 @@
             showToast("ASH RING · RUNNERS CLOSING IN");
           } else {
             let e=spawnEnemy("champion");if(!e)return;
-            let mod = ["swift", "splitting", "armored"][Math.floor(Math.random() * 3)];
+            let mod = ["swift", "splitting", "armored"][Math.floor(gameRandom() * 3)];
             e.eventElite = mod;
             e.hp *= 1.6;
             e.max = e.hp;
@@ -3717,6 +3759,171 @@
           }
           showToast("HEXER AMBUSH · WATCH AHEAD");
         }
+        // v72: new run metadata stays outside hero balance and belongs to the active slot.
+        let endgameRun=null,pendingDaily=null,endgameFactorKey="",endgameFactorCache=null;
+        const nightModifiers={relentless:"RELENTLESS · Enemy HP +20%",haunted:"HAUNTED · Three times as many rare champions","blood-moon":"BLOOD MOON · Enemy damage +20%"};
+        function migrateEndgameRun(saved){
+          saved.endgameRun=EmberEndgame.run(saved.endgameRun||{id:"legacy-"+activeSlot+"-"+saved.clock,seed:EmberEndgame.hash("legacy:"+activeSlot+":"+saved.clock),random:false});
+          if(saved.floorCheckpoint&&!saved.floorCheckpoint.endgameRun)saved.floorCheckpoint.endgameRun=structuredClone(saved.endgameRun);
+          saved.version=12;saved.balanceVersion=12;return saved;
+        }
+        function startEndgameRun(){
+          const challenge=pendingDaily;pendingDaily=null;
+          const bytes=new Uint32Array(1);crypto.getRandomValues(bytes);
+          endgameRun=EmberEndgame.run({id:Date.now().toString(36)+"-"+bytes[0],seed:challenge?.seed??bytes[0],daily:challenge,random:challenge?true:!!profile.randomLayouts,torment:challenge?0:profile.descentCleared?profile.selectedTorment||0:0});
+        }
+        function endgameFactors(){
+          const key=(endgameRun?.torment||0)+":"+(endgameRun?.daily?.modifier||"");
+          if(key!==endgameFactorKey||!endgameFactorCache){endgameFactorKey=key;endgameFactorCache=EmberEndgame.factors(endgameRun);}
+          return endgameFactorCache;
+        }
+        function gameRandom(){
+          if(!endgameRun?.daily)return Math.random();
+          endgameRun.rng=(Math.imul(endgameRun.rng,1664525)+1013904223)>>>0;
+          return endgameRun.rng/4294967296;
+        }
+        function endgameFloorSpec(number,spec){return endgameRun?.random?EmberEndgame.layout(spec,endgameRun.seed,number):spec;}
+        function prepareEndgameFloor(number){
+          if(!endgameRun)endgameRun=EmberEndgame.run({seed:0});
+          endgameRun.floor=number;
+          dungeon.secret=EmberEndgame.secret(endgameRun.seed,number);
+          dungeon.shop=null;
+          if(number>=3){
+            const [x,y,rw,rh]=floorSpec().rooms[6],cy=(y+rh/2)*80;
+            dungeon.shop={room:6,pads:[{kind:"heal",cost:18,x:(x+.9)*80,y:cy,used:false},{kind:"reroll",cost:24,x:(x+rw/2)*80,y:cy,used:false},{kind:"relic",cost:60,x:(x+rw-.9)*80,y:cy,used:false}],hold:0,active:null};
+          }
+        }
+        function enhanceEndgameEnemy(e,rare){
+          const f=endgameFactors();e.hp*=f.hp;e.max*=f.hp;
+          if(!endgameRun?.torment&&!endgameRun?.daily&&(isDescent()?dungeon.floor===1:wave<4))return;
+          if(!rare||e.treasure||e.type==="boss"||enemies.filter(n=>n.nightChampion).length>=2||gameRandom()>=f.elite)return;
+          const variants=["shielded","hasted","splitting","vampiric"],names=["IRON VEIL","THE HOLLOW HUNTER","SHARDMOTHER","RED CONFESSOR"];
+          const index=Math.floor(gameRandom()*variants.length);
+          e.nightChampion=variants[index];e.nightName=names[index];e.hp*=2;e.max*=2;
+          e.nightShield=e.nightChampion==="shielded"?e.max*.35:0;
+          if(e.nightChampion==="hasted")e.speed*=1.4;
+          showToast(e.nightName+" · "+e.nightChampion.toUpperCase());
+        }
+        function endgameDamage(e,amount){
+          if(!e.nightChampion||amount<=0)return amount;
+          if(e.nightShield>0){const absorbed=Math.min(e.nightShield,amount*.5);e.nightShield-=absorbed;amount-=absorbed;}
+          return amount;
+        }
+        function endgameEnemyKilled(e){
+          if(!endgameRun)return;
+          const coins=e.type==="boss"?25:e.nightChampion?12:2;
+          const gold=drops.filter(o=>o.type==="nightGold");
+          if(gold.length>=64)gold[0].value+=coins;else drops.push({x:e.x+9,y:e.y,type:"nightGold",value:coins});
+          if(e.nightChampion||e.type==="boss"&&endgameFactors().relic>0&&gameRandom()<endgameFactors().relic)drops.push({x:e.x-12,y:e.y,type:"nightRelic"});
+          if(e.nightChampion==="splitting"){
+            for(let i=0;i<2&&enemies.length<95;i++){
+              const child=spawnEnemy("runner");if(!child)continue;
+              if(!wallAt(e.x+i*18,e.y,child.r)){child.x=e.x+i*18;child.y=e.y;child.arrivingUntil=clock+1;child.entryId="split:"+clock+":"+i;child.entryX=child.x;child.entryY=child.y;}
+              child.nightChampion=null;child.nightName=null;
+            }
+          }
+        }
+        function claimNightRelic(label){
+          const existingEvent=dungeonEvent;offerRelic();
+          if(mode!=="relic"){dungeonEvent=existingEvent;saveRun(true);return;}
+          kickerEl.textContent=label;
+          for(const button of choicesEl.querySelectorAll("button")){
+            const take=button.onclick;button.onclick=()=>{take();dungeonEvent=existingEvent;saveRun(true);};
+          }
+        }
+        function collectEndgameDrop(o){
+          if(o.type==="nightGold"){endgameRun.gold=Math.min(999999,endgameRun.gold+(o.value||0));sfx("pickup");return true;}
+          if(o.type==="nightRelic"){claimNightRelic("CHAMPION RELIC");return true;}
+          return false;
+        }
+        function endgameHitSource(){
+          if(!endgameRun)return;
+          let e=null,nearest=Infinity;
+          for(const foe of enemies){const distance=Math.hypot(foe.x-hero.x,foe.y-hero.y);if(distance<foe.r+hero.r+35&&distance<nearest){nearest=distance;e=foe;}}
+          endgameRun.cause=e?(e.nightName||bestiaryNames[enemyKind(e)]||enemyKind(e).toUpperCase()):"Crypt hazards / hostile magic";
+          if(e?.nightChampion==="vampiric")e.hp=Math.min(e.max,e.hp+e.max*.035);
+        }
+        function walkingWest(){
+          const dx=joy.dx+(keys.d||keys.arrowright?1:0)-(keys.a||keys.arrowleft?1:0),dy=joy.dy+(keys.s||keys.arrowdown?1:0)-(keys.w||keys.arrowup?1:0);
+          return (rpgPreview?inputVector(dx,dy).x:dx)<-.15;
+        }
+        function updateEndgame(dt){
+          if(mode!=="play"||!hero||!isDescent())return;
+          const secret=dungeon.secret;
+          if(secret&&!secret.revealed&&hero.moving&&Math.hypot(hero.x-secret.mouth.x,hero.y-secret.mouth.y)<65&&walkingWest()){
+            secret.revealed=true;
+            for(const [x,y,rw,rh] of [secret.room,secret.neck])for(let i=x;i<x+rw;i++)for(let j=y;j<y+rh;j++)dungeon.cells.add(i+","+j);
+            navTime=0;showToast("SECRET ROOM · A RELIC AWAITS");sfx("door");
+          }
+          if(secret?.revealed&&!secret.used&&Math.hypot(hero.x-secret.reward.x,hero.y-secret.reward.y)<48){secret.used=true;claimNightRelic("SECRET RELIC");return;}
+          const shop=dungeon.shop;if(!shop)return;
+          const pad=shop.pads.find(p=>!p.used&&Math.hypot(hero.x-p.x,hero.y-p.y)<30);
+          if(!pad||hero.moving||enemies.some(e=>e.hp>0&&Math.hypot(hero.x-e.x,hero.y-e.y)<180)){shop.hold=0;shop.active=null;return;}
+          if(shop.active!==pad.kind){shop.active=pad.kind;shop.hold=0;}
+          if(endgameRun.gold<pad.cost||pad.kind==="heal"&&hero.hp>=hero.maxHp){shop.hold=0;return;}
+          shop.hold+=dt;
+          if(shop.hold<1.25)return;
+          pad.used=true;shop.hold=0;endgameRun.gold-=pad.cost;
+          if(pad.kind==="heal")hero.hp=Math.min(hero.maxHp,hero.hp+hero.maxHp*.5);
+          if(pad.kind==="reroll")hero.rerolls=(hero.rerolls||0)+1;
+          if(pad.kind==="relic")claimNightRelic("MERCHANT RELIC");else{showToast("MERCHANT · "+pad.kind.toUpperCase()+" PURCHASED");sfx("loot");saveRun(true);}
+        }
+        function recordEndgameResult(clear,cause){
+          if(!hero||!endgameRun)return;
+          Object.assign(profile,EmberEndgame.profile(profile));
+          EmberEndgame.record(profile,endgameRun,{hero:hero.class,mode:runMode,floor:isDescent()?dungeon.floor:0,time:clock,kills,bosses:runStats.bosses,clear,cause:cause||(clear?"Victory":endgameRun.cause)});
+          endgameRun.recorded=true;saveProfile();
+        }
+        function renderEndgameOptions(body){
+          body.append(menuText("h3","ENDLESS NIGHTS","menu-head"));
+          if(profile.descentCleared){
+            const row=menuText("div","","menu-inline");
+            const prev=menuButton("TORMENT −",()=>{profile.selectedTorment=Math.max(0,profile.selectedTorment-1);saveProfile();renderMenu("modes");});
+            const next=menuButton("TORMENT +",()=>{profile.selectedTorment=Math.min(10,profile.selectedTorment+1);saveProfile();renderMenu("modes");});
+            prev.disabled=!profile.selectedTorment;next.disabled=profile.selectedTorment>=10;
+            row.append(prev,menuText("strong","T"+profile.selectedTorment),next);body.append(row);
+            const f=EmberEndgame.factors({torment:profile.selectedTorment});
+            body.append(menuText("p","HP ×"+f.hp.toFixed(2)+" · DAMAGE ×"+f.damage.toFixed(2)+" · ARRIVALS ×"+f.density.toFixed(2)+" · EMBERS ×"+f.reward.toFixed(2)+" · extra relic drops", "menu-note"));
+          }else body.append(menuText("p","Clear The Descent to unlock Torment 1–10 and enable random layouts by default.","menu-note"));
+          body.append(menuButton(profile.randomLayouts?"RANDOM LAYOUTS":"CLASSIC LAYOUTS",()=>{profile.randomLayouts=!profile.randomLayouts;saveProfile();renderMenu("modes");},"Seeded authored room pieces or the original hand-built floors. Continue restarts the same floor."));
+          body.append(menuText("p","Crypt Depths keep their original modifiers. Torment adds enemy scaling and rewards; both can be combined.","menu-note"));
+          const challenge=EmberEndgame.daily(),best=profile.dailyBest?.[challenge.date]||0;
+          body.append(menuButton("DAILY CHALLENGE · "+challenge.date,()=>{
+            pendingDaily=EmberEndgame.daily();selectedHero=pendingDaily.hero;selectedMode="descent";selectedDepth=0;begin();menuShell.classList.add("hidden");game.classList.add("playing");
+          },heroNames[challenge.hero]+" · "+nightModifiers[challenge.modifier]+" · BEST "+best+" · local score", "primary"));
+          body.append(menuText("p","Daily score: kills + 500 per floor reached + 1,000 per boss + 5,000 for clearing. UTC daily seed; your shrine upgrades apply. No server or global leaderboard.","menu-note"));
+        }
+        function renderRunHistory(){
+          const body=menuBase("RUN HISTORY","hub","Last 20 runs for "+slots[activeSlot].name);
+          if(!profile.runHistory.length)body.append(menuText("p","Your next finished run will appear here.","menu-sub"));
+          for(const r of profile.runHistory){const card=menuText("section","","slot-card");card.append(menuText("b",heroNames[r.hero]+" · "+r.mode.toUpperCase()+" · T"+r.torment),menuText("p","FLOOR "+r.floor+" · "+Math.floor(r.time/60)+":"+String(r.time%60).padStart(2,"0")+" · "+r.kills+" KILLS","menu-sub"),menuText("p",r.cause+(r.daily?" · DAILY "+r.daily+" · SCORE "+r.score:""),"menu-note"));body.append(card);}
+        }
+        function drawEndgameRooms(){
+          if(!isDescent())return;
+          const secret=dungeon.secret;
+          if(secret&&!secret.revealed&&visiblePoint(secret.mouth.x,secret.mouth.y,100)){
+            ctx.strokeStyle="#a68a6590";ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(secret.mouth.x+5,secret.mouth.y-32);ctx.lineTo(secret.mouth.x-8,secret.mouth.y-7);ctx.lineTo(secret.mouth.x+9,secret.mouth.y+7);ctx.lineTo(secret.mouth.x-4,secret.mouth.y+33);ctx.stroke();
+          }
+          if(secret?.revealed&&!secret.used&&visiblePoint(secret.reward.x,secret.reward.y,100)){drawProp("prop-tomb-"+currentZone(),secret.reward.x,secret.reward.y,44,48);if(visualQuality.maxAtmosphere>=18)drawGlow(secret.reward.x,secret.reward.y,32,"#c99cff");billboard(secret.reward.x,secret.reward.y-50,()=>{ctx.fillStyle="#d5b6ff";ctx.font="bold 12px system-ui";ctx.textAlign="center";ctx.fillText("SECRET RELIC",0,0);});}
+          for(const pad of dungeon.shop?.pads||[]){if(!visiblePoint(pad.x,pad.y,100))continue;ctx.save();ctx.globalAlpha=pad.used?.3:.9;ctx.strokeStyle="#d1a66c";ctx.lineWidth=3;ctx.beginPath();ctx.arc(pad.x,pad.y,28,0,7);ctx.stroke();if(dungeon.shop.active===pad.kind&&dungeon.shop.hold>0){ctx.strokeStyle="#fff3b3";ctx.beginPath();ctx.arc(pad.x,pad.y,32,-Math.PI/2,-Math.PI/2+Math.PI*2*dungeon.shop.hold/1.25);ctx.stroke();}billboard(pad.x,pad.y-32,()=>{ctx.font="bold 11px system-ui";ctx.textAlign="center";ctx.fillStyle="#ffda8c";ctx.fillText(pad.used?"SOLD":pad.kind.toUpperCase()+" · "+pad.cost+"g",0,0);ctx.font="10px system-ui";ctx.fillText("Stand still to buy",0,14);});ctx.restore();}
+        }
+        function drawEndgameElite(e){
+          if(!e.nightChampion)return;
+          const color={shielded:"#acd9ff",hasted:"#ffe284",splitting:"#bdaaee",vampiric:"#ed789b"}[e.nightChampion];
+          ctx.strokeStyle=color;ctx.lineWidth=3;ctx.beginPath();ctx.arc(e.x,e.y,e.r+10+Math.sin(clock*3)*2,0,7);ctx.stroke();
+          billboard(e.x,e.y-e.r-24,()=>{ctx.fillStyle=color;ctx.font="bold 10px system-ui";ctx.textAlign="center";ctx.fillText(e.nightName+" · "+e.nightChampion.toUpperCase(),0,0);});
+        }
+        function drawEndgameMap(g,s){
+          const shop=dungeon.shop;if(shop&&dungeon.explored.includes(shop.room)){const r=floorSpec().rooms[shop.room];g.fillStyle="#e9bc75";g.font="9px system-ui";g.fillText("$",(r[0]+r[2]/2)*s,(r[1]+r[3]/2)*s);}
+          if(dungeon.secret?.revealed){g.fillStyle="#cda9ed";g.fillRect(0,9*s,5,8);}
+        }
+        function drawEndgameDrop(o){
+          if(o.type!=="nightGold"&&o.type!=="nightRelic")return false;
+          if(!visiblePoint(o.x,o.y,24))return true;
+          ctx.fillStyle=o.type==="nightGold"?"#e8bd65":"#d0a4f3";ctx.strokeStyle="#19131c";ctx.lineWidth=2;
+          ctx.beginPath();ctx.arc(o.x,o.y,o.type==="nightGold"?5:10,0,7);ctx.fill();ctx.stroke();return true;
+        }
+
         // Dungeon geometry is a union of authored rooms and corridors on an 80px grid.
         let selectedMode = "descent", runMode = "descent", dungeon = null, floorCheckpoint = null;
         let tipQueue = [], activeTip = null, tipTime = 0, navTime = 0, navField = new Map();
@@ -3729,15 +3936,17 @@
         ];
         const dungeonTile=80;
         function isDescent(){return runMode==="descent" && !!dungeon;}
-        function floorSpec(){return descentFloors[(dungeon?.floor||1)-1];}
+        function floorSpec(){return dungeon?.spec || descentFloors[(dungeon?.floor||1)-1];}
         function currentZone(){return isDescent()?floorSpec().zone:Math.floor((wave-1)/5)%3;}
         function dungeonCell(x,y){return Math.floor(x/80)+","+Math.floor(y/80);}
         function buildFloor(number){
           const spec=descentFloors[number-1], cells=new Set();
-          for(const [x,y,w,h] of [...spec.rooms,...spec.links])for(let i=x;i<x+w;i++)for(let j=y;j<y+h;j++)cells.add(i+","+j);
+          /* endgame-v72 */ const assembled=endgameFloorSpec(number,spec);
+          for(const [x,y,w,h] of [...assembled.rooms,...assembled.links])for(let i=x;i<x+w;i++)for(let j=y;j<y+h;j++)cells.add(i+","+j);
           dungeon={floor:number,cells,elapsed:0,startKills:kills,open:false,bossStarted:false,stairs:null,explored:[],title:2.5,eventAt:30};
+          /* endgame-v72 */ dungeon.spec=assembled;
           dungeon.entrances=[];
-          spec.rooms.forEach(([x,y,rw,rh],room)=>{
+          assembled.rooms.forEach(([x,y,rw,rh],room)=>{
             if(room===3)return;
             const primary=new Set([Math.floor(rw/2)+":0",Math.floor(rw/2)+":"+(rh-1),"0:"+Math.floor(rh/2),(rw-1)+":"+Math.floor(rh/2)]);
             // Preserve the original edge ordering/distribution; do not funnel packs through a few doors.
@@ -3766,16 +3975,19 @@
             hero=structuredClone(checkpoint.hero);clock=checkpoint.clock;kills=checkpoint.kills;level=checkpoint.level;
             xp=checkpoint.xp;needed=checkpoint.needed;weapon=structuredClone(checkpoint.weapon);armor=structuredClone(checkpoint.armor);
             runStats=structuredClone(checkpoint.runStats);runEmbers=checkpoint.runEmbers;xpReserve=checkpoint.xpReserve;
+          /* endgame-v72 */ if(checkpoint.endgameRun)endgameRun=EmberEndgame.run(checkpoint.endgameRun);
           }
           if(runMode==="descent"){profile.bestFloor=Math.max(profile.bestFloor||0,number);if(number>=3&&!profile.sunwarden){profile.sunwarden=true;showToast("SUNWARDEN UNLOCKED");}saveProfile();}
           ensureSkills(hero);hero.dashTime=0;hero.firestormTime=0;
           buildFloor(number);hero.x=400;hero.y=800;resetHeroActors();hero.inv=2;hero.finalBossSpawned=false;
+          /* endgame-v72 */ prepareEndgameFloor(number);
           hero.pactNext=clock+20;hero.pactUntil=0;
           enemies=[];shots=[];hazards=[];pools=[];drops=[];zoneHazards=[];meteors=[];bloodEffects=[];boss=null;
           dungeonEvent=null;trialChoicePending=0;spawn=1;attack=0;waveClock=0;wave=1+(number-1)*4;
           fairyTimers={};magnetTimer=0;zoneHazardNext=clock+(number===1?16:8);sites=[];siteCycle=0;siteNext=Infinity;
           for(let i=4;i<7;i++){let [x,y,rw,rh]=floorSpec().rooms[i];sites.push({x:(x+rw/2)*80,y:(y+rh/2)*80,kind:["well","forge","cache"][i-4],used:false,r:35});}
           floorCheckpoint={floor:number,hero:structuredClone(hero),clock,kills,level,xp,needed,weapon:structuredClone(weapon),armor:structuredClone(armor),runStats:structuredClone(runStats),runEmbers,xpReserve};
+          /* endgame-v72 */ floorCheckpoint.endgameRun=structuredClone(endgameRun);
           if(number>1)tipOnce("zone"+number,floorSpec().hazard);toastTimer=0;toastEl.classList.remove("show");updateHud();
         }
         function tipOnce(key,message){
@@ -3794,13 +4006,13 @@
           dungeon.elapsed+=dt;dungeon.title=Math.max(0,dungeon.title-dt);
           floorSpec().rooms.forEach((r,i)=>{if(hero.x>=r[0]*80&&hero.x<(r[0]+r[2])*80&&hero.y>=r[1]*80&&hero.y<(r[1]+r[3])*80&&!dungeon.explored.includes(i))dungeon.explored.push(i);});
           if(!dungeon.open&&(dungeon.elapsed>=180||kills-dungeon.startKills>=floorSpec().goal)){
-            dungeon.open=true;navTime=0;showToast("THE BOSS DOOR IS OPEN");
+            dungeon.open=true;navTime=0;showToast("THE BOSS DOOR IS OPEN");fx("door",{x:24.5*80,y:10*80});
             tipOnce("door","The boss door is open. Follow the gold mark on the minimap.");saveRun(true);
           }
           if(dungeon.open&&!dungeon.bossStarted&&hero.x>25*80){
             dungeon.bossStarted=true;spawnBoss(floorSpec().boss);boss.x=28.5*80;boss.y=10*80;clearWall(boss);
           }
-          if(dungeon.stairs&&Math.hypot(hero.x-dungeon.stairs.x,hero.y-dungeon.stairs.y)<42){floorEntry(dungeon.floor+1);saveRun(true);return;}
+          if(dungeon.stairs&&Math.hypot(hero.x-dungeon.stairs.x,hero.y-dungeon.stairs.y)<42){fx("stairs",hero);floorEntry(dungeon.floor+1);saveRun(true);return;}
           if(dungeon.elapsed>=dungeon.eventAt&&!dungeon.bossStarted){
             dungeon.eventAt+=30;wave++;profile.bestWave=Math.max(profile.bestWave,wave);if(wave>=10)profile.ember=true;checkAchievements();
             if(wave===2||wave%4===2)spawnTreasureImp();
@@ -3818,7 +4030,7 @@
           const candidates=dungeon.entrances.map(door=>({...door,d:Math.hypot(door.x-hero.x,door.y-hero.y)}))
             .filter(door=>!visiblePoint(door.x,door.y,65)&&door.d<1600&&!wallAt(door.x,door.y,35));
           candidates.sort((a,b)=>a.d-b.d);
-          return candidates[Math.floor(Math.random()*Math.min(12,candidates.length))]||null;
+          return candidates[Math.floor(gameRandom()*Math.min(12,candidates.length))]||null;
         }
         function arrivalGroups(){
           const groups=new Map();
@@ -3861,12 +4073,12 @@
           }
         }
         function queueRaisedMasonry(left,top){
-          const zone=currentZone();
+          const zone=currentZone(),scenery=visualScene();
           if(!masonryPatterns[zone]&&zoneFloorTiles[zone]){const texture=surface(96,96),g=texture.getContext("2d");g.drawImage(zoneFloorTiles[zone],0,0,96,96);g.fillStyle=["#ac98734a","#a0c2cb44","#b0bf7844"][zone];g.fillRect(0,0,96,96);masonryPatterns[zone]=ctx.createPattern(texture,"repeat");}
           const palette=[["#706455","#403931","#282822"],["#77949b","#3c555d","#283d46"],["#717b55","#404b36","#26392b"]][zone];
           for(let cy=Math.floor(top/80)-1;cy<=Math.ceil((top+worldH+180)/80);cy++)for(let cx=Math.floor(left/80)-1;cx<=Math.ceil((left+worldW+180)/80);cx++){
             if(!dungeonSolid(cx,cy)||[[1,0],[-1,0],[0,1],[0,-1]].every(([dx,dy])=>dungeonSolid(cx+dx,cy+dy)))continue;
-            if(rpgPreview&&isDescent()&&dungeon.floor===1&&window.EmberAsh?.lowerVoid(cx,cy))continue;
+            if(rpgPreview&&(dungeon.floor===1&&window.EmberAsh?.lowerVoid(cx,cy)||window.EmberZones?.lowerVoid(cx,cy,scenery)))continue;
             const x=cx*80,y=cy*80,height=42,lift=inputVector(0,-height);
             sceneItem(x+80,y+80,()=>{
               const near=projectVector(x+40-hero.x,y+40-hero.y);
@@ -3901,11 +4113,13 @@
             const px=(x+rw-.6)*80,py=(y+rh-.4)*80;
             if(px<left-80||py<top-80||px>left+worldW + 200||py>top+worldH + 200)continue;
             if(spriteReady("prop-tomb-"+zone))drawProp("prop-tomb-"+zone,px,py,70,90);
-            if(spriteReady("prop-brazier")){drawProp("prop-brazier",rpgPreview?(x+.6)*80:x*80+28,rpgPreview?(y+rh-.6)*80:(y+.8)*80,32,50);if(rpgPreview)drawProp("prop-brazier",(x+rw-.7)*80,(y+.7)*80,32,50);}
+            const zoneBrazier="prop-"+["ash","frost","venom"][zone]+"-brazier",brazierKey=rpgPreview&&spriteReady(zoneBrazier)?zoneBrazier:"prop-brazier";
+            if(spriteReady(brazierKey)){drawProp(brazierKey,rpgPreview?(x+.6)*80:x*80+28,rpgPreview?(y+rh-.6)*80:(y+.8)*80,32,50);if(rpgPreview)drawProp(brazierKey,(x+rw-.7)*80,(y+.7)*80,32,50);}
           }
           ctx.fillStyle=dungeon.open?"#ffd16b":"#835346";ctx.fillRect(24*80,9*80,14,160);
           ctx.font="bold 15px system-ui";ctx.textAlign="center";const label=dungeon.open?"BOSS DOOR OPEN":"BOSS · "+Math.max(0,floorSpec().goal-(kills-dungeon.startKills))+" KILLS / "+Math.max(0,Math.ceil(180-dungeon.elapsed))+"s";billboard(24*80,9*80-14,()=>ctx.fillText(label,0,0));
-          if(dungeon.stairs){const {x,y}=dungeon.stairs;ctx.fillStyle="#bce9df";for(let i=0;i<5;i++)ctx.fillRect(x-28+i*4,y-26+i*10,56-i*8,7);billboard(x,y-42,()=>ctx.fillText("DESCEND",0,0));}
+          drawEndgameRooms();
+          if(dungeon.stairs){const {x,y}=dungeon.stairs;ctx.save();ctx.globalAlpha=.24+Math.sin(clock*3)*.06;drawGlow(x,y,40,"#acece1");ctx.restore();ctx.fillStyle="#bce9df";for(let i=0;i<5;i++)ctx.fillRect(x-28+i*4,y-26+i*10,56-i*8,7);billboard(x,y-42,()=>ctx.fillText("DESCEND",0,0));}
         }
         function drawMinimap(){
           const canvas=$("dungeonMap");canvas.hidden=!isDescent()||mode!=="play";if(canvas.hidden)return;
@@ -3915,6 +4129,7 @@
           for(const [x,y,rw,rh] of floorSpec().links){g.fillStyle="#39484b";g.fillRect(x*s,y*s,rw*s,rh*s);}
           g.fillStyle=dungeon.open?"#ffd16b":"#9b5252";g.fillRect(24*s,9*s,3,2*s);
           if(dungeon.stairs){g.fillStyle="#bce9df";g.fillRect(dungeon.stairs.x/80*s-2,dungeon.stairs.y/80*s-2,4,4);}
+          drawEndgameMap(g,s);
           g.fillStyle="#fff";g.beginPath();g.arc(hero.x/80*s,hero.y/80*s,2,0,7);g.fill();
           g.fillStyle="#d8c7ac";g.font="8px system-ui";g.fillText("FLOOR "+dungeon.floor+" · "+Math.floor(dungeon.elapsed)+"s",8,89);
         }
@@ -4252,7 +4467,7 @@
               if(d>radius+e.r||Math.abs(delta)>half+Math.asin(Math.min(1,e.r/Math.max(1,d))))continue;
               const bleed=hero.bloodletting|| (hero.weaponEffect === "blood" ? 1 : 0);
               if(bleed){e.bleedUntil=clock+3;e.bleedPower=hero.damage*(.08+.04*bleed);e.bleedTick??=.5;}
-              const crit=Math.random()<hero.critChance;
+              const crit=gameRandom()<hero.critChance;
               damageEnemy(e,hero.damage*(crit?hero.critMultiplier:1),hero.weaponEffect === "earth" ? "earth":"blood",0,true,crit);
               if(hero.crimsonThirst&&healed<4){hero.hp=Math.min(hero.maxHp,hero.hp+1);healed++;}
             }
@@ -4393,7 +4608,7 @@
           const offsets=fan?[-.32,-.16,0,.16,.32]:[0];
           const aimAngles=offsets.map(offset=>angle+offset),targets=enemies.filter(e=>Math.hypot(e.x-hero.x,e.y-hero.y)<hero.range&&!segmentBlocked(hero.x,hero.y,e.x,e.y)).sort((a,b)=>Math.hypot(a.x-hero.x,a.y-hero.y)-Math.hypot(b.x-hero.x,b.y-hero.y));
           for(let i=1;i<hero.projectiles;i++){const other=targets[Math.min(i,targets.length-1)];aimAngles.push(Math.atan2(other.y-hero.y,other.x-hero.x));}
-          for(const a of aimAngles){const crit=Math.random()<hero.critChance;shots.push({x:hero.x,y:hero.y,vx:Math.cos(a)*670,vy:Math.sin(a)*670,life:Math.max(.6,hero.range/670+.1),damage:hero.damage*(crit?hero.critMultiplier:1),baseDamage:hero.damage,fromHero:true,arrow:true,chain:hero.chain>0||hero.weaponEffect==="arc",arcRank:hero.weaponEffect==="arc"?hero.weaponRank:0,pierceLeft:0,splash:false,color:hero.frostBolts?"#a6e9ff":"#ffe783"});}
+          for(const a of aimAngles){const crit=gameRandom()<hero.critChance;shots.push({x:hero.x,y:hero.y,vx:Math.cos(a)*670,vy:Math.sin(a)*670,life:Math.max(.6,hero.range/670+.1),damage:hero.damage*(crit?hero.critMultiplier:1),baseDamage:hero.damage,fromHero:true,arrow:true,chain:hero.chain>0||hero.weaponEffect==="arc",arcRank:hero.weaponEffect==="arc"?hero.weaponRank:0,pierceLeft:0,splash:false,color:hero.frostBolts?"#a6e9ff":"#ffe783"});}
           hero.aimX=Math.cos(angle);hero.aimY=Math.sin(angle);
           if(!hero.moving){hero.faceX=hero.aimX;hero.faceY=hero.aimY;}hero.cast=.18;attack=hero.rate;sfx("shoot");
         }
@@ -4418,7 +4633,7 @@
             beams.push({angle,length,x:hero.x+Math.cos(angle)*length,y:hero.y+Math.sin(angle)*length});
           }return beams;
         }
-        function sunHit(e,amount,element){const crit=Math.random()<hero.critChance;damageEnemy(e,amount*(crit?hero.critMultiplier:1),element,0,false,crit);}
+        function sunHit(e,amount,element){const crit=gameRandom()<hero.critChance;damageEnemy(e,amount*(crit?hero.critMultiplier:1),element,0,false,crit);}
         function updateSunwarden(dt){
           hero.hp=Math.min(hero.maxHp,hero.hp+4.0*dt);
           hero.beamAngle=(hero.beamAngle||0)+dt*1.4;
@@ -4427,7 +4642,7 @@
           hero.gustCd-=dt;if(hero.gustCd<=0){hero.gustCd=1.4;const eye=hero.evolutions.includes("eye"),radius=eye?220:180;for(const e of [...enemies])if(Math.hypot(e.x-hero.x,e.y-hero.y)<radius+e.r&&!segmentBlocked(hero.x,hero.y,e.x,e.y)){pushEnemy(e,hero.x,hero.y,150+25*(hero.gale||0)+(hero.weaponEffect==="wind"?hero.weaponRank*8:0));sunHit(e,hero.damage*(eye?1.0:.65),"wind");}rings.push({x:hero.x,y:hero.y,r:20,speed:radius*2,life:.55,color:elementColors.wind});hero.cast=.18;}
           hero.stillTime=hero.moving?0:(hero.stillTime||0)+dt;hero.sanctuaryCd=Math.max(0,hero.sanctuaryCd-dt);
           if(hero.sanctuary&&hero.stillTime>=1.2&&hero.sanctuaryCd<=0){hero.sanctuaryCd=6;heroZones.push({kind:"sanctuary",x:hero.x,y:hero.y,r:66,life:4});if(heroZones.length>8)heroZones.shift();}
-          hero.judgmentCd-=dt;if(hero.judgment&&hero.judgmentCd<=0){const elite=enemies.find(e=>(e.type==="boss"||e.eventElite)&&Math.hypot(e.x-hero.x,e.y-hero.y)<hero.range&&!segmentBlocked(hero.x,hero.y,e.x,e.y));if(elite){hero.judgmentCd=4;heroZones.push({kind:"pillar",x:elite.x,y:elite.y,r:28,life:.6});damageEnemy(elite,hero.damage*.7*hero.judgment,"light");}}
+          hero.judgmentCd-=dt;if(hero.judgment&&hero.judgmentCd<=0){const elite=enemies.find(e=>(e.type==="boss"||e.eventElite||e.nightChampion)&&Math.hypot(e.x-hero.x,e.y-hero.y)<hero.range&&!segmentBlocked(hero.x,hero.y,e.x,e.y));if(elite){hero.judgmentCd=4;heroZones.push({kind:"pillar",x:elite.x,y:elite.y,r:28,life:.6});damageEnemy(elite,hero.damage*.7*hero.judgment,"light");}}
           hero.cycloneCd-=dt;if(hero.cyclone&&hero.cycloneCd<=0){hero.cycloneCd=8;heroZones.push({kind:"cyclone",x:hero.x,y:hero.y,r:55,life:5,tick:0,angle:hero.beamAngle});}
           for(const zone of [...heroZones]){zone.life-=dt;if(zone.life<=0){heroZones.splice(heroZones.indexOf(zone),1);continue;}
             if(zone.kind==="sanctuary"){if(hero.evolutions.includes("halo")){zone.x=hero.x;zone.y=hero.y;}if(Math.hypot(hero.x-zone.x,hero.y-zone.y)<zone.r)hero.hp=Math.min(hero.maxHp,hero.hp+(1+hero.sanctuary)*dt);}
@@ -4792,6 +5007,7 @@
         }
         function damageEnemy(e, amount, kind = "neutral", spreadDepth = 0, fromHeroBolt = false, isCrit = false, earnsCharge = true) {
           if (!enemies.includes(e)) return;
+          /* endgame-v72 */ amount = endgameDamage(e, amount);
           noteEnemy(e.type === "boss" ? e.variant || "warden" : e.treasure ? "imp" : e.type);
           const element = kind === "burn" || kind === "cinder" || kind === "flame" ? "fire" :
             kind === "venom" || kind === "blight" ? "poison" :
@@ -4851,8 +5067,10 @@
               (weak ? "!" : ""), color, weak ? 1.25 : resisted ? 0.78 : 1);
           }
           if (e.hp > 0) return;
+          /* cosmetic-v69 */ fx("enemyDeath", e);
           enemies.splice(enemies.indexOf(e), 1);
-          if(hero.class==="gravecaller"&&Math.random()<.35)raiseMinion(e.x,e.y);
+          /* endgame-v72 */ endgameEnemyKilled(e);
+          if(hero.class==="gravecaller"&&gameRandom()<.35)raiseMinion(e.x,e.y);
           if(hero.evolutions?.includes("crimson")&&spreadDepth<2&&deathReactionBudget++<18) {
             bloodEffects.push({kind:"pulse",x:e.x,y:e.y,r:78,life:.4,color:elementColors.blood});
             hero.hp=Math.min(hero.maxHp,hero.hp+2);
@@ -4971,7 +5189,7 @@
             value: Math.round(baseXP * (1 + Math.floor((wave - 1) / 5) * 0.15)),
             bossReward: e.type === "boss",
           });
-          if (hero.xpBurst && Math.random() < 0.05 + hero.xpBurst * 0.05) {
+          if (hero.xpBurst && gameRandom() < 0.05 + hero.xpBurst * 0.05) {
             for (let k = 0; k < 3; k++) {
               let angle = (k * Math.PI * 2) / 3;
               drops.push({ x: e.x + Math.cos(angle) * 18, y: e.y + Math.sin(angle) * 18,
@@ -5008,11 +5226,11 @@
             showToast("CHAMPION DEFEATED");
           } else if (e.type === "caster") {
             showToast("HEXER DEFEATED");
-          } else if (Math.random() < 0.055) drops.push({ x: e.x + 12, y: e.y, type: "heal", value: 18 });
+          } else if (gameRandom() < 0.055) drops.push({ x: e.x + 12, y: e.y, type: "heal", value: 18 });
           let relicChance =
             e.type === "boss" ? 1 : e.type === "caster" || e.type === "champion" ? 0.12 : 0.032;
-          if (Math.random() < relicChance) {
-            let roll = Math.random(),
+          if (gameRandom() < relicChance) {
+            let roll = gameRandom(),
               type = roll < 0.16 ? "nuke" : roll < 0.58 ? "shield" : "haste";
             drops.push({ x: e.x + 20, y: e.y - 10, type, value: 0, expires: clock + 22 });
           }
@@ -5191,8 +5409,8 @@
               hero.firestormCd=.3;
               const visible=enemies.filter(e=>onScreenEnemy(e)&&!wallAt(e.x,e.y,8));
               for(let i=0;i<3&&meteors.length<50;i++){
-                const target=i===0&&visible.length?visible[Math.floor(Math.random()*visible.length)]:null,
-                  x=target?target.x:hero.x+(Math.random()-.5)*w*.9,y=target?target.y:hero.y+(Math.random()-.5)*h*.9;
+                const target=i===0&&visible.length?visible[Math.floor(gameRandom()*visible.length)]:null,
+                  x=target?target.x:hero.x+(gameRandom()-.5)*w*.9,y=target?target.y:hero.y+(gameRandom()-.5)*h*.9;
                 if(!wallAt(x,y,8))meteors.push({x,y,time:.45,r:80,damage:hero.damage*2.4,ultimate:true});
               }
             }
@@ -5291,6 +5509,7 @@
             if (hero.shieldCharges === 0) hero.shieldUntil = 0;
             return 0;
           }
+          /* endgame-v72 */ amount *= endgameFactors().damage;endgameHitSource();
           if (wave <= 3) amount *= 0.8;
           amount *= 1 + 0.08 * endlessTier();
           if (hero.depth >= 5) amount *= 1 + 0.12 * depthStacks(5);
@@ -5325,6 +5544,7 @@
           if (vibrationEnabled && navigator.vibrate) navigator.vibrate(60);
         }
         function update(dt) {
+          /* endgame-v72 */ updateEndgame(dt);
           updateTips(dt);
           for(let i=bloodEffects.length-1;i>=0;i--){const effect=bloodEffects[i];if(effect.delay>0)effect.delay-=dt;else effect.life-=dt;if(effect.life<=0)bloodEffects.splice(i,1);}
           toastTimer -= dt;
@@ -5511,7 +5731,8 @@
           if (spawn <= 0 && enemies.length < 95) {
             spawnEnemy();
             // Divide the interval by the floor rate: 0.75 means 25% fewer regular arrivals.
-            spawn = Math.max(0.16, 0.48 - clock * 0.005) * (Math.random() * 0.45 + 0.78) / (1 + Math.min(0.35, 0.04 * endlessTier())) / (isDescent()?[.75,.85,.95,1,1.05][dungeon.floor-1]:1);
+            spawn = Math.max(0.16, 0.48 - clock * 0.005) * (gameRandom() * 0.45 + 0.78) / (1 + Math.min(0.35, 0.04 * endlessTier())) / (isDescent()?[.75,.85,.95,1,1.05][dungeon.floor-1]:1);
+          /* endgame-v72 */ spawn /= endgameFactors().density;
           }
           attack -= dt;
           if(attack<=0&&hero.class==="sunwarden"){attack=hero.rate;}
@@ -5534,7 +5755,7 @@
                 vx: ((e.x - hero.x) / d) * 510,
                 vy: ((e.y - hero.y) / d) * 510,
                 life: 0.75,
-                damage: hero.damage * (hero.class==="gravecaller"?.6:1) * (Math.random() < hero.critChance ? hero.critMultiplier : 1),
+                damage: hero.damage * (hero.class==="gravecaller"?.6:1) * (gameRandom() < hero.critChance ? hero.critMultiplier : 1),
                 baseDamage: hero.damage*(hero.class==="gravecaller"?.6:1),
                 element:hero.class==="gravecaller"?"arcane":undefined,
                 fromHero: true,
@@ -6176,6 +6397,7 @@
               if ((o.type === "loot" || o.bossReward) && enemies.some((e) => e.type === "boss")) continue;
               if (o.type === "loot") saveRun(true);
               drops.splice(i, 1);
+              /* endgame-v72 */ if (collectEndgameDrop(o)) { if(mode!=="play")break;continue; }
               if (o.type === "loot") {
                 offerLoot(o);
                 break;
@@ -6465,7 +6687,7 @@
           ctx.restore();
           if(e.hitFlash>0&&spriteMasks.has(img)){
             ctx.save();ctx.globalAlpha=Math.min(.55,e.hitFlash*5);
-            drawGrounded(spriteMasks.get(img),x,actorFoot(y,r),width,height,e.stepPhase||0,e.walking||0,projectVector(e.faceX||0,e.faceY??1).x<-.25,false,e.faceX||0,hit);
+            drawGrounded(window.EmberMotion?.tint(img,["#ffe0c0","#d7f4ff","#ddf7b9"][currentZone()])||spriteMasks.get(img),x,actorFoot(y,r),width,height,e.stepPhase||0,e.walking||0,projectVector(e.faceX||0,e.faceY??1).x<-.25,false,e.faceX||0,hit);
             ctx.restore();
           }
           if (e.frostTime > 0 || e.poisonTime > 0 || e.burnTime > 0 || e.bleedUntil > clock) {
@@ -6490,9 +6712,12 @@
             h = hero.class === "bloodknight" ? 90 : 80,
             fx = hero.class==="ranger"&&hero.cast>.025 ? (hero.aimX??hero.faceX??0) : hero.faceX || 0,
             fy = hero.class==="ranger"&&hero.cast>.025 ? (hero.aimY??hero.faceY??1) : hero.faceY === undefined ? 1 : hero.faceY,
-            casting = hero.cast > 0.025,
+            poseCast = hero.cast,
+            beamPulse = hero.class==="sunwarden"&&mode==="play"&&hero.hp>0&&enemies.some(e=>Math.hypot(e.x-hero.x,e.y-hero.y)<hero.range),
+            casting = poseCast > 0.025,
             img = facingArt(heroArt, fx, fy, casting),
             side = Math.abs(projectVector(fx,fy).x) > Math.abs(projectVector(fx,fy).y) * 0.72;
+          if(beamPulse){const pulse=clock%1.2;if(pulse<.18){poseCast=Math.max(poseCast,.18-pulse);casting=true;if(sunPulse!==Math.floor(clock/1.2)){sunPulse=Math.floor(clock/1.2);sfx("shoot");}}}
           if(img.cinematic)w=Math.min(92,h*img.naturalWidth/img.naturalHeight);
           groundShadow(x,actorFoot(y,18),20,7);
           drawHeroRing(x,actorFoot(y,18),hero.class);
@@ -6507,7 +6732,7 @@
           let authored=false;
           if(window.EmberHeroAnimation?.ready(hero.class)){
             ctx.save();ctx.translate(x,actorFoot(y,19));cancelProjection();
-            authored=window.EmberHeroAnimation.draw(ctx,{kind:hero.class,height:h,direction:projectVector(fx,fy),phase:hero.stepPhase,moving:hero.moving,cast:hero.cast,hit:heroHit,dead:hero.hp<=0});ctx.restore();
+            authored=window.EmberHeroAnimation.draw(ctx,{kind:hero.class,height:h,direction:projectVector(fx,fy),phase:hero.stepPhase,moving:hero.moving,cast:poseCast,hit:heroHit,dead:hero.hp<=0});ctx.restore();
           }
           if(!authored)drawGrounded(img,x,actorFoot(y,19),w,h,hero.stepPhase||0,hero.moving,(side||hero.class==="ranger"&&casting)&&projectVector(fx,fy).x<0,casting,projectVector(fx,fy).x,heroHit,rpgPreview?Math.sin(Math.min(1,hero.cast/(hero.class==="bloodknight"?.2:.18))*Math.PI):0);
           ctx.restore();
@@ -7018,7 +7243,7 @@
                 ctx.arc(e.x, e.y, e.r + 5, 0, 7);
                 ctx.stroke();
               }
-              drawEnemy(e);
+              drawEnemy(e);drawEndgameElite(e);
               if(e.solarBlindUntil>clock){ctx.strokeStyle="#ffe4a0";ctx.lineWidth=2;ctx.beginPath();ctx.arc(e.x,e.y-e.r-8,8,0,Math.PI*2);ctx.stroke();}
 
               if (e.shieldedByGolem) { ctx.strokeStyle = "#a8e8ff"; ctx.lineWidth = 2;
@@ -7051,19 +7276,42 @@
               }
 
         }
+        let motionHero=null,motionDungeon=null,motionLevel=0,sunPulse=-1;const motionBosses=new WeakSet();
+        function visualScene(){return {isDescent:isDescent(),isometric:rpgPreview,dungeon,floor:dungeon?.floor,zone:currentZone(),rooms:isDescent()?floorSpec().rooms:[],links:isDescent()?floorSpec().links:[],hero,clock,visiblePoint,sceneItem,billboard,inputVector,art,drawProp,quality:visualQuality};}
+        function fx(kind,o) {
+          if(!hero)return;
+          const data={x:o.x??hero.x,y:o.y??hero.y,zone:currentZone()};
+          if(kind==="enemyDeath"){
+            const key=o.type==="boss"?o.variant:o.type==="champion"?"brute":o.type==="charger"?"runner":o.type;
+            const img=spriteReady(key)?facingArt(key,o.faceX||0,o.faceY??1,false):null;
+            data.img=img;data.height=o.r*(o.type==="boss"?3.36:o.type==="burrower"?2.3:3.835);
+            data.width=img?Math.min(data.height*1.4,data.height*(img.naturalWidth||img.width)/(img.naturalHeight||img.height)):o.r*2.7;
+            sfx("enemy-"+key);
+            if(o.type==="boss")window.EmberMotion?.emit("bossDeath",data,visualQuality);
+          }else if(["chest","well","forge","door","stairs"].includes(kind))sfx(kind==="door"?"unlock":kind);
+          window.EmberMotion?.emit(kind,data,visualQuality);
+        }
         function draw() {
+          music();
+          if(hero!==motionHero||dungeon!==motionDungeon){motionHero=hero;motionDungeon=dungeon;motionLevel=level;window.EmberMotion?.reset();}
+          if(hero&&level>motionLevel){motionLevel=level;fx("level",hero);}
+          if(boss&&boss.hp>0&&!motionBosses.has(boss)){motionBosses.add(boss);window.EmberMotion?.emit("bossIntro",{name:bossNames[boss.variant]||"CRYPT GUARDIAN"},visualQuality);}
+
           ctx.clearRect(0, 0, w, h);
           ctx.fillStyle = "#171b1f";
           ctx.fillRect(0, 0, w, h);
           if (!hero) return;
           ctx.save();
-          if(rpgPreview){ctx.translate(w/2+Math.sin(clock*89)*shake,cameraFocusY()+Math.cos(clock*71)*shake);ctx.scale(1,cameraTilt);ctx.rotate(cameraAngle);ctx.translate(-hero.x,-hero.y);}else ctx.translate(w/2-hero.x+(Math.random()-.5)*shake,h/2-hero.y+(Math.random()-.5)*shake);
+          if(rpgPreview){ctx.translate(w/2+Math.sin(clock*89)*(shakeEnabled?shake:0),cameraFocusY()+Math.cos(clock*71)*(shakeEnabled?shake:0)+(shakeEnabled?(window.EmberMotion?.cameraPush()||0):0));ctx.scale(1,cameraTilt);ctx.rotate(cameraAngle);ctx.translate(-hero.x,-hero.y);}else ctx.translate(w/2-hero.x+(Math.random()-.5)*(shakeEnabled?shake:0),h/2-hero.y+(Math.random()-.5)*(shakeEnabled?shake:0));
           queueScene=rpgPreview;sceneQueue=[];
           const center=inputVector(0,h/2-cameraFocusY()),left=hero.x+center.x-worldW/2-70,top=hero.y+center.y-worldH/2-70;
           dungeonFloor(left, top);
-          const ashScene={isDescent:isDescent(),isometric:rpgPreview,dungeon,floor:dungeon?.floor,rooms:isDescent()?floorSpec().rooms:[],hero,clock,visiblePoint,sceneItem,billboard,inputVector,art,drawProp};
+          const ashScene=visualScene();
           window.EmberAsh?.ground(ctx,ashScene);
           window.EmberAsh?.foreground(ctx,ashScene);
+          window.EmberZones?.ground(ctx,ashScene);
+          window.EmberZones?.foreground(ctx,ashScene);
+          window.EmberMotion?.draw(ctx,ashScene);
           drawZoneDepth(left,top);
           drawRpgLighting();
           drawSpellLighting();
@@ -7097,6 +7345,7 @@
               ctx.stroke();
             }
           for (const o of drops) {
+            if(drawEndgameDrop(o))continue;
             if (o.x < left || o.x > left + worldW + 140 || o.y < top || o.y > top + worldH + 140) continue;
             let color =
               o.type === "xp"
@@ -7220,7 +7469,7 @@
           ctx.font = "bold 15px system-ui";
           for (const f of floaters) {
             ctx.globalAlpha = Math.min(1, f.life * 2);
-            ctx.font = "bold " + Math.round(15 * (f.scale || 1)) + "px system-ui";
+            ctx.font = "bold " + Math.round(15 * (f.scale || 1)*(1+Math.max(0,(f.life-.6)/.2)*.32)) + "px system-ui";
             ctx.fillStyle = f.color;
             if(rpgPreview)billboard(f.x,f.y,()=>ctx.fillText(f.text,0,0));else ctx.fillText(f.text,f.x,f.y);
           }
@@ -7230,6 +7479,7 @@
           drawSiteCompass();
           drawMinimap();
           drawArrivalCues();
+          window.EmberMotion?.hud(ctx,w,h);
           if(isDescent()&&dungeon.title>0){ctx.fillStyle="#080b13cf";ctx.fillRect(0,h*.36,w,76);ctx.fillStyle="#ffdc9d";ctx.font="bold 17px system-ui";ctx.textAlign="center";ctx.fillText("FLOOR "+dungeon.floor+" · "+floorSpec().name,w/2,h*.36+43);}
           if(!vignetteCache||vignetteCache.width!==Math.ceil(w)||vignetteCache.height!==Math.ceil(h)){
             vignetteCache=surface(Math.ceil(w),Math.ceil(h));let g=vignetteCache.getContext("2d");
@@ -7291,6 +7541,7 @@
         }
         requestAnimationFrame(frame);
         document.addEventListener("visibilitychange", () => {
+          if(document.hidden)music("hidden");
           if (document.hidden && mode === "play") pauseRun(true);
           else if (document.hidden) saveRun(true);
           last = performance.now();
