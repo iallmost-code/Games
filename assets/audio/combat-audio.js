@@ -6,6 +6,7 @@
     new URL('assets/audio/combat-audio.js', root.document ? root.document.baseURI : 'http://localhost/').href);
   const contexts = new WeakMap(), downloads = new Map();
   const MAX_VOICES = 12;
+  const SAMPLE_VERSION = '68';
   const names = ['blade-air', 'dash-air', 'stone-impact', 'metal-impact', 'armor-hit',
     'shield-ring', 'bow-release', 'soul-cast', 'fire-crackle', 'crystal-chime',
     'pickup-gem', 'ember-blast', 'ultimate-rise', 'soul-fall', 'stone-door'];
@@ -52,7 +53,7 @@
   function raw(name) {
     if (!downloads.has(name)) {
       // A failed request stays failed; effects never start retrying network work during combat.
-      downloads.set(name, Promise.resolve().then(() => root.fetch(new URL(name + '.wav', base).href))
+      downloads.set(name, Promise.resolve().then(() => root.fetch(new URL(name + '.wav?v=' + SAMPLE_VERSION, base).href))
         .then(response => response.ok ? response.arrayBuffer() : null).catch(() => null));
     }
     return downloads.get(name);

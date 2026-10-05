@@ -69,6 +69,7 @@ async function mockChecks() {
   let downloads = 0;
   const api = moduleWith(async url => {
     downloads++;
+    assert.equal(new URL(url).searchParams.get('v'), '68', 'Versioned URLs bypass stale CDN failures');
     const bytes = fs.readFileSync(path.join(audio, new URL(url).pathname.split('/').pop()));
     return { ok: true, arrayBuffer: async () => bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength) };
   });
