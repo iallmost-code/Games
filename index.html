@@ -7,6 +7,11 @@
       content="width=device-width,initial-scale=1,viewport-fit=cover,maximum-scale=1,user-scalable=no"
     />
     <meta name="theme-color" content="#10100e" />
+    <link rel="manifest" href="manifest.webmanifest" />
+    <link rel="apple-touch-icon" href="assets/icon-192.png" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="description" content="A dungeon survival game with joystick, Dash and Ultimate controls." />
     <title>Ember Crypt</title>
     <link
@@ -662,6 +667,31 @@
       }
       @media (orientation:portrait) and (max-width:375px) { .joystick { width:28vw; height:28vw; } .skill { width:14vw; height:14vw; } }
       @media (prefers-reduced-motion:reduce) { .skill.ready { animation:none; } }
+      /* Compact layout for short screens (phones in landscape with a browser bar). */
+      @media (max-height: 449.98px), (max-width: 339.98px) {
+        .game .hud { padding-top:calc(env(safe-area-inset-top) + 4px); gap:4px;
+          right:calc(env(safe-area-inset-right) + 56px); left:env(safe-area-inset-left); }
+        .game .hudleft,.game .stats { padding:3px 7px; border-radius:7px; }
+        .game .logo,.game .statlines,.game #bonus,.game #effects,
+        .game .stats .gear { display:none !important; }
+        .game .zone { font-size:8px; margin-top:0; }
+        .game .bar { margin-top:2px; height:5px; }
+        .game .armorbar,.game .xp { height:3px; }
+        .game.playing .stats { padding-top:3px; font-size:11px; line-height:1.15; }
+        .game .stats small { font-size:9px; }
+        .game .pause-control { top:calc(env(safe-area-inset-top) + 4px); right:calc(env(safe-area-inset-right) + 8px);
+          min-width:40px; min-height:36px; font-size:15px; border-radius:9px; }
+        body #dungeonMap { top:calc(env(safe-area-inset-top) + 46px); right:calc(env(safe-area-inset-right) + 8px);
+          width:76px; height:50px; }
+        .game .skills { gap:10px; right:calc(env(safe-area-inset-right) + 10px); bottom:calc(env(safe-area-inset-bottom) + 10px); }
+        .game .skill { width:56px; height:56px; font-size:8px; }
+        .game .skill-icon { font-size:20px; line-height:21px; }
+        .game .skill-value { font-size:8px; line-height:10px; }
+        .game .tip { display:none; }
+        .game .toast { bottom:calc(env(safe-area-inset-bottom) + 76px); font-size:14px; }
+        body #firstRunTip { top:calc(env(safe-area-inset-top) + 44px) !important; font-size:11px; padding:5px 9px; }
+        .game .bossbar { top:calc(env(safe-area-inset-top) + 40px); }
+      }
     </style>
   </head>
   <body>
@@ -1117,6 +1147,31 @@
           slotPlayUnstored%=1;
           slots[activeSlot].lastPlayed=Date.now(); persistSlots();
         }
+        function fullscreenSupported() {
+          return !!(document.fullscreenEnabled || document.webkitFullscreenEnabled);
+        }
+        function toggleFullscreen() {
+          try {
+            if (document.fullscreenElement || document.webkitFullscreenElement)
+              (document.exitFullscreen || document.webkitExitFullscreen).call(document);
+            else {
+              const el = document.documentElement,
+                req = el.requestFullscreen || el.webkitRequestFullscreen;
+              const done = req && req.call(el, { navigationUI: "hide" });
+              if (done && done.then) done.then(() => screen.orientation?.lock?.(screen.orientation.type).catch(() => {})).catch(() => {});
+            }
+          } catch {}
+        }
+        function fullscreenButton() {
+          return menuButton(
+            document.fullscreenElement || document.webkitFullscreenElement ? "EXIT FULLSCREEN" : "FULLSCREEN",
+            () => {
+              toggleFullscreen();
+              setTimeout(() => renderMenu(currentMenuScreen), 300);
+            },
+            "Hide the browser bar for a bigger view.",
+          );
+        }
         function menuButton(label,action,small,kind="") {
           let b=document.createElement("button"); b.type="button"; b.className="menu-button "+kind;
           b.textContent=label;
@@ -1162,7 +1217,9 @@
             ember.style.setProperty("--drift",((i%5-2)*23)+"px");menuEmbers.append(ember);
           }
         }
+        let currentMenuScreen = "hub";
         function renderMenu(screen) {
+          currentMenuScreen = screen;
           menuScreen=screen; mode=screen==="pause"||screen==="settings"&&settingsReturn==="pause"?"paused":"menu";
           if(screen==="start") {showStartScreen();return;}
           if(screen==="slots") {
@@ -1199,7 +1256,8 @@
               menuButton("SHRINE",()=>renderMenu("shrine")),
               menuButton("BESTIARY",()=>renderMenu("bestiary")),
               menuButton("ACHIEVEMENTS",()=>renderMenu("achievements")),
-              menuButton("SETTINGS",()=>{settingsReturn="hub";renderMenu("settings");}));return;
+              menuButton("SETTINGS",()=>{settingsReturn="hub";renderMenu("settings");}));
+            if(fullscreenSupported())body.append(fullscreenButton());return;
           }
           if(screen==="modes") {let body=menuBase("PLAY","hub","Choose your journey.");
             body.append(menuButton("THE DESCENT",()=>{selectedMode="descent";renderMenu("heroes");},"Five dungeon floors. Defeat their guardians and descend.","primary"),menuButton("ENDLESS",()=>{selectedMode="endless";renderMenu("heroes");},"The original arena, Crypt Heart at wave 20 and endless tiers."));return;}
@@ -1228,6 +1286,7 @@
             let back=menuPage.children[0]?.children[0];if(back)back.onclick=resumePaused;
             body.append(menuButton("RESUME",resumePaused,null,"primary"),
               menuButton("SETTINGS",()=>{settingsReturn="pause";renderMenu("settings");}));
+            if(fullscreenSupported())body.append(fullscreenButton());
             let quit=menuButton("QUIT RUN",()=>{quit.textContent="QUIT RUN · CONFIRM";
               quit.onclick=()=>{saveSlotClock();clearRun();hero=null;showTitleMenu();};},
               "Embers earned stay with this character.");body.append(quit);return;
@@ -1307,6 +1366,7 @@
             menuButton("VIBRATION · "+(vibrationEnabled?"ON":"OFF"),()=>{
               vibrationEnabled=!vibrationEnabled;localStorage.setItem("ember-crypt-vibrate-"+activeSlot,vibrationEnabled?"1":"0");
               renderMenu("settings");}),
+            menuButton("VIEW · "+viewPref.toUpperCase(),()=>{viewPref=viewPref==="near"?"normal":viewPref==="normal"?"far":"near";try{localStorage.setItem("ember-crypt-view",viewPref);}catch{}resize();renderMenu("settings");},"Near · Normal · Far. Far shows more of the dungeon."),
             menuButton("GRAPHICS · "+(rpgPreview?"ISOMETRIC":"CLASSIC"),()=>{rpgPreview=!rpgPreview;try{localStorage.setItem("ember-crypt-rpg-preview",rpgPreview?"1":"0");}catch{}resetJoy();refreshCameraBounds();renderMenu("settings");},"Angled camera, raised stonework, upright actors and skill animations."),
             menuButton("RESET TIPS",()=>{profile.tips={};tipQueue=[];activeTip=null;saveProfile();renderMenu("settings");},"Show first-run tips again for this character."),
             menuButton("RENAME CHARACTER",()=>renderNameEntry(activeSlot,true)),
@@ -1955,19 +2015,35 @@
           else if(!isDescent())showToast("RUN RESUMED");
         }
         resumeBtn.addEventListener("click", restoreRun);
+        let viewZoom = 1,
+          viewPref = "normal";
+        try {
+          viewPref = ["near", "normal", "far"].includes(localStorage.getItem("ember-crypt-view"))
+            ? localStorage.getItem("ember-crypt-view")
+            : "normal";
+        } catch {}
         showStartScreen();
+        // Short screens (phones in landscape, browser bars) zoom the camera out so the
+        // visible world never shrinks to a thin strip around the hero.
+        function computeViewZoom(cssW, cssH) {
+          // Portrait keeps its original framing; only short landscape screens zoom out.
+          const fit = cssW > cssH ? cssH / 390 : cssW < 340 ? cssW / 340 : 1,
+            pref = viewPref === "far" ? 0.8 : viewPref === "near" ? 1.2 : 1;
+          return Math.max(0.45, Math.min(1, fit) * pref);
+        }
         function resize() {
           resetJoy();
           for(const key of Object.keys(keys))delete keys[key];
           const b = game.getBoundingClientRect();
-          w = b.width;
-          h = b.height;
+          viewZoom = computeViewZoom(b.width, b.height);
+          w = b.width / viewZoom;
+          h = b.height / viewZoom;
           refreshCameraBounds();
-          dpr = Math.min(devicePixelRatio || 1, w < 700 ? 1.5 : 2);
-          canvas.width = w * dpr;
-          canvas.height = h * dpr;
-          ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-        }
+          dpr = Math.min(devicePixelRatio || 1, b.width < 700 ? 1.5 : 2);
+          canvas.width = b.width * dpr;
+          canvas.height = b.height * dpr;
+          ctx.setTransform(dpr * viewZoom, 0, 0, dpr * viewZoom, 0, 0);
+                  }
         addEventListener("resize", resize);
         resize();
         function showToast(s) {
@@ -3040,7 +3116,7 @@
         }
         function pos(e) {
           let r = canvas.getBoundingClientRect();
-          return inputVector(e.clientX-r.left-w/2,e.clientY-r.top-cameraFocusY());
+          return inputVector((e.clientX-r.left)/viewZoom-w/2,(e.clientY-r.top)/viewZoom-cameraFocusY());
         }
         function resetJoy() {
           joy.id = null;
@@ -3683,7 +3759,7 @@
           if(!isDescent()||mode!=="play")return;
           const groups=arrivalGroups().filter(g=>!visiblePoint(g.x,g.y,-28))
             .sort((a,b)=>Math.hypot(a.x-hero.x,a.y-hero.y)-Math.hypot(b.x-hero.x,b.y-hero.y)).slice(0,3);
-          const top=rpgPreview?document.querySelector(".hud").getBoundingClientRect().bottom+24:Math.min(h*.4,document.querySelector(".hud").getBoundingClientRect().bottom+110+(activeTip?80:0)),bottom=rpgPreview?(w>h?h-108:h-180):Math.max(top+20,h-180);
+          const hudBottom=document.querySelector(".hud").getBoundingClientRect().bottom/viewZoom,top=rpgPreview?hudBottom+24:Math.min(h*.4,hudBottom+110+(activeTip?80:0)),bottom=rpgPreview?(w>h?h-108:h-180):Math.max(top+20,h-180);
           for(const group of groups){
             const delta=projectVector(group.x-hero.x,group.y-hero.y),dx=delta.x,dy=delta.y,angle=Math.atan2(dy,dx),scale=Math.min((w/2-18)/Math.max(1,Math.abs(dx)),(rpgPreview?(dy<0?cameraFocusY()-top:bottom-cameraFocusY()):h/2-22)/Math.max(1,Math.abs(dy)));
             const x=w/2+dx*scale,y=Math.max(top,Math.min(bottom,cameraFocusY()+dy*scale));

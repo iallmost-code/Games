@@ -18,3 +18,5 @@
 
 - `codex/action-rpg-preview` adds a selectable isometric camera and visual skill animations. Keep it unmerged for owner playtesting. Isometric screen input must go through `inputVector`; physics, ranges, dungeon cells and saved coordinates stay in world space. Spawn visibility, camera culling and navigation cues must use the projected viewport.
 - Depth-sort upright actors, props, raised masonry and heighted projectiles; keep foreground walls translucent near the hero. Cosmetic queues/effects are transient and must never enter run/profile saves. Classic remains available in Settings. Historical world-axis bot suites select Classic through `tests/classic-camera-fixture.cjs`; `tests/action-rpg.cjs` validates the new camera/input/render path.
+
+- Short landscape screens (height under 390px, e.g. phones with a browser bar) zoom the camera out via `computeViewZoom` and use the compact HUD media query (height under 450px). Portrait and full-height layouts keep their original framing; Settings → VIEW (Near/Normal/Far) adjusts zoom. Screen-to-world input must divide by `viewZoom`.
