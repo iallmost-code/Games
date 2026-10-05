@@ -1,15 +1,18 @@
 {
+  "id": "/Games/",
   "name": "Ember Crypt",
   "short_name": "Ember Crypt",
   "description": "A one-thumb dungeon survival game.",
-  "start_url": "./",
-  "scope": "./",
+  "start_url": "/Games/",
+  "scope": "/Games/",
   "display": "fullscreen",
+  "display_override": ["fullscreen", "standalone"],
   "orientation": "any",
   "background_color": "#10100e",
   "theme_color": "#10100e",
   "icons": [
-    { "src": "assets/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
-    { "src": "assets/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+    { "src": "/Games/assets/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/Games/assets/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/Games/assets/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
   ]
 }
