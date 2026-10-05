@@ -1,0 +1,469 @@
+{
+  "generatedFloors": 5000,
+  "uniqueLayouts": 1288,
+  "mechanics": [
+    "v11-to-v12 preserves Classic checkpoint, embers and shrine",
+    "Torment 10 enemy HP/damage; run-gold drop/collection",
+    "Seeded floor resumes exact geometry, floor-start gold rollback",
+    "All three standing merchant purchases and duplicate protection",
+    "Cracked wall opens only on approach, relic claim",
+    "All four champion modifiers, guaranteed relic, Torment density/reward",
+    "Fixed daily hero/seed/modifier and reproducible gameplay RNG",
+    "Last 20 history records, idempotency, daily/profile/run EC1",
+    "Slot isolation"
+  ],
+  "renders": [
+    {
+      "hero": "gravecaller",
+      "floor": 1,
+      "cells": 249,
+      "door": true,
+      "stairs": true,
+      "width": 390,
+      "height": 844
+    },
+    {
+      "hero": "gravecaller",
+      "floor": 2,
+      "cells": 261,
+      "door": true,
+      "stairs": true,
+      "width": 390,
+      "height": 844
+    },
+    {
+      "hero": "gravecaller",
+      "floor": 3,
+      "cells": 246,
+      "door": true,
+      "stairs": true,
+      "width": 390,
+      "height": 844
+    },
+    {
+      "hero": "gravecaller",
+      "floor": 4,
+      "cells": 261,
+      "door": true,
+      "stairs": true,
+      "width": 390,
+      "height": 844
+    },
+    {
+      "hero": "gravecaller",
+      "floor": 5,
+      "cells": 266,
+      "door": true,
+      "stairs": false,
+      "width": 390,
+      "height": 844
+    },
+    {
+      "hero": "ranger",
+      "floor": 1,
+      "cells": 224,
+      "door": true,
+      "stairs": true,
+      "width": 390,
+      "height": 844
+    },
+    {
+      "hero": "ranger",
+      "floor": 2,
+      "cells": 234,
+      "door": true,
+      "stairs": true,
+      "width": 390,
+      "height": 844
+    },
+    {
+      "hero": "ranger",
+      "floor": 3,
+      "cells": 252,
+      "door": true,
+      "stairs": true,
+      "width": 390,
+      "height": 844
+    },
+    {
+      "hero": "ranger",
+      "floor": 4,
+      "cells": 260,
+      "door": true,
+      "stairs": true,
+      "width": 390,
+      "height": 844
+    },
+    {
+      "hero": "ranger",
+      "floor": 5,
+      "cells": 274,
+      "door": true,
+      "stairs": false,
+      "width": 390,
+      "height": 844
+    },
+    {
+      "hero": "ember",
+      "floor": 1,
+      "cells": 260,
+      "door": true,
+      "stairs": true,
+      "width": 390,
+      "height": 844
+    },
+    {
+      "hero": "ember",
+      "floor": 2,
+      "cells": 239,
+      "door": true,
+      "stairs": true,
+      "width": 390,
+      "height": 844
+    },
+    {
+      "hero": "ember",
+      "floor": 3,
+      "cells": 248,
+      "door": true,
+      "stairs": true,
+      "width": 390,
+      "height": 844
+    },
+    {
+      "hero": "ember",
+      "floor": 4,
+      "cells": 246,
+      "door": true,
+      "stairs": true,
+      "width": 390,
+      "height": 844
+    },
+    {
+      "hero": "ember",
+      "floor": 5,
+      "cells": 278,
+      "door": true,
+      "stairs": false,
+      "width": 390,
+      "height": 844
+    },
+    {
+      "hero": "bloodknight",
+      "floor": 1,
+      "cells": 257,
+      "door": true,
+      "stairs": true,
+      "width": 390,
+      "height": 844
+    },
+    {
+      "hero": "bloodknight",
+      "floor": 2,
+      "cells": 254,
+      "door": true,
+      "stairs": true,
+      "width": 390,
+      "height": 844
+    },
+    {
+      "hero": "bloodknight",
+      "floor": 3,
+      "cells": 251,
+      "door": true,
+      "stairs": true,
+      "width": 390,
+      "height": 844
+    },
+    {
+      "hero": "bloodknight",
+      "floor": 4,
+      "cells": 244,
+      "door": true,
+      "stairs": true,
+      "width": 390,
+      "height": 844
+    },
+    {
+      "hero": "bloodknight",
+      "floor": 5,
+      "cells": 259,
+      "door": true,
+      "stairs": false,
+      "width": 390,
+      "height": 844
+    },
+    {
+      "hero": "sunwarden",
+      "floor": 1,
+      "cells": 237,
+      "door": true,
+      "stairs": true,
+      "width": 390,
+      "height": 844
+    },
+    {
+      "hero": "sunwarden",
+      "floor": 2,
+      "cells": 234,
+      "door": true,
+      "stairs": true,
+      "width": 390,
+      "height": 844
+    },
+    {
+      "hero": "sunwarden",
+      "floor": 3,
+      "cells": 230,
+      "door": true,
+      "stairs": true,
+      "width": 390,
+      "height": 844
+    },
+    {
+      "hero": "sunwarden",
+      "floor": 4,
+      "cells": 248,
+      "door": true,
+      "stairs": true,
+      "width": 390,
+      "height": 844
+    },
+    {
+      "hero": "sunwarden",
+      "floor": 5,
+      "cells": 277,
+      "door": true,
+      "stairs": false,
+      "width": 390,
+      "height": 844
+    },
+    {
+      "hero": "gravecaller",
+      "floor": 1,
+      "cells": 250,
+      "door": true,
+      "stairs": true,
+      "width": 844,
+      "height": 390
+    },
+    {
+      "hero": "gravecaller",
+      "floor": 2,
+      "cells": 247,
+      "door": true,
+      "stairs": true,
+      "width": 844,
+      "height": 390
+    },
+    {
+      "hero": "gravecaller",
+      "floor": 3,
+      "cells": 233,
+      "door": true,
+      "stairs": true,
+      "width": 844,
+      "height": 390
+    },
+    {
+      "hero": "gravecaller",
+      "floor": 4,
+      "cells": 256,
+      "door": true,
+      "stairs": true,
+      "width": 844,
+      "height": 390
+    },
+    {
+      "hero": "gravecaller",
+      "floor": 5,
+      "cells": 273,
+      "door": true,
+      "stairs": false,
+      "width": 844,
+      "height": 390
+    },
+    {
+      "hero": "ranger",
+      "floor": 1,
+      "cells": 254,
+      "door": true,
+      "stairs": true,
+      "width": 844,
+      "height": 390
+    },
+    {
+      "hero": "ranger",
+      "floor": 2,
+      "cells": 255,
+      "door": true,
+      "stairs": true,
+      "width": 844,
+      "height": 390
+    },
+    {
+      "hero": "ranger",
+      "floor": 3,
+      "cells": 249,
+      "door": true,
+      "stairs": true,
+      "width": 844,
+      "height": 390
+    },
+    {
+      "hero": "ranger",
+      "floor": 4,
+      "cells": 225,
+      "door": true,
+      "stairs": true,
+      "width": 844,
+      "height": 390
+    },
+    {
+      "hero": "ranger",
+      "floor": 5,
+      "cells": 285,
+      "door": true,
+      "stairs": false,
+      "width": 844,
+      "height": 390
+    },
+    {
+      "hero": "ember",
+      "floor": 1,
+      "cells": 246,
+      "door": true,
+      "stairs": true,
+      "width": 844,
+      "height": 390
+    },
+    {
+      "hero": "ember",
+      "floor": 2,
+      "cells": 228,
+      "door": true,
+      "stairs": true,
+      "width": 844,
+      "height": 390
+    },
+    {
+      "hero": "ember",
+      "floor": 3,
+      "cells": 251,
+      "door": true,
+      "stairs": true,
+      "width": 844,
+      "height": 390
+    },
+    {
+      "hero": "ember",
+      "floor": 4,
+      "cells": 261,
+      "door": true,
+      "stairs": true,
+      "width": 844,
+      "height": 390
+    },
+    {
+      "hero": "ember",
+      "floor": 5,
+      "cells": 284,
+      "door": true,
+      "stairs": false,
+      "width": 844,
+      "height": 390
+    },
+    {
+      "hero": "bloodknight",
+      "floor": 1,
+      "cells": 257,
+      "door": true,
+      "stairs": true,
+      "width": 844,
+      "height": 390
+    },
+    {
+      "hero": "bloodknight",
+      "floor": 2,
+      "cells": 234,
+      "door": true,
+      "stairs": true,
+      "width": 844,
+      "height": 390
+    },
+    {
+      "hero": "bloodknight",
+      "floor": 3,
+      "cells": 258,
+      "door": true,
+      "stairs": true,
+      "width": 844,
+      "height": 390
+    },
+    {
+      "hero": "bloodknight",
+      "floor": 4,
+      "cells": 241,
+      "door": true,
+      "stairs": true,
+      "width": 844,
+      "height": 390
+    },
+    {
+      "hero": "bloodknight",
+      "floor": 5,
+      "cells": 254,
+      "door": true,
+      "stairs": false,
+      "width": 844,
+      "height": 390
+    },
+    {
+      "hero": "sunwarden",
+      "floor": 1,
+      "cells": 255,
+      "door": true,
+      "stairs": true,
+      "width": 844,
+      "height": 390
+    },
+    {
+      "hero": "sunwarden",
+      "floor": 2,
+      "cells": 236,
+      "door": true,
+      "stairs": true,
+      "width": 844,
+      "height": 390
+    },
+    {
+      "hero": "sunwarden",
+      "floor": 3,
+      "cells": 248,
+      "door": true,
+      "stairs": true,
+      "width": 844,
+      "height": 390
+    },
+    {
+      "hero": "sunwarden",
+      "floor": 4,
+      "cells": 242,
+      "door": true,
+      "stairs": true,
+      "width": 844,
+      "height": 390
+    },
+    {
+      "hero": "sunwarden",
+      "floor": 5,
+      "cells": 273,
+      "door": true,
+      "stairs": false,
+      "width": 844,
+      "height": 390
+    }
+  ],
+  "errors": [],
+  "live": "Unmodified production page: actual menu/daily start, running frame loop, Dash, keyboard, portrait-to-landscape and pause"
+}

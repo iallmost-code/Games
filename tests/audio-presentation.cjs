@@ -138,7 +138,7 @@ async function browserChecks() {
     }), kinds);
     assert(scheduled.every(item => item.result && item.active > 0 && item.active <= 2), 'Real sources failed');
     await page.evaluate(() => { EmberAudio.stop(ctx); EmberAudio.play('ultimate', ctx); });
-    await page.waitForTimeout(1100);
+    await page.waitForFunction(() => EmberAudio.stats(ctx).active === 0, null, { timeout: 10000 });
     assert.equal(await page.evaluate(() => EmberAudio.stats(ctx).active), 0, 'Real source cleanup');
     await page.evaluate(async () => { EmberAudio.play('hurt', ctx); EmberAudio.stop(ctx); await ctx.suspend(); });
     assert.equal(await page.evaluate(() => EmberAudio.play('hurt', ctx)), false);

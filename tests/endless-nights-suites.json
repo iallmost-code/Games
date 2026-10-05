@@ -1,0 +1,64 @@
+[
+  {
+    "suite": "visual-invariants",
+    "exit": 0,
+    "seconds": 0.1
+  },
+  {
+    "suite": "action-rpg",
+    "exit": 0,
+    "seconds": 150.7
+  },
+  {
+    "suite": "landscape-skills",
+    "exit": 0,
+    "seconds": 135.3
+  },
+  {
+    "suite": "new-heroes",
+    "exit": 0,
+    "seconds": 51.5
+  },
+  {
+    "suite": "bloodknight",
+    "exit": 0,
+    "seconds": 11.3
+  },
+  {
+    "suite": "descent",
+    "exit": 0,
+    "seconds": 48.0
+  },
+  {
+    "suite": "descent-variety",
+    "exit": 0,
+    "seconds": 8.9
+  },
+  {
+    "suite": "descent-tuning",
+    "exit": 0,
+    "seconds": 123.8
+  },
+  {
+    "suite": "animated-catacombs",
+    "exit": 0,
+    "seconds": 68.3
+  },
+  {
+    "suite": "audio-presentation",
+    "exit": 0,
+    "seconds": 4.1,
+    "rerun": "Passed after replacing wall-clock sleep with polling natural onended cleanup; leak assertion retained."
+  },
+  {
+    "suite": "ash-environment",
+    "exit": 0,
+    "seconds": 0.1
+  },
+  {
+    "suite": "endless-nights",
+    "exit": 0,
+    "seconds": 25.7,
+    "additionalValidation": "Expanded modifiers/rewards/density, encounter preservation, exact daily combat traces, world-input secret discovery, invulnerable Dash vs vampirism, and unmodified production UI smoke passed."
+  }
+]
