@@ -6,9 +6,9 @@ const http = require('node:http');
 const assert = require('node:assert/strict');
 const { chromium } = require('playwright');
 const root = path.resolve(__dirname, '..');
-const source = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
+const source = fs.readFileSync(path.join(root, 'index.html'), 'utf8').replace('function music(kind) {','function music(kind) { return;');
 for (const script of source.matchAll(/<script[^>]*>([\s\S]*?)<\/script>/g)) new Function(script[1]);
-const heroes = ['gravecaller', 'bloodknight'];
+const heroes = ['gravecaller', 'bloodknight','ranger','sunwarden','ember'];
 const sizes = [{ width: 390, height: 844 }, { width: 844, height: 390 }];
 const errors = [];
 const report = { animation: [], scenes: [], compatibility: null, fallbacks: [], native: [], browserErrors: errors };
@@ -88,7 +88,7 @@ function summary(values) {
   try {
     const page = await browser.newPage({ viewport: sizes[0], hasTouch: true });
     await initialize(page); await page.goto(url); await loaded(page);
-    await page.waitForFunction(() => EmberHeroAnimation.ready('gravecaller') && EmberHeroAnimation.ready('bloodknight'));
+    await page.waitForFunction(() => ['gravecaller','bloodknight','ranger','sunwarden','ember'].every(k=>EmberHeroAnimation.ready(k)));
     report.animation = await page.evaluate(heroes => {
       const result = [], a = EmberHeroAnimation;
       function check(value, message) { if (!value) throw Error(message); }
@@ -141,7 +141,7 @@ function summary(values) {
         finally{performance.now=realNow;a.draw({save(){},restore(){},scale(){},drawImage(){}},{kind,height:192});}
         result.push({kind,walk:directions,distinctFrameHashes:hashes,footBaseline:[Math.min(...baseline),Math.max(...baseline)],spriteExtents:extents,poseExtents,attackFrames:cast,hitFrames:hits.map(f=>f.index),deathFrames:deaths.map(f=>f.index)});
       }
-      check(a.diagnostics().frames===60,'Expected two bounded 30-frame caches');
+      check(a.diagnostics().frames===150,'Expected five bounded 30-frame caches');
       return result;
     }, heroes);
     console.log('PASS: six distinct frames in each direction, attack/hit/death selectors, grounded uncropped sprites');

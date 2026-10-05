@@ -175,21 +175,22 @@
     });
     return (layout = { entries, props: props.slice(0, 32), runes });
   }
+  function limit(scene){const n=scene.quality?.maxAtmosphere??32,r=n>=32?1:n>=16?.65:.35;return Object.fromEntries(Object.entries(LIMIT).map(([k,v])=>[k,Math.max(1,Math.floor(v*r))]));}
   function visible(scene, x, y, padding) { return !scene.visiblePoint || scene.visiblePoint(x, y, padding); }
   function ground(ctx, scene) {
     if (!active(scene)) return;
-    prepare(); const data = getLayout(scene); let tiles = 0, lava = 0;
+    prepare(); const data = getLayout(scene),limits=limit(scene); let tiles = 0, lava = 0;
     ctx.save();
     for (const tile of data.entries) {
       if (!visible(scene, tile.x + 40, tile.y + 40, 100)) continue;
-      if (tiles++ < LIMIT.ground) {
+      if (tiles++ < limits.ground) {
         ctx.globalAlpha = .25; ctx.drawImage(atlas.slabs[Math.floor(tile.seed * 4)], tile.x, tile.y, TILE, TILE);
       }
     }
     // Magma is confined to known solid void cells beside the narrow bridges.
     // It stays below the combat palette and never imitates a hazard telegraph.
     for (const [cx, cy] of bridgeVoid) {
-      if (lava >= LIMIT.lava || !visible(scene, cx * TILE + 40, cy * TILE + 40, 110)) continue;
+      if (lava >= limits.lava || !visible(scene, cx * TILE + 40, cy * TILE + 40, 110)) continue;
       const seed = hash(cx, cy); lava++;
       ctx.globalAlpha = .82 + Math.sin((scene.clock || 0) * 1.7 + seed * 19) * .035;
       ctx.drawImage(atlas.lava[cx & 1], cx * TILE, cy * TILE, TILE, TILE);
@@ -214,10 +215,10 @@
   }
   function foreground(ctx, scene) {
     if (!active(scene) || !scene.sceneItem || !scene.billboard || !scene.inputVector) return;
-    prepare(); const data = getLayout(scene); let edges = 0, props = 0;
+    prepare(); const data = getLayout(scene),limits=limit(scene); let edges = 0, props = 0;
     const down = scene.inputVector(0, 19);
     for (const tile of data.entries) {
-      if (edges >= LIMIT.trim) break;
+      if (edges >= limits.trim) break;
       if ((!tile.bottom && !tile.right) || !visible(scene, tile.x + 40, tile.y + 40, 105)) continue;
       const { x, y } = tile;
       edges++;
@@ -233,7 +234,7 @@
       });
     }
     for (const prop of data.props) {
-      if (props >= LIMIT.props) break;
+      if (props >= limits.props) break;
       if (!visible(scene, prop.x, prop.y, prop.height + 30)) continue;
       const painted = sprite(scene, prop.kind);
       const img = painted || atlas.props[prop.kind];

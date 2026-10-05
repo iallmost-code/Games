@@ -24,3 +24,5 @@
 - Always work on a branch and open a PR; the owner playtests and approves merges to `main`. GitHub Actions runs the browser suites in `tests/` on every PR (`.github/workflows/tests.yml`); keep them passing and update their assertions when a deliberate change makes one obsolete.
 - Pause → REPORT A BUG copies recent errors plus game state for the owner to paste into an issue. Automatic quality (Settings → QUALITY: Auto/High/Low) lowers the frame rate cap and effect counts when a phone cannot hold 60 FPS; it must never change gameplay timing, ranges or saves.
 
+
+- v69 SOUND & MOTION extends authored animation to all five heroes and zone scenery to all Descent/Endless zones. All added work remains presentation only, quality-scaled and bounded. Preserve `function sfx(kind) {` and separately stubbable `function music(kind) {`. Do not rebaseline `tests/visual-invariants.cjs`: its only exception is the exact marked enemy-death fx call. Music/SOUND/shake preferences are localStorage-only; no save-version bump. Music must fade on pause/hidden and wait for a gesture after returning from hidden. Keep all PR suites green and this branch unmerged for owner playtesting.

@@ -2,7 +2,7 @@
 const fs=require('node:fs'),path=require('node:path'),http=require('node:http'),assert=require('node:assert/strict'),{execFileSync}=require('node:child_process');
 const {chromium}=require('playwright'),root=path.resolve(__dirname,'..');
 const baselineCommit=process.env.BASELINE_COMMIT||'d11e59a6c2cd72dfc3fefbb3052fdce61fb29cf1';
-const source=require('./classic-camera-fixture.cjs')(fs.readFileSync(path.join(root,'index.html'),'utf8')),before=execFileSync('git',['show',baselineCommit+':index.html'],{cwd:root,encoding:'utf8'});
+const source=require('./classic-camera-fixture.cjs')(fs.readFileSync(path.join(root,'index.html'),'utf8').replace('function music(kind) {','function music(kind) { return;')),before=execFileSync('git',['show',baselineCommit+':index.html'],{cwd:root,encoding:'utf8'});
 for(const m of source.matchAll(/<script[^>]*>([\s\S]*?)<\/script>/g))new Function(m[1]);
 const hooks=`window.gameTest={begin,applyProfile,update,draw,swingBlade,spawnEnemy,floorEntry,updateZoneHazards,
 get hero(){return hero},get enemies(){return enemies},set enemies(v){enemies=v},get joy(){return joy},get clock(){return clock},get mode(){return mode},get level(){return level},get kills(){return kills},get dungeon(){return dungeon},get zoneHazards(){return zoneHazards},get spawn(){return spawn},get profile(){return profile},get attack(){return attack},set selectedHero(v){selectedHero=v},set selectedMode(v){selectedMode=v},wallAt};`;

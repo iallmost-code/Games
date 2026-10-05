@@ -1,7 +1,7 @@
 // New lineup mechanics and genuine v10 -> v11/profile-v2 migration in Chromium.
 const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path'),http=require('node:http'),{execFileSync}=require('node:child_process');
 const {chromium}=require('playwright'),root=path.resolve(__dirname,'..');
-const source=require('./classic-camera-fixture.cjs')(fs.readFileSync(path.join(root,'index.html'),'utf8')),baselineCommit='990662055e59f37a70c831bae6458d8c8db04ec0';
+const source=require('./classic-camera-fixture.cjs')(fs.readFileSync(path.join(root,'index.html'),'utf8').replace('function music(kind) {','function music(kind) { return;')),baselineCommit='990662055e59f37a70c831bae6458d8c8db04ec0';
 for(const m of source.matchAll(/<script[^>]*>([\s\S]*?)<\/script>/g))new Function(m[1]);
 const legacy=execFileSync('git',['show',baselineCommit+':index.html'],{cwd:root,encoding:'utf8'});
 const common=`begin,clearRun,codeChecksum,applyProfile,saveProfile,selectSlot,saveRun,readRun,restoreRun,offerLoot,makeSaveCode,loadSaveCode,floorEntry,damageEnemy,levelUp,renderMenu,renderHeroScreen,update,draw,wallAt,segmentBlocked,evolutionReady,

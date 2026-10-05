@@ -1,6 +1,6 @@
 # Ember Crypt
 
-**v68 Animated Catacombs — branch `codex/animated-catacombs`, awaiting owner playtest.**
+**v69 SOUND & MOTION — branch `codex/sound-motion`, awaiting owner playtest.**
 The public links below still serve the published main build.
 Play: https://iallmost-code.github.io/Games/ (GitHub Pages, deployed from `main`)
 ChatGPT Sites copy: https://ember-crypt.alpine0-0.chatgpt.site
@@ -108,3 +108,13 @@ Ash Catacombs gains original painted basalt columns, gothic arches, chains, tomb
 Fifteen original short WAV layers add class-specific attack sounds, sword air, metal/stone impacts, spells, skill cues and loot tones. Samples are offline-authored noise/modal synthesis, not recorded Foley. Decoding is cached, voices cap at twelve, mute immediately stops sample tails, and the original oscillator sounds remain a failure/loading fallback. No additional controls or external runtime dependencies.
 
 Run `node tests/visual-invariants.cjs`, `node tests/ash-environment.cjs`, `node tests/audio-presentation.cjs` and `node tests/animated-catacombs.cjs`. Existing camera/hero/migration/Descent suites remain applicable. Browser diagnostics do not establish physical Android FPS.
+
+## SOUND & MOTION (v69)
+
+All five heroes now use original 30-cell authored animations, with the existing sprites as failure fallback. Frost and Venom receive painted eight-prop atlases; scenery follows existing zones through all five Descent floors and Endless. Raised voids remain solid, props fade near the hero and new work scales with Auto quality.
+
+Original procedural music supplies a menu motif, Ash/Frost/Venom ambient beds, enemy-density combat percussion, boss drums and four event stings. MUSIC is independent of SOUND; both unlock through a user gesture. Pausing/hidden tabs fades the music, and hidden-tab return waits for another gesture. Settings also offers SCREEN SHAKE. Preferences are local only; profiles v2, runs v11 and EC1 codes are unchanged.
+
+Twelve additional original samples bring combat audio to 27 layers. Cached zone-tinted hit flashes, dissolving enemies, damage-number pops, level-up pillars, boss introductions/death bursts, opening chests, well ripples, forge sparks, door unlocks and glowing stairs are presentation only. New WebP art totals 2,708,874 bytes; additional samples 279,408 bytes; music needs no downloads. PNG fallbacks retain the unchanged generated originals.
+
+`tests/sound-motion.cjs` covers zone/mode integration, physics safety, quality caps, transient effects, independent settings and real Web Audio lifecycle. Every game simulation separately stubs `music(kind)`; music is exercised directly in its focused browser harness. The invariant baseline remains `c588c3f`, allowing only the exact marked enemy-death `fx` call to be stripped. Physical Android FPS and subjective listening quality still require owner playtesting.

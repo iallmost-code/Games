@@ -755,11 +755,14 @@
     <canvas id="dungeonMap" width="144" height="94" hidden aria-label="Dungeon minimap"></canvas><div id="firstRunTip" hidden role="status"></div>
     <script src="assets/cinematic/hero-animation.js"></script>
     <script src="assets/cinematic/ash-environment.js"></script>
+    <script src="assets/cinematic/zone-environment.js"></script>
+    <script src="assets/cinematic/motion.js"></script>
     <script src="assets/audio/combat-audio.js"></script>
+    <script src="assets/audio/music.js"></script>
     <script>
       (() => {
         "use strict";
-        const GAME_VERSION = "v68 · ANIMATED CATACOMBS";
+        const GAME_VERSION = "v69 · SOUND & MOTION";
         // Recent script errors for Pause → REPORT A BUG. Never saved.
         const recentErrors = [];
         function noteError(kind, detail) {
@@ -905,6 +908,7 @@
           loadAtlas("bosses",4,4,["warden","warden-back","tyrant","tyrant-back","colossus","colossus-back","oracle","oracle-back",
             "heart","heart-back","cinderImp","cinderImp-back","frostGolem","frostGolem-back","sporeSpitter","sporeSpitter-back"]);
           loadAtlas("ash-props",4,2,["prop-ash-column","prop-ash-arch","prop-ash-chain","prop-ash-coffin","prop-ash-seal","prop-ash-statue","prop-ash-brazier","prop-ash-bones"]);
+          for(const zone of ["frost","venom"])loadAtlas(zone+"-props",4,2,["column","arch","chain","coffin","seal","statue","brazier","bones"].map(k=>"prop-"+zone+"-"+k));
           loadAtlas("props",4,2,["prop-tomb-0","prop-tomb-1","prop-tomb-2","prop-statue","prop-brazier","prop-well","prop-chest","prop-pillar"]);
           let floors=new Image();floors.onload=()=>{
             for(let z=0;z<3;z++){let tile=surface(384,384);
@@ -1393,7 +1397,7 @@
         function pauseRun(background=false) {
           if(mode!=="play")return;
           saveRun(true);saveSlotClock();mode="paused";resetJoy();
-          game.classList.remove("playing");renderMenu("pause");
+          game.classList.remove("playing");renderMenu("pause");music("pause");
           if(background) last=performance.now();
         }
         function resumePaused() {
@@ -1440,6 +1444,8 @@
         function renderSettings(){
           let body=menuBase("SETTINGS",settingsReturn,slots[activeSlot]?.name||"");
           body.append(menuButton("SOUND · "+(soundEnabled?"ON":"OFF"),()=>{soundToggle.click();renderMenu("settings");}),
+            menuButton("MUSIC · "+(musicEnabled?"ON":"OFF"),()=>{musicEnabled=!musicEnabled;try{localStorage.setItem("ember-crypt-music-muted",musicEnabled?"0":"1");}catch{}ensureAudio();music("setting");renderMenu("settings");}),
+            menuButton("SCREEN SHAKE · "+(shakeEnabled?"ON":"OFF"),()=>{shakeEnabled=!shakeEnabled;try{localStorage.setItem("ember-crypt-screen-shake",shakeEnabled?"1":"0");}catch{}renderMenu("settings");}),
             menuButton("SPEED · "+gameSpeed+"×",()=>{speedToggle.click();renderMenu("settings");},"1× · 1.25× · 1.5×"),
             menuButton("VIBRATION · "+(vibrationEnabled?"ON":"OFF"),()=>{
               vibrationEnabled=!vibrationEnabled;localStorage.setItem("ember-crypt-vibrate-"+activeSlot,vibrationEnabled?"1":"0");
@@ -1794,6 +1800,8 @@
           updateSpeedButton();
         });
         updateSpeedButton();
+        let musicEnabled=true,shakeEnabled=true,lastMusicAt=0;
+        try{musicEnabled=localStorage.getItem("ember-crypt-music-muted")!=="1";shakeEnabled=localStorage.getItem("ember-crypt-screen-shake")!=="0";}catch{}
         let soundEnabled = true,
           audioCtx = null,
           lastPlayed = {};
@@ -1805,17 +1813,32 @@
           soundToggle.setAttribute("aria-label", soundEnabled ? "Mute game audio" : "Unmute game audio");
         }
         function ensureAudio() {
-          if (!soundEnabled) return;
+          if (!soundEnabled && !musicEnabled) return;
           let C = globalThis.AudioContext || globalThis.webkitAudioContext;
           if (!C) return;
           try {
             if (!audioCtx) audioCtx = new C();
             if (audioCtx.state === "suspended") audioCtx.resume().catch(() => {});
-            window.EmberAudio?.ensure(audioCtx);
+            if(soundEnabled)window.EmberAudio?.ensure(audioCtx);
+            music("unlock");
           } catch {}
         }
+        // Stubbable independently of sfx: simulation suites never synthesize music.
+        function music(kind) {
+          const m=window.EmberMusic;if(!m||!audioCtx)return;
+          if(kind==="unlock")m.unlock(audioCtx);
+          else if(["Level","Clear","Victory","Death"].includes(kind))m.sting(audioCtx,kind);
+          const now=performance.now();if(!kind&&now-lastMusicAt<250)return;lastMusicAt=now;
+          const scene=document.hidden||mode==="paused"||mode==="error"?"pause":mode==="play"?"play":hero&&["upgrade","loot","trial","relic"].includes(mode)?"ambient":"menu";
+          const near=hero?enemies.reduce((n,e)=>n+(Math.hypot(e.x-hero.x,e.y-hero.y)<430?1:0),0):0;
+          m.update(audioCtx,{scene,zone:hero?currentZone():0,near,boss:!!(boss&&boss.hp>0),enabled:musicEnabled,lock:document.hidden});
+        }
         function sfx(kind) {
+          if(kind==="upgrade")music("Level");
+          if(kind==="bossDown")music(mode==="victory"?"Victory":"Clear");
+          if(kind==="death")music("Death");
           if (!soundEnabled || !audioCtx || audioCtx.state !== "running") return;
+          if(["chest","well","forge","unlock","stairs"].includes(kind)||kind.startsWith("enemy-")){window.EmberAudio?.play(kind,audioCtx,hero?.class);return;}
           const sounds = {
             start: [410, 700, 0.17, 0.026, "sine", 0],
             cast: [350, 580, 0.07, 0.012, "triangle", 90],
@@ -1871,6 +1894,7 @@
           sfx("start");
         });
         game.addEventListener("pointerdown", ensureAudio, { passive: true });
+        addEventListener("keydown",e=>{if(e.isTrusted&&!e.repeat)ensureAudio();});
         updateSoundButton();
         const currentRunVersion = 11;
         const legacySaveKeys = [];
@@ -2827,6 +2851,7 @@
           panel.classList.remove("hidden");
         }
         function offerLoot(drop) {
+          fx("chest",drop);
           mode = "loot";
           bestiaryEl.hidden = true;
           resetJoy();
@@ -3575,6 +3600,7 @@
             let d = Math.hypot(hero.x - site.x, hero.y - site.y);
             if (d < 44) {
               site.used = true;
+              fx(site.kind==="cache"?"chest":site.kind,site);
               let col = siteColors[site.kind];
               rings.push({ x: site.x, y: site.y, r: 12, life: 0.7, speed: 240, color: col });
               burst(site.x, site.y, col, 28);
@@ -3794,13 +3820,13 @@
           dungeon.elapsed+=dt;dungeon.title=Math.max(0,dungeon.title-dt);
           floorSpec().rooms.forEach((r,i)=>{if(hero.x>=r[0]*80&&hero.x<(r[0]+r[2])*80&&hero.y>=r[1]*80&&hero.y<(r[1]+r[3])*80&&!dungeon.explored.includes(i))dungeon.explored.push(i);});
           if(!dungeon.open&&(dungeon.elapsed>=180||kills-dungeon.startKills>=floorSpec().goal)){
-            dungeon.open=true;navTime=0;showToast("THE BOSS DOOR IS OPEN");
+            dungeon.open=true;navTime=0;showToast("THE BOSS DOOR IS OPEN");fx("door",{x:24.5*80,y:10*80});
             tipOnce("door","The boss door is open. Follow the gold mark on the minimap.");saveRun(true);
           }
           if(dungeon.open&&!dungeon.bossStarted&&hero.x>25*80){
             dungeon.bossStarted=true;spawnBoss(floorSpec().boss);boss.x=28.5*80;boss.y=10*80;clearWall(boss);
           }
-          if(dungeon.stairs&&Math.hypot(hero.x-dungeon.stairs.x,hero.y-dungeon.stairs.y)<42){floorEntry(dungeon.floor+1);saveRun(true);return;}
+          if(dungeon.stairs&&Math.hypot(hero.x-dungeon.stairs.x,hero.y-dungeon.stairs.y)<42){fx("stairs",hero);floorEntry(dungeon.floor+1);saveRun(true);return;}
           if(dungeon.elapsed>=dungeon.eventAt&&!dungeon.bossStarted){
             dungeon.eventAt+=30;wave++;profile.bestWave=Math.max(profile.bestWave,wave);if(wave>=10)profile.ember=true;checkAchievements();
             if(wave===2||wave%4===2)spawnTreasureImp();
@@ -3861,12 +3887,12 @@
           }
         }
         function queueRaisedMasonry(left,top){
-          const zone=currentZone();
+          const zone=currentZone(),scenery=visualScene();
           if(!masonryPatterns[zone]&&zoneFloorTiles[zone]){const texture=surface(96,96),g=texture.getContext("2d");g.drawImage(zoneFloorTiles[zone],0,0,96,96);g.fillStyle=["#ac98734a","#a0c2cb44","#b0bf7844"][zone];g.fillRect(0,0,96,96);masonryPatterns[zone]=ctx.createPattern(texture,"repeat");}
           const palette=[["#706455","#403931","#282822"],["#77949b","#3c555d","#283d46"],["#717b55","#404b36","#26392b"]][zone];
           for(let cy=Math.floor(top/80)-1;cy<=Math.ceil((top+worldH+180)/80);cy++)for(let cx=Math.floor(left/80)-1;cx<=Math.ceil((left+worldW+180)/80);cx++){
             if(!dungeonSolid(cx,cy)||[[1,0],[-1,0],[0,1],[0,-1]].every(([dx,dy])=>dungeonSolid(cx+dx,cy+dy)))continue;
-            if(rpgPreview&&isDescent()&&dungeon.floor===1&&window.EmberAsh?.lowerVoid(cx,cy))continue;
+            if(rpgPreview&&(dungeon.floor===1&&window.EmberAsh?.lowerVoid(cx,cy)||window.EmberZones?.lowerVoid(cx,cy,scenery)))continue;
             const x=cx*80,y=cy*80,height=42,lift=inputVector(0,-height);
             sceneItem(x+80,y+80,()=>{
               const near=projectVector(x+40-hero.x,y+40-hero.y);
@@ -3901,11 +3927,12 @@
             const px=(x+rw-.6)*80,py=(y+rh-.4)*80;
             if(px<left-80||py<top-80||px>left+worldW + 200||py>top+worldH + 200)continue;
             if(spriteReady("prop-tomb-"+zone))drawProp("prop-tomb-"+zone,px,py,70,90);
-            if(spriteReady("prop-brazier")){drawProp("prop-brazier",rpgPreview?(x+.6)*80:x*80+28,rpgPreview?(y+rh-.6)*80:(y+.8)*80,32,50);if(rpgPreview)drawProp("prop-brazier",(x+rw-.7)*80,(y+.7)*80,32,50);}
+            const zoneBrazier="prop-"+["ash","frost","venom"][zone]+"-brazier",brazierKey=rpgPreview&&spriteReady(zoneBrazier)?zoneBrazier:"prop-brazier";
+            if(spriteReady(brazierKey)){drawProp(brazierKey,rpgPreview?(x+.6)*80:x*80+28,rpgPreview?(y+rh-.6)*80:(y+.8)*80,32,50);if(rpgPreview)drawProp(brazierKey,(x+rw-.7)*80,(y+.7)*80,32,50);}
           }
           ctx.fillStyle=dungeon.open?"#ffd16b":"#835346";ctx.fillRect(24*80,9*80,14,160);
           ctx.font="bold 15px system-ui";ctx.textAlign="center";const label=dungeon.open?"BOSS DOOR OPEN":"BOSS · "+Math.max(0,floorSpec().goal-(kills-dungeon.startKills))+" KILLS / "+Math.max(0,Math.ceil(180-dungeon.elapsed))+"s";billboard(24*80,9*80-14,()=>ctx.fillText(label,0,0));
-          if(dungeon.stairs){const {x,y}=dungeon.stairs;ctx.fillStyle="#bce9df";for(let i=0;i<5;i++)ctx.fillRect(x-28+i*4,y-26+i*10,56-i*8,7);billboard(x,y-42,()=>ctx.fillText("DESCEND",0,0));}
+          if(dungeon.stairs){const {x,y}=dungeon.stairs;ctx.save();ctx.globalAlpha=.24+Math.sin(clock*3)*.06;drawGlow(x,y,40,"#acece1");ctx.restore();ctx.fillStyle="#bce9df";for(let i=0;i<5;i++)ctx.fillRect(x-28+i*4,y-26+i*10,56-i*8,7);billboard(x,y-42,()=>ctx.fillText("DESCEND",0,0));}
         }
         function drawMinimap(){
           const canvas=$("dungeonMap");canvas.hidden=!isDescent()||mode!=="play";if(canvas.hidden)return;
@@ -4851,6 +4878,7 @@
               (weak ? "!" : ""), color, weak ? 1.25 : resisted ? 0.78 : 1);
           }
           if (e.hp > 0) return;
+          /* cosmetic-v69 */ fx("enemyDeath", e);
           enemies.splice(enemies.indexOf(e), 1);
           if(hero.class==="gravecaller"&&Math.random()<.35)raiseMinion(e.x,e.y);
           if(hero.evolutions?.includes("crimson")&&spreadDepth<2&&deathReactionBudget++<18) {
@@ -6465,7 +6493,7 @@
           ctx.restore();
           if(e.hitFlash>0&&spriteMasks.has(img)){
             ctx.save();ctx.globalAlpha=Math.min(.55,e.hitFlash*5);
-            drawGrounded(spriteMasks.get(img),x,actorFoot(y,r),width,height,e.stepPhase||0,e.walking||0,projectVector(e.faceX||0,e.faceY??1).x<-.25,false,e.faceX||0,hit);
+            drawGrounded(window.EmberMotion?.tint(img,["#ffe0c0","#d7f4ff","#ddf7b9"][currentZone()])||spriteMasks.get(img),x,actorFoot(y,r),width,height,e.stepPhase||0,e.walking||0,projectVector(e.faceX||0,e.faceY??1).x<-.25,false,e.faceX||0,hit);
             ctx.restore();
           }
           if (e.frostTime > 0 || e.poisonTime > 0 || e.burnTime > 0 || e.bleedUntil > clock) {
@@ -6490,9 +6518,12 @@
             h = hero.class === "bloodknight" ? 90 : 80,
             fx = hero.class==="ranger"&&hero.cast>.025 ? (hero.aimX??hero.faceX??0) : hero.faceX || 0,
             fy = hero.class==="ranger"&&hero.cast>.025 ? (hero.aimY??hero.faceY??1) : hero.faceY === undefined ? 1 : hero.faceY,
-            casting = hero.cast > 0.025,
+            poseCast = hero.cast,
+            beamPulse = hero.class==="sunwarden"&&mode==="play"&&hero.hp>0&&enemies.some(e=>Math.hypot(e.x-hero.x,e.y-hero.y)<hero.range),
+            casting = poseCast > 0.025,
             img = facingArt(heroArt, fx, fy, casting),
             side = Math.abs(projectVector(fx,fy).x) > Math.abs(projectVector(fx,fy).y) * 0.72;
+          if(beamPulse){const pulse=clock%1.2;if(pulse<.18){poseCast=Math.max(poseCast,.18-pulse);casting=true;if(sunPulse!==Math.floor(clock/1.2)){sunPulse=Math.floor(clock/1.2);sfx("shoot");}}}
           if(img.cinematic)w=Math.min(92,h*img.naturalWidth/img.naturalHeight);
           groundShadow(x,actorFoot(y,18),20,7);
           drawHeroRing(x,actorFoot(y,18),hero.class);
@@ -6507,7 +6538,7 @@
           let authored=false;
           if(window.EmberHeroAnimation?.ready(hero.class)){
             ctx.save();ctx.translate(x,actorFoot(y,19));cancelProjection();
-            authored=window.EmberHeroAnimation.draw(ctx,{kind:hero.class,height:h,direction:projectVector(fx,fy),phase:hero.stepPhase,moving:hero.moving,cast:hero.cast,hit:heroHit,dead:hero.hp<=0});ctx.restore();
+            authored=window.EmberHeroAnimation.draw(ctx,{kind:hero.class,height:h,direction:projectVector(fx,fy),phase:hero.stepPhase,moving:hero.moving,cast:poseCast,hit:heroHit,dead:hero.hp<=0});ctx.restore();
           }
           if(!authored)drawGrounded(img,x,actorFoot(y,19),w,h,hero.stepPhase||0,hero.moving,(side||hero.class==="ranger"&&casting)&&projectVector(fx,fy).x<0,casting,projectVector(fx,fy).x,heroHit,rpgPreview?Math.sin(Math.min(1,hero.cast/(hero.class==="bloodknight"?.2:.18))*Math.PI):0);
           ctx.restore();
@@ -7051,19 +7082,42 @@
               }
 
         }
+        let motionHero=null,motionDungeon=null,motionLevel=0,sunPulse=-1;const motionBosses=new WeakSet();
+        function visualScene(){return {isDescent:isDescent(),isometric:rpgPreview,dungeon,floor:dungeon?.floor,zone:currentZone(),rooms:isDescent()?floorSpec().rooms:[],links:isDescent()?floorSpec().links:[],hero,clock,visiblePoint,sceneItem,billboard,inputVector,art,drawProp,quality:visualQuality};}
+        function fx(kind,o) {
+          if(!hero)return;
+          const data={x:o.x??hero.x,y:o.y??hero.y,zone:currentZone()};
+          if(kind==="enemyDeath"){
+            const key=o.type==="boss"?o.variant:o.type==="champion"?"brute":o.type==="charger"?"runner":o.type;
+            const img=spriteReady(key)?facingArt(key,o.faceX||0,o.faceY??1,false):null;
+            data.img=img;data.height=o.r*(o.type==="boss"?3.36:o.type==="burrower"?2.3:3.835);
+            data.width=img?Math.min(data.height*1.4,data.height*(img.naturalWidth||img.width)/(img.naturalHeight||img.height)):o.r*2.7;
+            sfx("enemy-"+key);
+            if(o.type==="boss")window.EmberMotion?.emit("bossDeath",data,visualQuality);
+          }else if(["chest","well","forge","door","stairs"].includes(kind))sfx(kind==="door"?"unlock":kind);
+          window.EmberMotion?.emit(kind,data,visualQuality);
+        }
         function draw() {
+          music();
+          if(hero!==motionHero||dungeon!==motionDungeon){motionHero=hero;motionDungeon=dungeon;motionLevel=level;window.EmberMotion?.reset();}
+          if(hero&&level>motionLevel){motionLevel=level;fx("level",hero);}
+          if(boss&&boss.hp>0&&!motionBosses.has(boss)){motionBosses.add(boss);window.EmberMotion?.emit("bossIntro",{name:bossNames[boss.variant]||"CRYPT GUARDIAN"},visualQuality);}
+
           ctx.clearRect(0, 0, w, h);
           ctx.fillStyle = "#171b1f";
           ctx.fillRect(0, 0, w, h);
           if (!hero) return;
           ctx.save();
-          if(rpgPreview){ctx.translate(w/2+Math.sin(clock*89)*shake,cameraFocusY()+Math.cos(clock*71)*shake);ctx.scale(1,cameraTilt);ctx.rotate(cameraAngle);ctx.translate(-hero.x,-hero.y);}else ctx.translate(w/2-hero.x+(Math.random()-.5)*shake,h/2-hero.y+(Math.random()-.5)*shake);
+          if(rpgPreview){ctx.translate(w/2+Math.sin(clock*89)*(shakeEnabled?shake:0),cameraFocusY()+Math.cos(clock*71)*(shakeEnabled?shake:0)+(shakeEnabled?(window.EmberMotion?.cameraPush()||0):0));ctx.scale(1,cameraTilt);ctx.rotate(cameraAngle);ctx.translate(-hero.x,-hero.y);}else ctx.translate(w/2-hero.x+(Math.random()-.5)*(shakeEnabled?shake:0),h/2-hero.y+(Math.random()-.5)*(shakeEnabled?shake:0));
           queueScene=rpgPreview;sceneQueue=[];
           const center=inputVector(0,h/2-cameraFocusY()),left=hero.x+center.x-worldW/2-70,top=hero.y+center.y-worldH/2-70;
           dungeonFloor(left, top);
-          const ashScene={isDescent:isDescent(),isometric:rpgPreview,dungeon,floor:dungeon?.floor,rooms:isDescent()?floorSpec().rooms:[],hero,clock,visiblePoint,sceneItem,billboard,inputVector,art,drawProp};
+          const ashScene=visualScene();
           window.EmberAsh?.ground(ctx,ashScene);
           window.EmberAsh?.foreground(ctx,ashScene);
+          window.EmberZones?.ground(ctx,ashScene);
+          window.EmberZones?.foreground(ctx,ashScene);
+          window.EmberMotion?.draw(ctx,ashScene);
           drawZoneDepth(left,top);
           drawRpgLighting();
           drawSpellLighting();
@@ -7220,7 +7274,7 @@
           ctx.font = "bold 15px system-ui";
           for (const f of floaters) {
             ctx.globalAlpha = Math.min(1, f.life * 2);
-            ctx.font = "bold " + Math.round(15 * (f.scale || 1)) + "px system-ui";
+            ctx.font = "bold " + Math.round(15 * (f.scale || 1)*(1+Math.max(0,(f.life-.6)/.2)*.32)) + "px system-ui";
             ctx.fillStyle = f.color;
             if(rpgPreview)billboard(f.x,f.y,()=>ctx.fillText(f.text,0,0));else ctx.fillText(f.text,f.x,f.y);
           }
@@ -7230,6 +7284,7 @@
           drawSiteCompass();
           drawMinimap();
           drawArrivalCues();
+          window.EmberMotion?.hud(ctx,w,h);
           if(isDescent()&&dungeon.title>0){ctx.fillStyle="#080b13cf";ctx.fillRect(0,h*.36,w,76);ctx.fillStyle="#ffdc9d";ctx.font="bold 17px system-ui";ctx.textAlign="center";ctx.fillText("FLOOR "+dungeon.floor+" · "+floorSpec().name,w/2,h*.36+43);}
           if(!vignetteCache||vignetteCache.width!==Math.ceil(w)||vignetteCache.height!==Math.ceil(h)){
             vignetteCache=surface(Math.ceil(w),Math.ceil(h));let g=vignetteCache.getContext("2d");
@@ -7291,6 +7346,7 @@
         }
         requestAnimationFrame(frame);
         document.addEventListener("visibilitychange", () => {
+          if(document.hidden)music("hidden");
           if (document.hidden && mode === "play") pauseRun(true);
           else if (document.hidden) saveRun(true);
           last = performance.now();

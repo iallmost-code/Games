@@ -150,3 +150,11 @@ Historical combat/navigation bots feed world-axis joystick vectors. `classic-cam
 Existing camera checks passed 50 hero/floor/orientation scenes and all ten native hero/orientation cases at DPR 3; new-hero/migration/slots/codes and 25 assisted Descent progression cases passed. These are automated browser diagnostics, not a human balance test or measured Android performance.
 
 All seven existing browser suites passed after merging the latest stability update. The 25 normal-stat Floor 1 circling diagnostics in `animated-catacombs-survival.json` exactly reproduce the earlier five-hero survival outcomes, including HP, kills, levels and floor exits. The existing seeded-bot policy uses no manual skill buttons; this is a reproducibility check, not human difficulty or phone FPS evidence. The new animation, audio and Ash checks are included in GitHub Actions.
+
+## SOUND & MOTION (v69)
+
+Run every GitHub Actions matrix suite locally before opening the PR. `animated-catacombs.cjs` now checks all five heroes/150 decoded frames, their distinct walk frames, hit/attack/death selectors and uncropped foot anchors, including PNG/total-media fallback. `audio-presentation.cjs` checks all 27 WAVs within 610 KB and the shared 12-voice admission/lifecycle budget.
+
+`node tests/sound-motion.cjs` validates 50 hero/floor/orientation scenes, Endless Ash/Frost/Venom changes, solid corridor-adjacent voids, boss doorway safety, reduced Medium/Low prop/effect budgets, cached sprite tint, immediate enemy death, boss cards, scenery interactions, independent music/shake settings and unchanged v2/v11/EC1 data. A mocked music context forbids gameplay RNG and verifies lazy caches, bounded crossfades and constant source allocation across enemy-count changes. A separate actual Web Audio harness checks menu/zone/combat/boss layers, four stings, cleanup, pause/hidden/gesture lifecycle and output fades. Results: sound-motion-results.json and sound-motion screenshots.
+
+The gameplay invariant baseline is unchanged (`c588c3f`). It strips only the exact marked `fx("enemyDeath", e)` line before comparing function bodies. Music has its own stubbable `function music(kind) {`, separately stubbed in every simulation fixture. Frame-time reports are headless diagnostics, not phone FPS, audio latency or a subjective listening assessment.

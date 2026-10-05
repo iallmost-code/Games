@@ -100,3 +100,36 @@ render('stone-door', 0.51, lambda t, lo, mid, hi:
        mid * .65 * math.exp(-abs(t - .07) * 90) +
        modal(t, [(69, .22, 1), (153, .09, 1.5)], 10), 1543)
 print('Authored 15 original mono WAV layers:', sum(p.stat().st_size for p in OUT.glob('*.wav')), 'bytes')
+
+# v69: additional original sample layers, same format and headroom as v68.
+render('thunder-string', .39, lambda t, lo, mid, hi:
+       modal(t, [(227,.32,1),(453,.17,1.4),(911,.08,2)],20) +
+       (lo*1.2+hi*.22)*math.exp(-max(0,t-.028)*18),1601)
+render('holy-chime', .62, lambda t, lo, mid, hi:
+       modal(t, [(523,.24,1),(1047,.15,1.2),(1569,.08,1.6),(2093,.05,2)],7),1709)
+render('fire-whoosh', .41, lambda t, lo, mid, hi:
+       (lo*1.9+mid*.9+hi*.22)*math.sin(math.pi*min(1,t/.41))**1.3*math.exp(-t*4),1811)
+render('death-bones', .38, lambda t, lo, mid, hi:
+       mid*sum(math.exp(-abs(t-p)*160) for p in [.01,.05,.11,.20])+
+       modal(t,[(487,.18,1),(911,.1,1.7)],24),1901)
+render('death-flesh', .32, lambda t, lo, mid, hi:
+       lo*1.6*math.exp(-t*13)+mid*.5*math.exp(-t*23)+
+       math.sin(TAU*(97*t-30*t*t))*.25*math.exp(-t*14),2011)
+render('death-stone', .48, lambda t, lo, mid, hi:
+       (lo*2+mid*.7)*math.exp(-t*11)+modal(t,[(67,.26,1),(157,.15,1.7)],13),2111)
+render('death-spirit', .56, lambda t, lo, mid, hi:
+       (lo*.7+mid*.2)*math.exp(-t*8)+math.sin(TAU*(339*t-110*t*t))*.2*math.exp(-t*7),2203)
+render('chest-open', .42, lambda t, lo, mid, hi:
+       mid*.5*math.exp(-t*16)+modal(t,[(283,.18,1),(711,.08,2)],19)+
+       hi*.35*math.exp(-abs(t-.13)*120),2309)
+render('well-drink', .48, lambda t, lo, mid, hi:
+       math.sin(TAU*(540*t+17*math.sin(22*t)))*.24*math.exp(-t*9)+lo*.8*math.exp(-t*11),2411)
+render('forge-anvil', .61, lambda t, lo, mid, hi:
+       hi*.5*math.exp(-t*70)+modal(t,[(337,.29,1),(829,.16,1.3),(1397,.08,2)],9),2503)
+render('stairs-step', .32, lambda t, lo, mid, hi:
+       (lo+mid*.6)*sum(math.exp(-abs(t-p)*140) for p in [.015,.13,.25]),2609)
+render('boss-roar', .82, lambda t, lo, mid, hi:
+       (lo*1.6+mid*.6)*math.sin(math.pi*min(1,t/.82))+
+       math.sin(TAU*(71*t-22*t*t))*.3*math.exp(-t*3),2707)
+print('v69 original mono WAV layers:', len(list(OUT.glob('*.wav'))),
+      sum(p.stat().st_size for p in OUT.glob('*.wav')), 'bytes')

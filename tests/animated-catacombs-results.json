@@ -593,6 +593,897 @@
         28,
         29
       ]
+    },
+    {
+      "kind": "ranger",
+      "walk": [
+        {
+          "row": 0,
+          "frames": 6
+        },
+        {
+          "row": 1,
+          "frames": 6
+        },
+        {
+          "row": 2,
+          "frames": 6
+        }
+      ],
+      "distinctFrameHashes": [
+        [
+          541511518,
+          1063481784,
+          1751211034,
+          2700947876,
+          1621327171,
+          3870239468
+        ],
+        [
+          3073513917,
+          1370070606,
+          1885903048,
+          1288514694,
+          246878611,
+          3634519327
+        ],
+        [
+          194798587,
+          268892267,
+          2320705385,
+          4255265928,
+          446414015,
+          3686530121
+        ]
+      ],
+      "footBaseline": [
+        188,
+        188
+      ],
+      "spriteExtents": [
+        {
+          "row": 0,
+          "col": 0,
+          "left": 50,
+          "right": 184,
+          "top": 33,
+          "bottom": 188
+        },
+        {
+          "row": 0,
+          "col": 1,
+          "left": 49,
+          "right": 178,
+          "top": 32,
+          "bottom": 188
+        },
+        {
+          "row": 0,
+          "col": 2,
+          "left": 42,
+          "right": 178,
+          "top": 33,
+          "bottom": 188
+        },
+        {
+          "row": 0,
+          "col": 3,
+          "left": 39,
+          "right": 180,
+          "top": 33,
+          "bottom": 188
+        },
+        {
+          "row": 0,
+          "col": 4,
+          "left": 43,
+          "right": 170,
+          "top": 34,
+          "bottom": 188
+        },
+        {
+          "row": 0,
+          "col": 5,
+          "left": 37,
+          "right": 173,
+          "top": 37,
+          "bottom": 188
+        },
+        {
+          "row": 1,
+          "col": 0,
+          "left": 48,
+          "right": 196,
+          "top": 18,
+          "bottom": 188
+        },
+        {
+          "row": 1,
+          "col": 1,
+          "left": 27,
+          "right": 185,
+          "top": 18,
+          "bottom": 188
+        },
+        {
+          "row": 1,
+          "col": 2,
+          "left": 37,
+          "right": 187,
+          "top": 18,
+          "bottom": 188
+        },
+        {
+          "row": 1,
+          "col": 3,
+          "left": 36,
+          "right": 189,
+          "top": 18,
+          "bottom": 188
+        },
+        {
+          "row": 1,
+          "col": 4,
+          "left": 37,
+          "right": 187,
+          "top": 18,
+          "bottom": 188
+        },
+        {
+          "row": 1,
+          "col": 5,
+          "left": 36,
+          "right": 180,
+          "top": 18,
+          "bottom": 188
+        },
+        {
+          "row": 2,
+          "col": 0,
+          "left": 64,
+          "right": 196,
+          "top": 18,
+          "bottom": 188
+        },
+        {
+          "row": 2,
+          "col": 1,
+          "left": 60,
+          "right": 184,
+          "top": 18,
+          "bottom": 188
+        },
+        {
+          "row": 2,
+          "col": 2,
+          "left": 57,
+          "right": 186,
+          "top": 18,
+          "bottom": 188
+        },
+        {
+          "row": 2,
+          "col": 3,
+          "left": 60,
+          "right": 191,
+          "top": 18,
+          "bottom": 188
+        },
+        {
+          "row": 2,
+          "col": 4,
+          "left": 51,
+          "right": 188,
+          "top": 18,
+          "bottom": 188
+        },
+        {
+          "row": 2,
+          "col": 5,
+          "left": 55,
+          "right": 176,
+          "top": 18,
+          "bottom": 188
+        }
+      ],
+      "poseExtents": [
+        {
+          "index": 18,
+          "left": 44,
+          "right": 190,
+          "top": 18,
+          "bottom": 188
+        },
+        {
+          "index": 19,
+          "left": 38,
+          "right": 196,
+          "top": 18,
+          "bottom": 188
+        },
+        {
+          "index": 20,
+          "left": 28,
+          "right": 196,
+          "top": 18,
+          "bottom": 188
+        },
+        {
+          "index": 21,
+          "left": 27,
+          "right": 196,
+          "top": 18,
+          "bottom": 188
+        },
+        {
+          "index": 22,
+          "left": 27,
+          "right": 190,
+          "top": 18,
+          "bottom": 188
+        },
+        {
+          "index": 23,
+          "left": 44,
+          "right": 180,
+          "top": 18,
+          "bottom": 188
+        },
+        {
+          "index": 24,
+          "left": 52,
+          "right": 196,
+          "top": 29,
+          "bottom": 188
+        },
+        {
+          "index": 25,
+          "left": 27,
+          "right": 191,
+          "top": 29,
+          "bottom": 188
+        },
+        {
+          "index": 26,
+          "left": 33,
+          "right": 196,
+          "top": 32,
+          "bottom": 188
+        },
+        {
+          "index": 27,
+          "left": 27,
+          "right": 196,
+          "top": 35,
+          "bottom": 187
+        },
+        {
+          "index": 28,
+          "left": 27,
+          "right": 196,
+          "top": 32,
+          "bottom": 188
+        },
+        {
+          "index": 29,
+          "left": 27,
+          "right": 191,
+          "top": 31,
+          "bottom": 187
+        }
+      ],
+      "attackFrames": [
+        18,
+        19,
+        20,
+        21,
+        22,
+        23
+      ],
+      "hitFrames": [
+        24,
+        25,
+        26
+      ],
+      "deathFrames": [
+        27,
+        28,
+        29
+      ]
+    },
+    {
+      "kind": "sunwarden",
+      "walk": [
+        {
+          "row": 0,
+          "frames": 6
+        },
+        {
+          "row": 1,
+          "frames": 6
+        },
+        {
+          "row": 2,
+          "frames": 6
+        }
+      ],
+      "distinctFrameHashes": [
+        [
+          3289896626,
+          1687299785,
+          4088752684,
+          3276049850,
+          1082493878,
+          64902552
+        ],
+        [
+          2515635588,
+          329915378,
+          1795817839,
+          896769710,
+          1202150018,
+          4061813082
+        ],
+        [
+          139922868,
+          264925969,
+          2315532864,
+          3137910374,
+          3811052182,
+          3624624499
+        ]
+      ],
+      "footBaseline": [
+        188,
+        188
+      ],
+      "spriteExtents": [
+        {
+          "row": 0,
+          "col": 0,
+          "left": 57,
+          "right": 196,
+          "top": 19,
+          "bottom": 188
+        },
+        {
+          "row": 0,
+          "col": 1,
+          "left": 27,
+          "right": 194,
+          "top": 21,
+          "bottom": 188
+        },
+        {
+          "row": 0,
+          "col": 2,
+          "left": 47,
+          "right": 192,
+          "top": 22,
+          "bottom": 188
+        },
+        {
+          "row": 0,
+          "col": 3,
+          "left": 42,
+          "right": 187,
+          "top": 22,
+          "bottom": 188
+        },
+        {
+          "row": 0,
+          "col": 4,
+          "left": 39,
+          "right": 183,
+          "top": 27,
+          "bottom": 188
+        },
+        {
+          "row": 0,
+          "col": 5,
+          "left": 36,
+          "right": 182,
+          "top": 22,
+          "bottom": 188
+        },
+        {
+          "row": 1,
+          "col": 0,
+          "left": 42,
+          "right": 190,
+          "top": 18,
+          "bottom": 188
+        },
+        {
+          "row": 1,
+          "col": 1,
+          "left": 35,
+          "right": 196,
+          "top": 18,
+          "bottom": 188
+        },
+        {
+          "row": 1,
+          "col": 2,
+          "left": 27,
+          "right": 188,
+          "top": 18,
+          "bottom": 188
+        },
+        {
+          "row": 1,
+          "col": 3,
+          "left": 28,
+          "right": 180,
+          "top": 18,
+          "bottom": 188
+        },
+        {
+          "row": 1,
+          "col": 4,
+          "left": 28,
+          "right": 182,
+          "top": 18,
+          "bottom": 188
+        },
+        {
+          "row": 1,
+          "col": 5,
+          "left": 28,
+          "right": 182,
+          "top": 18,
+          "bottom": 188
+        },
+        {
+          "row": 2,
+          "col": 0,
+          "left": 40,
+          "right": 189,
+          "top": 18,
+          "bottom": 188
+        },
+        {
+          "row": 2,
+          "col": 1,
+          "left": 36,
+          "right": 184,
+          "top": 18,
+          "bottom": 188
+        },
+        {
+          "row": 2,
+          "col": 2,
+          "left": 28,
+          "right": 179,
+          "top": 18,
+          "bottom": 188
+        },
+        {
+          "row": 2,
+          "col": 3,
+          "left": 29,
+          "right": 196,
+          "top": 18,
+          "bottom": 188
+        },
+        {
+          "row": 2,
+          "col": 4,
+          "left": 27,
+          "right": 196,
+          "top": 18,
+          "bottom": 188
+        },
+        {
+          "row": 2,
+          "col": 5,
+          "left": 27,
+          "right": 181,
+          "top": 18,
+          "bottom": 188
+        }
+      ],
+      "poseExtents": [
+        {
+          "index": 18,
+          "left": 46,
+          "right": 196,
+          "top": 18,
+          "bottom": 188
+        },
+        {
+          "index": 19,
+          "left": 27,
+          "right": 196,
+          "top": 18,
+          "bottom": 188
+        },
+        {
+          "index": 20,
+          "left": 38,
+          "right": 196,
+          "top": 18,
+          "bottom": 188
+        },
+        {
+          "index": 21,
+          "left": 27,
+          "right": 196,
+          "top": 18,
+          "bottom": 188
+        },
+        {
+          "index": 22,
+          "left": 27,
+          "right": 196,
+          "top": 18,
+          "bottom": 188
+        },
+        {
+          "index": 23,
+          "left": 27,
+          "right": 196,
+          "top": 18,
+          "bottom": 188
+        },
+        {
+          "index": 24,
+          "left": 43,
+          "right": 196,
+          "top": 30,
+          "bottom": 188
+        },
+        {
+          "index": 25,
+          "left": 27,
+          "right": 196,
+          "top": 25,
+          "bottom": 188
+        },
+        {
+          "index": 26,
+          "left": 34,
+          "right": 195,
+          "top": 30,
+          "bottom": 188
+        },
+        {
+          "index": 27,
+          "left": 37,
+          "right": 196,
+          "top": 28,
+          "bottom": 188
+        },
+        {
+          "index": 28,
+          "left": 27,
+          "right": 196,
+          "top": 27,
+          "bottom": 188
+        },
+        {
+          "index": 29,
+          "left": 27,
+          "right": 187,
+          "top": 30,
+          "bottom": 188
+        }
+      ],
+      "attackFrames": [
+        18,
+        19,
+        20,
+        21,
+        22,
+        23
+      ],
+      "hitFrames": [
+        24,
+        25,
+        26
+      ],
+      "deathFrames": [
+        27,
+        28,
+        29
+      ]
+    },
+    {
+      "kind": "ember",
+      "walk": [
+        {
+          "row": 0,
+          "frames": 6
+        },
+        {
+          "row": 1,
+          "frames": 6
+        },
+        {
+          "row": 2,
+          "frames": 6
+        }
+      ],
+      "distinctFrameHashes": [
+        [
+          2940427879,
+          2054846499,
+          2279097134,
+          1038164354,
+          2562223265,
+          2553729327
+        ],
+        [
+          1635525546,
+          3284154040,
+          2735720946,
+          2611616572,
+          1390487270,
+          1862447527
+        ],
+        [
+          1042663642,
+          2920258337,
+          2488448165,
+          3699458028,
+          1051250438,
+          2022702045
+        ]
+      ],
+      "footBaseline": [
+        188,
+        188
+      ],
+      "spriteExtents": [
+        {
+          "row": 0,
+          "col": 0,
+          "left": 53,
+          "right": 196,
+          "top": 23,
+          "bottom": 188
+        },
+        {
+          "row": 0,
+          "col": 1,
+          "left": 27,
+          "right": 194,
+          "top": 22,
+          "bottom": 188
+        },
+        {
+          "row": 0,
+          "col": 2,
+          "left": 49,
+          "right": 191,
+          "top": 21,
+          "bottom": 188
+        },
+        {
+          "row": 0,
+          "col": 3,
+          "left": 43,
+          "right": 196,
+          "top": 23,
+          "bottom": 188
+        },
+        {
+          "row": 0,
+          "col": 4,
+          "left": 27,
+          "right": 179,
+          "top": 24,
+          "bottom": 188
+        },
+        {
+          "row": 0,
+          "col": 5,
+          "left": 31,
+          "right": 180,
+          "top": 21,
+          "bottom": 188
+        },
+        {
+          "row": 1,
+          "col": 0,
+          "left": 51,
+          "right": 191,
+          "top": 18,
+          "bottom": 188
+        },
+        {
+          "row": 1,
+          "col": 1,
+          "left": 36,
+          "right": 193,
+          "top": 18,
+          "bottom": 188
+        },
+        {
+          "row": 1,
+          "col": 2,
+          "left": 30,
+          "right": 196,
+          "top": 18,
+          "bottom": 188
+        },
+        {
+          "row": 1,
+          "col": 3,
+          "left": 27,
+          "right": 196,
+          "top": 18,
+          "bottom": 188
+        },
+        {
+          "row": 1,
+          "col": 4,
+          "left": 27,
+          "right": 196,
+          "top": 18,
+          "bottom": 188
+        },
+        {
+          "row": 1,
+          "col": 5,
+          "left": 27,
+          "right": 172,
+          "top": 18,
+          "bottom": 188
+        },
+        {
+          "row": 2,
+          "col": 0,
+          "left": 47,
+          "right": 191,
+          "top": 18,
+          "bottom": 188
+        },
+        {
+          "row": 2,
+          "col": 1,
+          "left": 39,
+          "right": 196,
+          "top": 18,
+          "bottom": 188
+        },
+        {
+          "row": 2,
+          "col": 2,
+          "left": 27,
+          "right": 196,
+          "top": 18,
+          "bottom": 188
+        },
+        {
+          "row": 2,
+          "col": 3,
+          "left": 27,
+          "right": 196,
+          "top": 18,
+          "bottom": 188
+        },
+        {
+          "row": 2,
+          "col": 4,
+          "left": 27,
+          "right": 196,
+          "top": 18,
+          "bottom": 188
+        },
+        {
+          "row": 2,
+          "col": 5,
+          "left": 27,
+          "right": 180,
+          "top": 18,
+          "bottom": 188
+        }
+      ],
+      "poseExtents": [
+        {
+          "index": 18,
+          "left": 42,
+          "right": 196,
+          "top": 18,
+          "bottom": 188
+        },
+        {
+          "index": 19,
+          "left": 27,
+          "right": 194,
+          "top": 18,
+          "bottom": 188
+        },
+        {
+          "index": 20,
+          "left": 27,
+          "right": 196,
+          "top": 18,
+          "bottom": 188
+        },
+        {
+          "index": 21,
+          "left": 27,
+          "right": 196,
+          "top": 18,
+          "bottom": 188
+        },
+        {
+          "index": 22,
+          "left": 27,
+          "right": 196,
+          "top": 18,
+          "bottom": 188
+        },
+        {
+          "index": 23,
+          "left": 27,
+          "right": 185,
+          "top": 18,
+          "bottom": 188
+        },
+        {
+          "index": 24,
+          "left": 56,
+          "right": 196,
+          "top": 29,
+          "bottom": 189
+        },
+        {
+          "index": 25,
+          "left": 27,
+          "right": 196,
+          "top": 30,
+          "bottom": 187
+        },
+        {
+          "index": 26,
+          "left": 27,
+          "right": 182,
+          "top": 30,
+          "bottom": 188
+        },
+        {
+          "index": 27,
+          "left": 31,
+          "right": 196,
+          "top": 31,
+          "bottom": 188
+        },
+        {
+          "index": 28,
+          "left": 27,
+          "right": 196,
+          "top": 25,
+          "bottom": 188
+        },
+        {
+          "index": 29,
+          "left": 27,
+          "right": 191,
+          "top": 37,
+          "bottom": 187
+        }
+      ],
+      "attackFrames": [
+        18,
+        19,
+        20,
+        21,
+        22,
+        23
+      ],
+      "hitFrames": [
+        24,
+        25,
+        26
+      ],
+      "deathFrames": [
+        27,
+        28,
+        29
+      ]
     }
   ],
   "scenes": [
@@ -623,6 +1514,45 @@
       "paused": "game and cosmetic clocks stop"
     },
     {
+      "kind": "ranger",
+      "width": 390,
+      "height": 844,
+      "movement": 91.50000000000026,
+      "renderPurity": "hero/enemies/dungeon and combat RNG unchanged",
+      "controls": [
+        "dashButton",
+        "pauseControl",
+        "ultimateButton"
+      ],
+      "paused": "game and cosmetic clocks stop"
+    },
+    {
+      "kind": "sunwarden",
+      "width": 390,
+      "height": 844,
+      "movement": 69.00000000000009,
+      "renderPurity": "hero/enemies/dungeon and combat RNG unchanged",
+      "controls": [
+        "dashButton",
+        "pauseControl",
+        "ultimateButton"
+      ],
+      "paused": "game and cosmetic clocks stop"
+    },
+    {
+      "kind": "ember",
+      "width": 390,
+      "height": 844,
+      "movement": 71.39999999999947,
+      "renderPurity": "hero/enemies/dungeon and combat RNG unchanged",
+      "controls": [
+        "dashButton",
+        "pauseControl",
+        "ultimateButton"
+      ],
+      "paused": "game and cosmetic clocks stop"
+    },
+    {
       "kind": "gravecaller",
       "width": 844,
       "height": 390,
@@ -647,6 +1577,45 @@
         "ultimateButton"
       ],
       "paused": "game and cosmetic clocks stop"
+    },
+    {
+      "kind": "ranger",
+      "width": 844,
+      "height": 390,
+      "movement": 91.50000000000026,
+      "renderPurity": "hero/enemies/dungeon and combat RNG unchanged",
+      "controls": [
+        "dashButton",
+        "pauseControl",
+        "ultimateButton"
+      ],
+      "paused": "game and cosmetic clocks stop"
+    },
+    {
+      "kind": "sunwarden",
+      "width": 844,
+      "height": 390,
+      "movement": 69.00000000000009,
+      "renderPurity": "hero/enemies/dungeon and combat RNG unchanged",
+      "controls": [
+        "dashButton",
+        "pauseControl",
+        "ultimateButton"
+      ],
+      "paused": "game and cosmetic clocks stop"
+    },
+    {
+      "kind": "ember",
+      "width": 844,
+      "height": 390,
+      "movement": 71.39999999999947,
+      "renderPurity": "hero/enemies/dungeon and combat RNG unchanged",
+      "controls": [
+        "dashButton",
+        "pauseControl",
+        "ultimateButton"
+      ],
+      "paused": "game and cosmetic clocks stop"
     }
   ],
   "compatibility": {
@@ -662,8 +1631,11 @@
       "legacyAudioNodes": 0,
       "mode": "play",
       "pngRequests": [
+        "/assets/cinematic/ranger-animation.png",
         "/assets/cinematic/gravecaller-animation.png",
         "/assets/cinematic/bloodknight-animation.png",
+        "/assets/cinematic/sunwarden-animation.png",
+        "/assets/cinematic/ember-animation.png",
         "/assets/cinematic/ash-props.png"
       ]
     },
@@ -673,9 +1645,12 @@
       "legacyAudioNodes": 1,
       "mode": "play",
       "pngRequests": [
+        "/assets/cinematic/gravecaller-animation.png",
         "/assets/cinematic/bloodknight-animation.png",
-        "/assets/cinematic/ash-props.png",
-        "/assets/cinematic/gravecaller-animation.png"
+        "/assets/cinematic/ranger-animation.png",
+        "/assets/cinematic/sunwarden-animation.png",
+        "/assets/cinematic/ember-animation.png",
+        "/assets/cinematic/ash-props.png"
       ]
     },
     {
@@ -695,9 +1670,9 @@
       "height": 844,
       "deviceScaleFactor": 3,
       "frames": 60,
-      "medianMs": 2.6,
-      "p95Ms": 7.6,
-      "maxMs": 15.4,
+      "medianMs": 3.1,
+      "p95Ms": 11.5,
+      "maxMs": 38.4,
       "pixels": 513785
     },
     {
@@ -706,9 +1681,42 @@
       "height": 844,
       "deviceScaleFactor": 3,
       "frames": 60,
-      "medianMs": 3.2,
-      "p95Ms": 41.6,
-      "maxMs": 45.8,
+      "medianMs": 2.5,
+      "p95Ms": 12.4,
+      "maxMs": 18.9,
+      "pixels": 513785
+    },
+    {
+      "kind": "ranger",
+      "width": 390,
+      "height": 844,
+      "deviceScaleFactor": 3,
+      "frames": 60,
+      "medianMs": 2.3,
+      "p95Ms": 17.1,
+      "maxMs": 28.7,
+      "pixels": 513785
+    },
+    {
+      "kind": "sunwarden",
+      "width": 390,
+      "height": 844,
+      "deviceScaleFactor": 3,
+      "frames": 60,
+      "medianMs": 2.5,
+      "p95Ms": 3.8,
+      "maxMs": 17,
+      "pixels": 513785
+    },
+    {
+      "kind": "ember",
+      "width": 390,
+      "height": 844,
+      "deviceScaleFactor": 3,
+      "frames": 60,
+      "medianMs": 2.4,
+      "p95Ms": 6.7,
+      "maxMs": 25.5,
       "pixels": 513785
     },
     {
@@ -717,9 +1725,9 @@
       "height": 390,
       "deviceScaleFactor": 3,
       "frames": 60,
-      "medianMs": 3.6,
-      "p95Ms": 18.6,
-      "maxMs": 40.4,
+      "medianMs": 2.3,
+      "p95Ms": 6.1,
+      "maxMs": 6.6,
       "pixels": 513785
     },
     {
@@ -728,9 +1736,42 @@
       "height": 390,
       "deviceScaleFactor": 3,
       "frames": 60,
-      "medianMs": 5.5,
-      "p95Ms": 36.6,
-      "maxMs": 59.8,
+      "medianMs": 2.4,
+      "p95Ms": 4.4,
+      "maxMs": 5.9,
+      "pixels": 513785
+    },
+    {
+      "kind": "ranger",
+      "width": 844,
+      "height": 390,
+      "deviceScaleFactor": 3,
+      "frames": 60,
+      "medianMs": 2.5,
+      "p95Ms": 12.7,
+      "maxMs": 13.4,
+      "pixels": 513785
+    },
+    {
+      "kind": "sunwarden",
+      "width": 844,
+      "height": 390,
+      "deviceScaleFactor": 3,
+      "frames": 60,
+      "medianMs": 2.1,
+      "p95Ms": 4.2,
+      "maxMs": 12.6,
+      "pixels": 513785
+    },
+    {
+      "kind": "ember",
+      "width": 844,
+      "height": 390,
+      "deviceScaleFactor": 3,
+      "frames": 60,
+      "medianMs": 2.4,
+      "p95Ms": 3,
+      "maxMs": 3.3,
       "pixels": 513785
     }
   ],
