@@ -753,10 +753,13 @@
       </div>
     </main>
     <canvas id="dungeonMap" width="144" height="94" hidden aria-label="Dungeon minimap"></canvas><div id="firstRunTip" hidden role="status"></div>
+    <script src="assets/cinematic/hero-animation.js"></script>
+    <script src="assets/cinematic/ash-environment.js"></script>
+    <script src="assets/audio/combat-audio.js"></script>
     <script>
       (() => {
         "use strict";
-        const GAME_VERSION = "v67 · STABILITY";
+        const GAME_VERSION = "v68 · ANIMATED CATACOMBS";
         // Recent script errors for Pause → REPORT A BUG. Never saved.
         const recentErrors = [];
         function noteError(kind, detail) {
@@ -891,6 +894,7 @@
           img.src="assets/cinematic/"+file+".webp";
         }
         function loadCinematicArt() {
+          window.EmberHeroAnimation?.ensure();
           if(typeof Image==="undefined")return;
           loadAtlas("heroes",4,3,["gravecaller","gravecaller-side","gravecaller-back","gravecaller-cast",
             "storm","storm-side","storm-back","storm-cast","ember","ember-side","ember-back","ember-cast"]);
@@ -900,6 +904,7 @@
             "skeleton","skeleton-back","sentinel","sentinel-back","burrower","burrower-back","wraith","wraith-back"]);
           loadAtlas("bosses",4,4,["warden","warden-back","tyrant","tyrant-back","colossus","colossus-back","oracle","oracle-back",
             "heart","heart-back","cinderImp","cinderImp-back","frostGolem","frostGolem-back","sporeSpitter","sporeSpitter-back"]);
+          loadAtlas("ash-props",4,2,["prop-ash-column","prop-ash-arch","prop-ash-chain","prop-ash-coffin","prop-ash-seal","prop-ash-statue","prop-ash-brazier","prop-ash-bones"]);
           loadAtlas("props",4,2,["prop-tomb-0","prop-tomb-1","prop-tomb-2","prop-statue","prop-brazier","prop-well","prop-chest","prop-pillar"]);
           let floors=new Image();floors.onload=()=>{
             for(let z=0;z<3;z++){let tile=surface(384,384);
@@ -1244,6 +1249,7 @@
             menuPage.onclick=(e)=>{if(e.target===menuPage||e.target===title)renderMenu("slots");};
           }
           menuPage.append(menuText("span",GAME_VERSION,"menu-version"));
+
           if(!menuEmbers.children.length)for(let i=0;i<22;i++){
             let ember=document.createElement("i");
             ember.style.setProperty("--x",(i*47%100)+"%");
@@ -1805,6 +1811,7 @@
           try {
             if (!audioCtx) audioCtx = new C();
             if (audioCtx.state === "suspended") audioCtx.resume().catch(() => {});
+            window.EmberAudio?.ensure(audioCtx);
           } catch {}
         }
         function sfx(kind) {
@@ -1828,11 +1835,14 @@
             ultimate: [320, 1200, 0.45, 0.045, "sine", 0],
             death: [360, 95, 0.55, 0.045, "triangle", 1000],
           };
+          if(kind==="shoot")sounds.shoot=[350,580,.07,.012,"triangle",90];
           let config = sounds[kind];
           if (!config) return;
           let now = performance.now();
           if (lastPlayed[kind] !== undefined && now - lastPlayed[kind] < config[5]) return;
           lastPlayed[kind] = now;
+          const audioKind=kind==="hit"&&hero?.class==="bloodknight"&&hero.cast>=.23?"swing":kind;
+          if(window.EmberAudio?.play(audioKind,audioCtx,hero?.class)||window.EmberAudio?.ready(audioKind,audioCtx,hero?.class))return;
           try {
             let [from, to, duration, volume, type] = config,
               t = audioCtx.currentTime,
@@ -1852,6 +1862,7 @@
         }
         soundToggle.addEventListener("click", () => {
           soundEnabled = !soundEnabled;
+          if(!soundEnabled)window.EmberAudio?.stop(audioCtx);
           try {
             localStorage.setItem("ember-crypt-muted", soundEnabled ? "0" : "1");
           } catch {}
@@ -3855,10 +3866,11 @@
           const palette=[["#706455","#403931","#282822"],["#77949b","#3c555d","#283d46"],["#717b55","#404b36","#26392b"]][zone];
           for(let cy=Math.floor(top/80)-1;cy<=Math.ceil((top+worldH+180)/80);cy++)for(let cx=Math.floor(left/80)-1;cx<=Math.ceil((left+worldW+180)/80);cx++){
             if(!dungeonSolid(cx,cy)||[[1,0],[-1,0],[0,1],[0,-1]].every(([dx,dy])=>dungeonSolid(cx+dx,cy+dy)))continue;
+            if(rpgPreview&&isDescent()&&dungeon.floor===1&&window.EmberAsh?.lowerVoid(cx,cy))continue;
             const x=cx*80,y=cy*80,height=42,lift=inputVector(0,-height);
             sceneItem(x+80,y+80,()=>{
               const near=projectVector(x+40-hero.x,y+40-hero.y);
-              ctx.save();if(Math.abs(near.x)<105&&near.y>0&&near.y<115)ctx.globalAlpha=.3;
+              ctx.save();if(Math.abs(near.x)<105&&near.y>-35&&near.y<140)ctx.globalAlpha=.18;
               const face=(points,color)=>{ctx.fillStyle=color;ctx.beginPath();points.forEach(([px,py],i)=>i?ctx.lineTo(px,py):ctx.moveTo(px,py));ctx.closePath();ctx.fill();};
               face([[x,y+80],[x+80,y+80],[x+80+lift.x,y+80+lift.y],[x+lift.x,y+80+lift.y]],palette[1]);
               face([[x+80,y],[x+80,y+80],[x+80+lift.x,y+80+lift.y],[x+80+lift.x,y+lift.y]],palette[2]);
@@ -6492,7 +6504,12 @@
           ctx.save();
           if (hero.inv > 0 && Math.floor(hero.inv * 16) % 2) ctx.globalAlpha = 0.45;
           let heroHit=Math.max(0,1-(clock-(hero.lastHit??-99))/.18);
-          drawGrounded(img,x,actorFoot(y,19),w,h,hero.stepPhase||0,hero.moving,(side||hero.class==="ranger"&&casting)&&projectVector(fx,fy).x<0,casting,projectVector(fx,fy).x,heroHit,rpgPreview?Math.sin(Math.min(1,hero.cast/(hero.class==="bloodknight"?.2:.18))*Math.PI):0);
+          let authored=false;
+          if(window.EmberHeroAnimation?.ready(hero.class)){
+            ctx.save();ctx.translate(x,actorFoot(y,19));cancelProjection();
+            authored=window.EmberHeroAnimation.draw(ctx,{kind:hero.class,height:h,direction:projectVector(fx,fy),phase:hero.stepPhase,moving:hero.moving,cast:hero.cast,hit:heroHit,dead:hero.hp<=0});ctx.restore();
+          }
+          if(!authored)drawGrounded(img,x,actorFoot(y,19),w,h,hero.stepPhase||0,hero.moving,(side||hero.class==="ranger"&&casting)&&projectVector(fx,fy).x<0,casting,projectVector(fx,fy).x,heroHit,rpgPreview?Math.sin(Math.min(1,hero.cast/(hero.class==="bloodknight"?.2:.18))*Math.PI):0);
           ctx.restore();
           if (casting && hero.class !== "bloodknight") {
             let pulse = Math.sin(Math.min(1, hero.cast / 0.18) * Math.PI),
@@ -7044,6 +7061,9 @@
           queueScene=rpgPreview;sceneQueue=[];
           const center=inputVector(0,h/2-cameraFocusY()),left=hero.x+center.x-worldW/2-70,top=hero.y+center.y-worldH/2-70;
           dungeonFloor(left, top);
+          const ashScene={isDescent:isDescent(),isometric:rpgPreview,dungeon,floor:dungeon?.floor,rooms:isDescent()?floorSpec().rooms:[],hero,clock,visiblePoint,sceneItem,billboard,inputVector,art,drawProp};
+          window.EmberAsh?.ground(ctx,ashScene);
+          window.EmberAsh?.foreground(ctx,ashScene);
           drawZoneDepth(left,top);
           drawRpgLighting();
           drawSpellLighting();

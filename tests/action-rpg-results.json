@@ -5,10 +5,10 @@
       "floor": 1,
       "width": 390,
       "height": 844,
-      "sceneItems": 79,
+      "sceneItems": 98,
       "worldViewport": [
-        1002.34,
-        1002.34
+        1153.42,
+        1153.42
       ],
       "movement": "screen-aligned",
       "spawns": "offscreen",
@@ -19,7 +19,7 @@
       "floor": 2,
       "width": 390,
       "height": 844,
-      "sceneItems": 91,
+      "sceneItems": 96,
       "worldViewport": [
         1153.42,
         1153.42
@@ -33,7 +33,7 @@
       "floor": 3,
       "width": 390,
       "height": 844,
-      "sceneItems": 100,
+      "sceneItems": 101,
       "worldViewport": [
         1153.42,
         1153.42
@@ -47,7 +47,7 @@
       "floor": 4,
       "width": 390,
       "height": 844,
-      "sceneItems": 118,
+      "sceneItems": 115,
       "worldViewport": [
         1153.42,
         1153.42
@@ -75,7 +75,7 @@
       "floor": 1,
       "width": 390,
       "height": 844,
-      "sceneItems": 113,
+      "sceneItems": 118,
       "worldViewport": [
         1153.42,
         1153.42
@@ -89,7 +89,7 @@
       "floor": 2,
       "width": 390,
       "height": 844,
-      "sceneItems": 121,
+      "sceneItems": 120,
       "worldViewport": [
         1153.42,
         1153.42
@@ -103,7 +103,7 @@
       "floor": 3,
       "width": 390,
       "height": 844,
-      "sceneItems": 123,
+      "sceneItems": 125,
       "worldViewport": [
         1153.42,
         1153.42
@@ -117,7 +117,7 @@
       "floor": 4,
       "width": 390,
       "height": 844,
-      "sceneItems": 139,
+      "sceneItems": 141,
       "worldViewport": [
         1153.42,
         1153.42
@@ -131,7 +131,7 @@
       "floor": 5,
       "width": 390,
       "height": 844,
-      "sceneItems": 116,
+      "sceneItems": 117,
       "worldViewport": [
         1153.42,
         1153.42
@@ -145,7 +145,7 @@
       "floor": 1,
       "width": 390,
       "height": 844,
-      "sceneItems": 83,
+      "sceneItems": 86,
       "worldViewport": [
         1153.42,
         1153.42
@@ -159,7 +159,7 @@
       "floor": 2,
       "width": 390,
       "height": 844,
-      "sceneItems": 88,
+      "sceneItems": 89,
       "worldViewport": [
         1153.42,
         1153.42
@@ -173,7 +173,7 @@
       "floor": 3,
       "width": 390,
       "height": 844,
-      "sceneItems": 91,
+      "sceneItems": 96,
       "worldViewport": [
         1153.42,
         1153.42
@@ -187,7 +187,7 @@
       "floor": 4,
       "width": 390,
       "height": 844,
-      "sceneItems": 110,
+      "sceneItems": 106,
       "worldViewport": [
         1153.42,
         1153.42
@@ -215,7 +215,7 @@
       "floor": 1,
       "width": 390,
       "height": 844,
-      "sceneItems": 79,
+      "sceneItems": 86,
       "worldViewport": [
         1153.42,
         1153.42
@@ -229,7 +229,7 @@
       "floor": 2,
       "width": 390,
       "height": 844,
-      "sceneItems": 88,
+      "sceneItems": 87,
       "worldViewport": [
         1153.42,
         1153.42
@@ -243,7 +243,7 @@
       "floor": 3,
       "width": 390,
       "height": 844,
-      "sceneItems": 90,
+      "sceneItems": 92,
       "worldViewport": [
         1153.42,
         1153.42
@@ -257,7 +257,7 @@
       "floor": 4,
       "width": 390,
       "height": 844,
-      "sceneItems": 108,
+      "sceneItems": 109,
       "worldViewport": [
         1153.42,
         1153.42
@@ -271,7 +271,7 @@
       "floor": 5,
       "width": 390,
       "height": 844,
-      "sceneItems": 84,
+      "sceneItems": 86,
       "worldViewport": [
         1153.42,
         1153.42
@@ -285,7 +285,7 @@
       "floor": 1,
       "width": 390,
       "height": 844,
-      "sceneItems": 81,
+      "sceneItems": 86,
       "worldViewport": [
         1153.42,
         1153.42
@@ -327,7 +327,7 @@
       "floor": 4,
       "width": 390,
       "height": 844,
-      "sceneItems": 108,
+      "sceneItems": 109,
       "worldViewport": [
         1153.42,
         1153.42
@@ -341,7 +341,7 @@
       "floor": 5,
       "width": 390,
       "height": 844,
-      "sceneItems": 81,
+      "sceneItems": 82,
       "worldViewport": [
         1153.42,
         1153.42
@@ -355,7 +355,7 @@
       "floor": 1,
       "width": 844,
       "height": 390,
-      "sceneItems": 81,
+      "sceneItems": 88,
       "worldViewport": [
         1002.34,
         1002.34
@@ -383,7 +383,7 @@
       "floor": 3,
       "width": 844,
       "height": 390,
-      "sceneItems": 99,
+      "sceneItems": 95,
       "worldViewport": [
         1002.34,
         1002.34
@@ -411,7 +411,7 @@
       "floor": 5,
       "width": 844,
       "height": 390,
-      "sceneItems": 90,
+      "sceneItems": 88,
       "worldViewport": [
         1002.34,
         1002.34
@@ -425,7 +425,7 @@
       "floor": 1,
       "width": 844,
       "height": 390,
-      "sceneItems": 107,
+      "sceneItems": 113,
       "worldViewport": [
         1002.34,
         1002.34
@@ -439,7 +439,7 @@
       "floor": 2,
       "width": 844,
       "height": 390,
-      "sceneItems": 106,
+      "sceneItems": 104,
       "worldViewport": [
         1002.34,
         1002.34
@@ -481,7 +481,7 @@
       "floor": 5,
       "width": 844,
       "height": 390,
-      "sceneItems": 115,
+      "sceneItems": 114,
       "worldViewport": [
         1002.34,
         1002.34
@@ -495,7 +495,7 @@
       "floor": 1,
       "width": 844,
       "height": 390,
-      "sceneItems": 72,
+      "sceneItems": 81,
       "worldViewport": [
         1002.34,
         1002.34
@@ -509,7 +509,7 @@
       "floor": 2,
       "width": 844,
       "height": 390,
-      "sceneItems": 73,
+      "sceneItems": 74,
       "worldViewport": [
         1002.34,
         1002.34
@@ -523,7 +523,7 @@
       "floor": 3,
       "width": 844,
       "height": 390,
-      "sceneItems": 88,
+      "sceneItems": 89,
       "worldViewport": [
         1002.34,
         1002.34
@@ -537,7 +537,7 @@
       "floor": 4,
       "width": 844,
       "height": 390,
-      "sceneItems": 90,
+      "sceneItems": 93,
       "worldViewport": [
         1002.34,
         1002.34
@@ -551,7 +551,7 @@
       "floor": 5,
       "width": 844,
       "height": 390,
-      "sceneItems": 83,
+      "sceneItems": 82,
       "worldViewport": [
         1002.34,
         1002.34
@@ -565,7 +565,7 @@
       "floor": 1,
       "width": 844,
       "height": 390,
-      "sceneItems": 73,
+      "sceneItems": 80,
       "worldViewport": [
         1002.34,
         1002.34
@@ -607,7 +607,7 @@
       "floor": 4,
       "width": 844,
       "height": 390,
-      "sceneItems": 92,
+      "sceneItems": 91,
       "worldViewport": [
         1002.34,
         1002.34
@@ -621,7 +621,7 @@
       "floor": 5,
       "width": 844,
       "height": 390,
-      "sceneItems": 82,
+      "sceneItems": 81,
       "worldViewport": [
         1002.34,
         1002.34
@@ -635,7 +635,7 @@
       "floor": 1,
       "width": 844,
       "height": 390,
-      "sceneItems": 72,
+      "sceneItems": 80,
       "worldViewport": [
         1002.34,
         1002.34
@@ -649,7 +649,7 @@
       "floor": 2,
       "width": 844,
       "height": 390,
-      "sceneItems": 75,
+      "sceneItems": 74,
       "worldViewport": [
         1002.34,
         1002.34
@@ -663,7 +663,7 @@
       "floor": 3,
       "width": 844,
       "height": 390,
-      "sceneItems": 89,
+      "sceneItems": 92,
       "worldViewport": [
         1002.34,
         1002.34
@@ -677,7 +677,7 @@
       "floor": 4,
       "width": 844,
       "height": 390,
-      "sceneItems": 90,
+      "sceneItems": 91,
       "worldViewport": [
         1002.34,
         1002.34
@@ -691,7 +691,7 @@
       "floor": 5,
       "width": 844,
       "height": 390,
-      "sceneItems": 80,
+      "sceneItems": 82,
       "worldViewport": [
         1002.34,
         1002.34
@@ -707,71 +707,71 @@
       "hero": "gravecaller",
       "width": 390,
       "height": 844,
-      "medianMs": 1.2,
-      "maxMs": 4.6
+      "medianMs": 7.5,
+      "maxMs": 60.9
     },
     {
       "hero": "ranger",
       "width": 390,
       "height": 844,
-      "medianMs": 1.2,
-      "maxMs": 5.5
+      "medianMs": 5.4,
+      "maxMs": 102.4
     },
     {
       "hero": "ember",
       "width": 390,
       "height": 844,
-      "medianMs": 1.1,
-      "maxMs": 1.7
+      "medianMs": 1.8,
+      "maxMs": 59.3
     },
     {
       "hero": "bloodknight",
       "width": 390,
       "height": 844,
-      "medianMs": 0.9,
-      "maxMs": 2
+      "medianMs": 1.5,
+      "maxMs": 34.3
     },
     {
       "hero": "sunwarden",
       "width": 390,
       "height": 844,
-      "medianMs": 1.2,
-      "maxMs": 8.3
+      "medianMs": 1.6,
+      "maxMs": 43.7
     },
     {
       "hero": "gravecaller",
       "width": 844,
       "height": 390,
-      "medianMs": 1.1,
-      "maxMs": 5
+      "medianMs": 2,
+      "maxMs": 28.7
     },
     {
       "hero": "ranger",
       "width": 844,
       "height": 390,
-      "medianMs": 1,
-      "maxMs": 1.9
+      "medianMs": 1.2,
+      "maxMs": 2.1
     },
     {
       "hero": "ember",
       "width": 844,
       "height": 390,
       "medianMs": 1.1,
-      "maxMs": 6
+      "maxMs": 1.7
     },
     {
       "hero": "bloodknight",
       "width": 844,
       "height": 390,
-      "medianMs": 1,
-      "maxMs": 3.1
+      "medianMs": 1.2,
+      "maxMs": 1.7
     },
     {
       "hero": "sunwarden",
       "width": 844,
       "height": 390,
-      "medianMs": 1.2,
-      "maxMs": 2
+      "medianMs": 1.9,
+      "maxMs": 12.2
     }
   ],
   "browserErrors": [],
