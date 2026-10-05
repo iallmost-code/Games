@@ -142,3 +142,11 @@ Historical combat/navigation bots feed world-axis joystick vectors. `classic-cam
 ## v66 visual-only invariants
 
 `node tests/visual-invariants.cjs` compares 18 core combat, AI, movement, skills, dungeon and persistence function bodies against the prior prototype, and checks the 60 FPS target and bounded light/pixel configuration. Existing Chromium suites cover projection, all hero/floor scenes, native controls, migration, slots, codes and progression. Browser timing diagnostics do not establish physical Android performance.
+
+## Animated Catacombs (v68)
+
+`node tests/animated-catacombs.cjs` exercises both authored heroes, frame selection/distinctness, grounding/render purity, PNG and total-asset-failure fallback, first-floor scenery gates, controls, saves and native mobile rendering. `node tests/audio-presentation.cjs` validates sample byte/voice budgets, decode/playback, cache/failure behavior and mute cleanup in mocked and real Chromium AudioContexts. `node tests/ash-environment.cjs` proves all 22 render-only magma shafts remain in solid void beside existing bridges. The invariant suite compares 18 gameplay/persistence function bodies to current-main baseline `c588c3f`.
+
+Existing camera checks passed 50 hero/floor/orientation scenes and all ten native hero/orientation cases at DPR 3; new-hero/migration/slots/codes and 25 assisted Descent progression cases passed. These are automated browser diagnostics, not a human balance test or measured Android performance.
+
+All seven existing browser suites passed after merging the latest stability update. The 25 normal-stat Floor 1 circling diagnostics in `animated-catacombs-survival.json` exactly reproduce the earlier five-hero survival outcomes, including HP, kills, levels and floor exits. The existing seeded-bot policy uses no manual skill buttons; this is a reproducibility check, not human difficulty or phone FPS evidence. The new animation, audio and Ash checks are included in GitHub Actions.

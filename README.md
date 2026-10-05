@@ -1,6 +1,6 @@
 # Ember Crypt
 
-**Prototype: v65 Action RPG Preview — branch `codex/action-rpg-preview`, awaiting owner playtest.**
+**v68 Animated Catacombs — branch `codex/animated-catacombs`, awaiting owner playtest.**
 The public links below still serve the published main build.
 Play: https://iallmost-code.github.io/Games/ (GitHub Pages, deployed from `main`)
 ChatGPT Sites copy: https://ember-crypt.alpine0-0.chatgpt.site
@@ -18,7 +18,7 @@ Select this repository and its default branch, `main`, in a Codex Cloud environm
 - ENDLESS: the original arena, wave 20 Crypt Heart and subsequent endless tiers. Both modes retain zone hazards, relics, evolutions, depth modifiers, treasure imps and elite events.
 - Three named local save slots, mode-specific depth/kill records, shrine, bestiary, achievements, and save-code export/import. First-run tips are tracked per character and can be reset in Settings.
 - Joystick + Dash + Ultimate controls: automatic attacks, pause control, sound and speed in Settings. Landscape fills the screen with a floating left joystick and 72px right skill buttons; portrait keeps the bottom-center joystick and smaller right buttons.
-- Cinematic art loads as WebP with PNG fallback. The frame limiter is 40 FPS.
+- Cinematic art loads as WebP with PNG fallback. The renderer targets 60 FPS with a bounded high-DPI canvas.
 
 ## Files
 
@@ -98,3 +98,13 @@ This remains a sprite-based browser prototype. [ACTION_RPG_DIRECTION.md](ACTION_
 `codex/25d-polish` builds on the unmerged isometric prototype. Cartesian collision, AI, combat, progression and save formats are retained. Stage 1 reuses tested projection, screen-depth sorting and grounded animation. Stage 2 adds deterministic floor cracks, markings, ice patches and lower edge trim, with foreground chains, ice and vines fading near the hero. Stage 3 adds bounded spell lights, rift cracks, pooled-effect ground mist and fixed-count atmosphere. Stage 4 gives each zone a separate decoration/lighting palette. Stage 5 retains the bronze HUD and existing controls, targets 60 FPS, caps canvas DPR at 1.5 and limits the canvas to 1.8 million pixels.
 
 Lighting is simulated with reusable glow sprites, not a per-enemy shadow engine. Environmental details and particles use deterministic hashes rather than combat random numbers. Fog and lights reuse active spell pools; there are no additional damage or collision objects. New controls and gameplay tuning are outside this change. Physical Android profiling is still required before claiming sustained 60 FPS.
+
+## Animated Catacombs (v68)
+
+The first-floor presentation package adds original 30-cell Gravecaller and Bloodknight animation sheets: six-frame front/side/back walking, attack/casting, three hit reactions and a three-frame death sequence. Side views mirror for left-facing movement. Frames are decoded and grounded once; existing sprites remain the fallback. Attack timing, damage, collision and hero stats are unchanged.
+
+Ash Catacombs gains original painted basalt columns, gothic arches, chains, tombs, seals and statuary, cached platform details and magma beneath 22 fixed bridge-adjacent void cells. These cells remain solid to gameplay; doorways, navigation and hazards are unchanged. Props fade near the hero. Other floors and Classic preserve their previous scenery.
+
+Fifteen original short WAV layers add class-specific attack sounds, sword air, metal/stone impacts, spells, skill cues and loot tones. Samples are offline-authored noise/modal synthesis, not recorded Foley. Decoding is cached, voices cap at twelve, mute immediately stops sample tails, and the original oscillator sounds remain a failure/loading fallback. No additional controls or external runtime dependencies.
+
+Run `node tests/visual-invariants.cjs`, `node tests/ash-environment.cjs`, `node tests/audio-presentation.cjs` and `node tests/animated-catacombs.cjs`. Existing camera/hero/migration/Descent suites remain applicable. Browser diagnostics do not establish physical Android FPS.

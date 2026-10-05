@@ -43,3 +43,11 @@ Existing original WebP-first/PNG-fallback painted sheets are retained. Ground ti
 Walking now uses eight cached procedural phases derived from the painted poses, with bob, lean and attack follow-through. Summoned skeletons emerge over 0.3 seconds; Dash leaves short fading silhouettes. Firestorm adds upright falling comets, Earthsplitter radial cracks, Army a summoning rune, Arrow Storm lightning trails, and Solar Flare light columns. These are bounded cosmetic effects, not new damage sources or fully rigged 3D animations.
 
 The native 40 FPS limiter is unchanged. Headless canvas render timings are diagnostics, not physical-phone frame-rate measurements.
+
+## Animated Catacombs (v68)
+
+New original image-generated transparent atlases: `gravecaller-animation.png` and `bloodknight-animation.png`, each 1374×1145 with six columns and five rows (30 authored pose images). Rows contain front walk, right-side walk, back walk, cast/swing and hit/death poses. Left side mirrors right; attack poses follow the existing cast clock. This is an authored sprite sequence, not a 3D rig. Cells are sliced once into foot-anchored caches; images load WebP first with PNG fallback and the legacy hero art remains available on failure. Runtime death timing is cosmetic and never serialized.
+
+`ash-props.png` is a 1774×887 transparent four-by-two painted atlas: broken column, ruined arch, chain set, sarcophagus, floor seal, hooded statue, coal brazier and bone pile. Ash's scenery module prefers these painted images and retains cached canvas fallbacks. All new WebPs use quality 88 and full alpha quality. Additional WebP download size is approximately 1.9 MB; PNG fallback approximately 6.5 MB. The generated source images are retained unchanged.
+
+Original layered audio source and regeneration instructions are documented in `assets/audio/README.md`. No borrowed commercial-game artwork or sounds are used.

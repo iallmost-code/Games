@@ -1,6 +1,6 @@
 // Guard against accidental changes to combat, AI, saves and progression.
 const fs=require('node:fs'),cp=require('node:child_process'),assert=require('node:assert/strict');
-const base=cp.execFileSync('git',['show','a4e9a62:index.html'],{encoding:'utf8'}),current=fs.readFileSync('index.html','utf8');
+const base=cp.execFileSync('git',['show','c588c3f:index.html'],{encoding:'utf8'}),current=fs.readFileSync('index.html','utf8');
 const names=['update','damageEnemy','takeHit','begin','saveRun','restoreRun','applyProfile','makeSaveCode','loadSaveCode','moveAroundWalls','segmentBlocked','spawnEnemy','spawnBoss','floorEntry','buildFloor','useDash','useUltimate','updateHeroActors','fire','attack','levelUp'];
 function body(source,name){const match=new RegExp('function '+name+'\\s*\\(').exec(source);if(!match)return null;let start=source.indexOf('{',match.index),depth=1,i=start+1,quote=null,escape=false;for(;depth&&i<source.length;i++){const c=source[i];if(quote){if(escape)escape=false;else if(c==='\\')escape=true;else if(c===quote)quote=null;}else if(c==='"'||c==="'"||c==='`')quote=c;else if(c==='{')depth++;else if(c==='}')depth--;}return source.slice(match.index,i);}
 let checked=0;for(const name of names){const old=body(base,name);if(old){assert.equal(body(current,name),old,'Gameplay changed: '+name);checked++;}}
