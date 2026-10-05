@@ -29,7 +29,8 @@ jobs:
         run: |
           node -e '
             const fs = require("fs");
-            for (const file of ["index.html", "sw.js", "assets/cinematic/hero-animation.js", "assets/cinematic/ash-environment.js", "assets/audio/combat-audio.js", "assets/audio/music.js", "assets/cinematic/zone-environment.js", "assets/cinematic/motion.js", "assets/endgame/endless-nights.js"]) {
+            for (const file of ["index.html", "sw.js", "assets/cinematic/hero-animation.js", "assets/cinematic/ash-environment.js", "assets/audio/combat-audio.js", "assets/audio/music.js", "assets/cinematic/zone-environment.js", "assets/cinematic/motion.js", "assets/endgame/endless-nights.js", "assets/heroes/mastery.js"]) {
+
               const source = fs.readFileSync(file, "utf8");
               const blocks = file.endsWith(".html") ? [...source.matchAll(/<script>([\s\S]*?)<\/script>/g)].map(m => m[1]) : [source];
               blocks.forEach(code => new Function(code));
@@ -48,7 +49,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        suite: [action-rpg, landscape-skills, new-heroes, bloodknight, descent, descent-variety, descent-tuning, animated-catacombs, audio-presentation, ash-environment, sound-motion, endless-nights]
+        suite: [action-rpg, landscape-skills, new-heroes, bloodknight, descent, descent-variety, descent-tuning, animated-catacombs, audio-presentation, ash-environment, sound-motion, endless-nights, new-blood]
+
     env:
       ARTIFACT_DIR: ${{ github.workspace }}/artifacts
       NODE_PATH: ${{ github.workspace }}/.playwright/node_modules

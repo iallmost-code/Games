@@ -396,14 +396,14 @@
       }
       .choice.fire { border-color: #ff9a59; background: #42291f; }
       .choice.poison { border-color: #9bea7c; background: #263822; }
-      .choice.frost { border-color: #a6e9ff; background: #253c48; }
+      .choice.frost, .choice.ice { border-color: #a6e9ff; background: #253c48; }
       .choice.lightning { border-color: #ffe783; background: #40391e; }
       .choice.arcane { border-color: #c89cff; background: #342945; }
       .choice.shadow { border-color: #9062b8; background: #2b223c; }
       .choice.shared { border-color: #93999d; background: #333638; }
       .choice.evolution.fire { background: linear-gradient(120deg, #64321c, #342522); }
       .choice.evolution.poison { background: linear-gradient(120deg, #394724, #302a20); }
-      .choice.evolution.frost { background: linear-gradient(120deg, #2a4f63, #28313c); }
+      .choice.evolution.frost, .choice.evolution.ice { background: linear-gradient(120deg, #2a4f63, #28313c); }
       .choice.evolution.lightning { background: linear-gradient(120deg, #5a4e1e, #30323f); }
       .choice.evolution.arcane { background: linear-gradient(120deg, #4b3266, #322f4a); }
       .choice.evolution.shadow { background: linear-gradient(120deg, #382650, #292336); }
@@ -585,7 +585,7 @@
       .choice.shared { background:linear-gradient(120deg,#302d29,#1c1c1b);border-color:#aa9577; }
       .choice.fire { background:linear-gradient(120deg,#49301e,#211b17); }
       .choice.poison { background:linear-gradient(120deg,#2c3725,#1b211a); }
-      .choice.frost { background:linear-gradient(120deg,#29383b,#191f20); }
+      .choice.frost, .choice.ice { background:linear-gradient(120deg,#29383b,#191f20); }
       .choice.lightning { background:linear-gradient(120deg,#3f3924,#1e1d19); }
       .choice.arcane { background:linear-gradient(120deg,#352a3b,#1b1920); }
       .choice.shadow { background:linear-gradient(120deg,#302839,#191820); }
@@ -732,7 +732,7 @@
           <div class="kicker" id="kicker">DUNGEON SURVIVAL</div>
           <h1 id="title">EMBER<br />CRYPT</h1>
           <p id="description">
-            Survive the crypt. Your staff fires automatically. Collect blue embers to level up, grab rare relics,
+            Survive the crypt. Your weapons attack automatically. Collect blue embers to level up, grab rare relics,
             and follow the glowing markers to wells, forges, and vaults.
           </p>
           <div class="meta-bar" id="metaBar"></div>
@@ -760,10 +760,12 @@
     <script src="assets/audio/combat-audio.js"></script>
     <script src="assets/audio/music.js"></script>
     <script src="assets/endgame/endless-nights.js"></script>
+    <script src="assets/heroes/mastery.js"></script>
     <script>
       (() => {
         "use strict";
-        const GAME_VERSION = "v72 · ENDLESS NIGHTS";
+        const GAME_VERSION = "v73 · NEW BLOOD";
+
         // Recent script errors for Pause → REPORT A BUG. Never saved.
         const recentErrors = [];
         function noteError(kind, detail) {
@@ -930,7 +932,8 @@
           floors.src="assets/cinematic/floors.webp";
         }
         function paintHeroPortrait(canvas,kind) {
-          let img=art[kind]||art.gravecaller;if(!img)return;
+          const color=Number(canvas.dataset.color??profile.mastery?.[kind]?.color)||0;
+          let img=window.EmberHeroAnimation?.frame?.(kind,0,color)||window.EmberHeroAnimation?.tint?.(art[kind]||art.gravecaller,color)||art[kind]||art.gravecaller;if(!img)return;
           let g=canvas.getContext("2d");g.clearRect(0,0,canvas.width,canvas.height);
           let ih=img.naturalHeight||img.height,iw=img.naturalWidth||img.width,hh=canvas.height-12,ww=hh*iw/ih;
           g.drawImage(img,(canvas.width-ww)/2,6,ww,hh);
@@ -959,12 +962,12 @@
         }
         function drawHeroRing(x,foot,kind) {
           if(rpgPreview){
-            const colors={gravecaller:["#b999ff","#7553be"],sunwarden:["#ffefac","#c5eee5"],ranger:["#9be9ff","#ffe17a"],ember:["#ffab6b","#9eec86"],bloodknight:["#c94459","#c49455"]}[kind];
+            const colors={gravecaller:["#b999ff","#7553be"],sunwarden:["#ffefac","#c5eee5"],ranger:["#9be9ff","#ffe17a"],ember:["#ffab6b","#9eec86"],bloodknight:["#c94459","#c49455"],rogue:["#a5df7c","#aa85dc"],frostwarden:["#a6e9ff","#c49455"]}[kind];
             ctx.save();ctx.globalAlpha=.85;ctx.lineWidth=3;ctx.strokeStyle=colors[0];ctx.beginPath();ctx.arc(x,foot,25,0,Math.PI);ctx.stroke();ctx.strokeStyle=colors[1];ctx.beginPath();ctx.arc(x,foot,25,Math.PI,Math.PI*2);ctx.stroke();ctx.restore();return;
           }
           let ring=heroRingCache.get(kind);
           if(!ring){
-            const colors={gravecaller:["#b999ff","#7553be"],sunwarden:["#ffefac","#c5eee5"],ranger:["#9be9ff","#ffe17a"],ember:["#ffab6b","#9eec86"],bloodknight:["#c94459","#c49455"]}[kind]||["#b999ff","#7553be"];
+            const colors={gravecaller:["#b999ff","#7553be"],sunwarden:["#ffefac","#c5eee5"],ranger:["#9be9ff","#ffe17a"],ember:["#ffab6b","#9eec86"],bloodknight:["#c94459","#c49455"],rogue:["#a5df7c","#aa85dc"],frostwarden:["#a6e9ff","#c49455"]}[kind]||["#b999ff","#7553be"];
             ring=surface(128,80);let g=ring.getContext("2d");
             g.translate(64,40);g.scale(1,.5);
             let glow=g.createRadialGradient(0,0,25,0,0,61);
@@ -1043,7 +1046,7 @@
             art[name === "ash-floor" ? "floor" : name] = img;
           }
         }
-        loadCinematicArt();
+        loadCinematicArt();loadNewHeroArt();
         const zoneNames = ["ASH CATACOMBS", "FROST VAULT", "VENOM HOLLOW"];
         let w = 0,
           h = 0,
@@ -1138,6 +1141,7 @@
           prior=migrateHeroProfile(prior);
           profile=blankProfile(); selectedHero="gravecaller"; selectedDepth=0;
           /* endgame-v72 */ Object.assign(profile, EmberEndgame.profile(prior || {}));
+          /* new-blood-v73 */ applyNewBloodProfile(prior);
           profile.tips={};profile.records={descent:{kills:0,bestDepth:{}},endless:{kills:0,bestDepth:{}}};
           if (!prior || typeof prior!=="object") return;
           profile.tips=prior.tips&&typeof prior.tips==="object"?{...prior.tips}:{};
@@ -1164,6 +1168,7 @@
           profile.bloodknight=!!prior.bloodknight||profile.bosses>=3;
           selectedHero=["ranger","ember","bloodknight","sunwarden"].includes(prior.selectedHero)?prior.selectedHero:"gravecaller";
           if(selectedHero==="ranger"&&!profile.ranger||selectedHero==="ember"&&!profile.ember||selectedHero==="bloodknight"&&!profile.bloodknight||selectedHero==="sunwarden"&&!profile.sunwarden)selectedHero="gravecaller";
+          /* new-blood-v73 */ if(newHeroKeys.includes(prior?.selectedHero)&&profile[prior.selectedHero])selectedHero=prior.selectedHero;
         }
         function selectSlot(n) {
           if (!slots[n]) return false;
@@ -1281,6 +1286,7 @@
                   " · "+Math.floor((slots[i].playTime||0)/3600)+"h "+Math.floor(((slots[i].playTime||0)%3600)/60)+"m"+
                   " · "+new Date(slots[i].lastPlayed||Date.now()).toLocaleDateString(),"slot-stats");
                 let icon=menuText("span",savedProfile.selectedHero==="bloodknight"?"⚔":savedProfile.selectedHero==="ranger"?"⚡":savedProfile.selectedHero==="ember"?"✹":"✧");
+                if(newHeroKeys.includes(savedProfile.selectedHero)){icon=document.createElement("canvas");icon.width=48;icon.height=56;icon.className="slot-icon";icon.dataset.hero=savedProfile.selectedHero;icon.dataset.color=String(savedProfile.mastery?.[savedProfile.selectedHero]?.color||0);paintHeroPortrait(icon,savedProfile.selectedHero);}
                 icon.style.color=savedProfile.selectedHero==="bloodknight"?"#c94459":savedProfile.selectedHero==="ranger"?"#ffe783":savedProfile.selectedHero==="ember"?"#ff9a59":"#c89cff";
                 icon.style.fontSize="24px";
                 card.append(icon,menuText("b", " SLOT "+(i+1)+" · "+slots[i].name),
@@ -1324,7 +1330,7 @@
           if(screen==="bestiary"){
             let body=menuBase("BESTIARY","hub","Enemies you've encountered and their element matchups.");
             showBestiary();let view=menuText("div","","bestiary");view.innerHTML=bestiaryEl.innerHTML;
-            body.append(view);bestiaryEl.hidden=true;return;
+            body.append(view,menuText("h3","NEW HEROES","menu-head"),menuText("p","SHADOW ROGUE · Poison + Shadow. Short daggers, a Dash decoy and Night Veil critical strikes. FROST WARDEN · Ice + Earth. Shield bashes, enemy-only ice walls and a protective ice dome. Ice attacks use frost weaknesses and resistances.","menu-note"));bestiaryEl.hidden=true;return;
           }
           if(screen==="achievements"){
             let body=menuBase("ACHIEVEMENTS","hub","One-time ember rewards for this character.");
@@ -1339,7 +1345,8 @@
             if(fullscreenSupported())body.append(fullscreenButton());
             body.append(menuButton("REPORT A BUG",()=>renderMenu("report"),"Copies recent errors and your game state."));
             let quit=menuButton("QUIT RUN",()=>{quit.textContent="QUIT RUN · CONFIRM";
-              quit.onclick=()=>{recordEndgameResult(false,"Abandoned");saveSlotClock();clearRun();hero=null;showTitleMenu();};},
+              quit.onclick=()=>{recordEndgameResult(false,"Abandoned");awardHeroMastery(false);saveSlotClock();clearRun();hero=null;showTitleMenu();};},
+
               "Embers earned stay with this character.");body.append(quit);return;
           }
           if(screen==="settings") {renderSettings();return;}
@@ -1491,7 +1498,7 @@
         }
         function renderHeroScreen(){
           let body=menuBase("CHOOSE YOUR HERO","hub","Swipe or tap the arrows. Depths you've unlocked are below.");
-          const heroes=["gravecaller","ranger","ember","bloodknight","sunwarden"];let index=heroes.indexOf(selectedHero);
+          const heroes=["gravecaller","ranger","ember","bloodknight","sunwarden","rogue","frostwarden"];let index=heroes.indexOf(selectedHero);
           let portrait=document.createElement("canvas");portrait.width=360;portrait.height=380;
           portrait.className="hero-art";portrait.dataset.hero=selectedHero;
           portrait.setAttribute("aria-label",heroNames[selectedHero]);body.append(portrait);paintHeroPortrait(portrait,selectedHero);
@@ -1502,9 +1509,11 @@
           left.onclick=()=>cycle(-1);right.onclick=()=>cycle(1);row.append(left,label,right);body.append(row);
           let unlocked=selectedHero==="gravecaller"||!!profile[selectedHero];
           body.append(menuText("p",unlocked?heroTraits[selectedHero]:
-            "LOCKED · "+(selectedHero==="sunwarden"?"Reach floor 3 in The Descent":selectedHero==="bloodknight"?"Defeat 3 bosses total · "+Math.min(3,profile.bosses)+"/3":selectedHero==="ranger"?"Defeat a boss":"Reach wave 10 or earn 600 lifetime embers"),"menu-sub"),
+            "LOCKED · "+(selectedHero==="rogue"?"Defeat 5 bosses total · "+Math.min(5,profile.bosses)+"/5":selectedHero==="frostwarden"?"Reach floor 4 in The Descent":selectedHero==="sunwarden"?"Reach floor 3 in The Descent":selectedHero==="bloodknight"?"Defeat 3 bosses total · "+Math.min(3,profile.bosses)+"/3":selectedHero==="ranger"?"Defeat a boss":"Reach wave 10 or earn 600 lifetime embers"),"menu-sub"),
             menuText("p",selectedMode.toUpperCase()+" · BEST DEPTH "+(profile.records?.[selectedMode]?.bestDepth[selectedHero]||0)+" · BEST KILLS "+(profile.records?.[selectedMode]?.kills||0),"menu-sub"));
           body.append(menuText("p","BEST TORMENT CLEARED · "+(profile.bestTorment?.[selectedHero]||0),"menu-sub"));
+          renderMastery(body,selectedHero);
+
           let touch=0;portrait.addEventListener("touchstart",e=>{touch=e.touches[0].clientX;},{passive:true});
           portrait.addEventListener("touchend",e=>{let shift=e.changedTouches[0].clientX-touch;if(Math.abs(shift)>35)cycle(shift<0?1:-1);},{passive:true});
           body.append(menuText("label","CRYPT DEPTH · "+selectedDepth+" · +"+(selectedDepth*25)+"% EMBERS","menu-label"));
@@ -1535,15 +1544,17 @@
           }
           saveProfile();
         }
-        const heroNames = { gravecaller: "GRAVECALLER", ranger: "STORM RANGER", ember: "EMBERWEAVER", bloodknight: "BLOODKNIGHT", sunwarden:"SUNWARDEN" };
+        const heroNames = { gravecaller: "GRAVECALLER", ranger: "STORM RANGER", ember: "EMBERWEAVER", bloodknight: "BLOODKNIGHT", sunwarden:"SUNWARDEN",rogue:"SHADOW ROGUE",frostwarden:"FROST WARDEN" };
         const heroTraits = {
+          rogue:"POISON + SHADOW · Fast fragile dagger fighter. Dash leaves a decoy; Night Veil grants invisibility and critical strikes.",
+          frostwarden:"ICE + EARTH · Slow shield tank. Ice walls stop enemies, never you; Glacier Fortress protects you inside its dome.",
           bloodknight: "BLOOD + EARTH · Greatsword sweeps, bleeding wounds and stone magic",
           gravecaller: "SHADOW + ARCANE · Raise a skeleton legion from fallen foes",
           ranger: "FROST + LIGHTNING · Longbow, hunting wolf and automatic traps",
           sunwarden:"LIGHT + WIND · Sweeping light, healing sanctuaries and crowd control",
           ember: "FIRE + POISON · Cinder patches and blight magic",
         };
-        const elementColors = { fire: "#ff9a59", poison: "#9bea7c", frost: "#a6e9ff",
+        const elementColors = { ice:"#a6e9ff",fire: "#ff9a59", poison: "#9bea7c", frost: "#a6e9ff",
           blood: "#c94459", earth: "#c49455", light:"#ffe5a1",wind:"#a6e4d7", lightning: "#ffe783", arcane: "#c89cff", shadow: "#ae83df", neutral: "#c4d6d5" };
         const enemyMatchups = {
           ghoul: { weak: "fire" }, charger: { weak: "fire" }, runner: { weak: "shadow" },
@@ -1637,6 +1648,7 @@
           if (!profile.bloodknight && profile.ranger && profile.ember) return "Bloodknight: defeat " + Math.max(0,3-profile.bosses) + " more bosses";
           if (!profile.ember) return "Emberweaver: reach wave 10 or earn " + (600 - profile.total) + " more lifetime embers";
           if(!profile.sunwarden)return "Sunwarden: reach floor 3 in The Descent";
+          if(!profile.rogue)return "Shadow Rogue: defeat 5 bosses total";if(!profile.frostwarden)return "Frost Warden: reach floor 4 in The Descent";
           let costs = shrinePowers
             .filter((u) => (profile.upgrades[u.key] || 0) < u.cap)
             .map((u) => u.cost * (1 + (profile.upgrades[u.key] || 0)));
@@ -1742,7 +1754,7 @@
         shrineBtn.addEventListener("click", showShrine);
         menuBack.addEventListener("click", showTitleMenu);
         heroBtn.addEventListener("click", () => {
-          const available = ["gravecaller",...["ranger","ember","bloodknight","sunwarden"].filter(h=>profile[h])];
+          const available = ["gravecaller",...["ranger","ember","bloodknight","sunwarden","rogue","frostwarden"].filter(h=>profile[h])];
           selectedHero = available[(available.indexOf(selectedHero) + 1) % available.length];
           saveProfile();
           updateMeta();
@@ -1762,13 +1774,13 @@
           heading.textContent = "HERO · DEPTH " + selectedDepth + " · BEST " +
             (profile.bestDepth?.[selectedHero] || 0);
           choicesEl.append(heading);
-          for (const key of ["gravecaller", "ranger", "ember", "bloodknight", "sunwarden"]) {
+          for (const key of ["gravecaller", "ranger", "ember", "bloodknight", "sunwarden", "rogue", "frostwarden"]) {
             let unlocked = key === "gravecaller" || !!profile[key];
             let button = document.createElement("button");
             button.className = "choice " + (selectedHero === key ? "evolution" : "shared");
             button.disabled = !unlocked;
             button.innerHTML = heroNames[key] + " · BEST DEPTH " + (profile.bestDepth?.[key] || 0) +
-              "<small>" + (unlocked ? heroTraits[key] : key === "sunwarden" ? "Reach floor 3 in The Descent" : key === "bloodknight" ? "Defeat 3 bosses total · "+Math.min(3,profile.bosses)+"/3" : key === "ranger" ? "Defeat a boss to unlock" : "Reach wave 10 or earn 600 embers") + "</small>";
+              "<small>" + (unlocked ? heroTraits[key] : key === "rogue" ? "Defeat 5 bosses total" : key === "frostwarden" ? "Reach floor 4 in The Descent" : key === "sunwarden" ? "Reach floor 3 in The Descent" : key === "bloodknight" ? "Defeat 3 bosses total · "+Math.min(3,profile.bosses)+"/3" : key === "ranger" ? "Defeat a boss to unlock" : "Reach wave 10 or earn 600 embers") + "</small>";
             button.onclick = () => { selectedHero = key; saveProfile(); updateMeta(); renderHeroDepthChoices(); };
             choicesEl.append(button);
           }
@@ -1980,7 +1992,8 @@
             if(saved.version<11||["mage","storm"].includes(saved.hero.class))saved=migrateLineupRun(saved);
             saved=migrateEndgameRun(saved);
             if(saved.runMode==="descent"&&saved.hero.victoryPaid&&!profile.descentCleared){profile.descentCleared=true;profile.randomLayouts=true;saveProfile();}
-            if(!["gravecaller","ranger","ember","bloodknight","sunwarden"].includes(saved.hero.class))return null;
+            if(!["gravecaller","ranger","ember","bloodknight","sunwarden","rogue","frostwarden"].includes(saved.hero.class))return null;
+
             if(saved.runMode==="descent"&&saved.floor>=3&&!profile.sunwarden){profile.bestFloor=Math.max(profile.bestFloor||0,saved.floor);profile.sunwarden=true;saveProfile();}
             localStorage.setItem(saveKey,JSON.stringify(saved));if(usedKey!==saveKey)localStorage.removeItem(usedKey);
             return saved;
@@ -2110,6 +2123,7 @@
           hero.emberFraction ||= 0;
           xpReserve = saved.xpReserve || 0;
           if(runMode==="descent")floorEntry(saved.floor||1,floorCheckpoint);
+          /* new-blood-v73 */ ensureNewBloodFields();resetNewBloodActors();ensureMasteryRun();
           if(hero.class==="ranger"&&!companions.length)addWolf();
           clearWall(hero);
           for (const e of enemies) clearWall(e);
@@ -2263,6 +2277,7 @@
           ensureSkills(hero);
           resetHeroActors();
           /* endgame-v72 */ startEndgameRun();
+          /* new-blood-v73 */ initializeNewBloodRun();
           runStats = { damage: 0, hpLost: 0, armorBlocked: 0, bosses: 0 };
           weaponDryStreak = 0;
           enemies = [];
@@ -2324,9 +2339,12 @@
           if(runMode==="descent")floorEntry(1);
           saveRun(true);
           updateOpeningGuide();
+          /* new-blood-v73 */ if(isNewBloodHero())tipOnce(hero.class+"-tactics",hero.class==="rogue"?"Your Dash leaves a decoy. Night Veil makes every dagger a critical hit.":"Your ice walls stop enemies, never you. Stay inside Glacier Fortress for protection.");
           if(!isDescent())showToast("WAVE 1");
         }
         function updateHud() {
+          updateNewBloodUnlocks();
+          if(isNewBloodHero())gearEl.textContent=(weapon?.name||(hero.class==="rogue"?"Venom Daggers":"Rime Shield & Stone Mace"))+" · "+(armor?.name||(hero.class==="rogue"?"Shadow Leather":"Frost Plate"));
           updateSkillButtons();
           healthEl.style.width = Math.max(0, (hero.hp / hero.maxHp) * 100) + "%";
           armorfillEl.style.width = Math.max(0, (hero.armor / hero.maxArmor) * 100) + "%";
@@ -2376,8 +2394,10 @@
         }
         start.addEventListener("click", () => mode === "victory" ? continueEndless() : begin());
         function allowedHeroElements(kind) {
+          if(kind==="rogue")return "Poison + Shadow";if(kind==="frostwarden")return "Ice + Earth";
           return kind === "sunwarden" ? "Light + Wind" : kind === "bloodknight" ? "Blood + Earth" : kind === "ember" ? "Fire + Poison" : kind === "ranger" ? "Frost + Lightning" : "Arcane + Shadow";
         }
+        const newBloodRequirements={nightbloom:[["Venom Tips","venomTips",2],["Toxic Vial","toxicVial",2]],phantoms:[["Shadow Lace","shadowLace",2],["Mirror Edge","mirrorEdge",2]],permafrost:[["Rime Bash","rimeBash",2],["Frozen Bulwark","frozenBulwark",2]],avalanche:[["Seismic Counter","seismicCounter",2],["Granite Mantle","graniteMantle",2]]};
         const evolutionRequirements = {
           legion:[["Raise Legion","minionCapacity",6],["Bone Armor","boneArmor",2]],
           ossuary:[["Raise Legion","minionCapacity",5],["Soul Link","soulLink",2]],
@@ -2401,6 +2421,7 @@
           rift: [["Soul Harvest", "xpBurst", 1], ["Shadow Fairy", "fairy:shadow", 1]],
           veil: [["Wraith Orbit", "orbitRank", 3], ["Blood Ember", "leech", 1]],
         };
+        Object.assign(evolutionRequirements,newBloodRequirements);
         function requirementValue(key) {
           return key.startsWith("fairy:") ? Number(hero.fairies.includes(key.slice(6))) : Number(hero[key] || 0);
         }
@@ -2436,6 +2457,7 @@
           choicesEl.replaceChildren();
           const allowedElements = hero.class === "sunwarden" ? ["light","wind","shared"] : hero.class === "bloodknight" ? ["blood","earth","shared"] : hero.class === "ember" ? ["fire", "poison", "shared"] :
             hero.class === "ranger" ? ["frost", "lightning", "shared"] : ["arcane", "shadow", "shared"];
+          /* new-blood-v73 */ if(isNewBloodHero())allowedElements.splice(0,allowedElements.length,...newHeroElements());
           const options = [
             {
               name: "PHASE BOLTS", element: "arcane",
@@ -2520,6 +2542,7 @@
             { name: "Long Reach", element: "shared", text: (hero.class === "bloodknight" ? "+25 swing radius · rank " : "+25 attack range · rank ") + ((hero.reachRank || 0) + 1) + "/3", available: () => (hero.reachRank || 0) < 3,
               apply: () => { hero.reachRank = (hero.reachRank || 0) + 1; hero.range += 25; } },
           ].filter((o) => (!o.available || o.available()) && (!o.element || allowedElements.includes(o.element)) && prototypeCardAllowed(o));
+          /* new-blood-v73 */ if(isNewBloodHero())describeNewBloodShared(options);
           if (hero.class === "ember" && !hero.poison)
             options.push({
               name: "Venom Bolts", element: "poison",
@@ -2625,6 +2648,7 @@
                     },
                   }))
               : [];
+          /* new-blood-v73 */ if(isNewBloodHero())fairyChoices.length=0;
           options.push(...fairyChoices);
           const owned = hero.evolutions || [],
             evolutionPaths = [
@@ -2935,8 +2959,9 @@
             let bonus = Math.round(
                 (slot === "weapon" ? weaponBase : armorBase * (style === "heavy" ? 1.3 : 0.85)) * rarity.mult,
               ),
-              effect = slot === "weapon" ? ({ gravecaller: ["pierce", "shadow"], ranger: ["arc", "frost"], sunwarden:["light","wind"],
+              effect = slot === "weapon" ? ({ rogue:["venom","shadow"],frostwarden:["frost","earth"],gravecaller: ["pierce", "shadow"], ranger: ["arc", "frost"], sunwarden:["light","wind"],
                 ember: ["ember", "venom"], bloodknight: ["blood", "earth"] }[hero.class] || ["pierce"])[Math.floor(gameRandom() * 2)] : null,
+
               effectRank = slot === "weapon" ? Math.max(1, rarities.indexOf(rarity) - 1) : 0,
               baseName =
                 slot === "weapon"
@@ -3017,7 +3042,7 @@
                 hero.weaponRank = effectRank;
                 weapon = item;
               } else {
-                hero.maxArmor = (hero.class === "bloodknight" ? 45 : 30) + bonus + hero.armorBonus;
+                hero.maxArmor = (hero.class === "rogue" ? 25 : hero.class === "frostwarden" ? 80 : hero.class === "bloodknight" ? 45 : 30) + bonus + hero.armorBonus;
                 hero.armor = hero.maxArmor;
                 hero.armorStyle = style;
                 armor = item;
@@ -3105,6 +3130,8 @@
         function recordModeResult(){profile.records ||= {descent:{kills:0,bestDepth:{}},endless:{kills:0,bestDepth:{...profile.bestDepth}}};const record=profile.records[runMode];record.kills=Math.max(record.kills,kills);if(hero.victoryPaid)record.bestDepth[hero.class]=Math.max(record.bestDepth[hero.class]||0,hero.depth);saveProfile();}
         function gameOver() {
           recordEndgameResult(false);
+          awardHeroMastery(false);
+
           clearRun();
           resumeBtn.hidden = true;
           updateMeta();
@@ -3169,6 +3196,7 @@
         }
         function showVictory() {
           if (!hero?.victoryPaid || hero.endless) return;
+          awardHeroMastery(true);
           if (!hero.depthRecorded) {
             hero.depthRecorded = true;
             profile.unlockedDepth = Math.max(profile.unlockedDepth || 0, Math.min(20, hero.depth + 1));
@@ -3891,7 +3919,7 @@
           body.append(menuButton("DAILY CHALLENGE · "+challenge.date,()=>{
             pendingDaily=EmberEndgame.daily();selectedHero=pendingDaily.hero;selectedMode="descent";selectedDepth=0;begin();menuShell.classList.add("hidden");game.classList.add("playing");
           },heroNames[challenge.hero]+" · "+nightModifiers[challenge.modifier]+" · BEST "+best+" · local score", "primary"));
-          body.append(menuText("p","Daily score: kills + 500 per floor reached + 1,000 per boss + 5,000 for clearing. UTC daily seed; your shrine upgrades apply. No server or global leaderboard.","menu-note"));
+          body.append(menuText("p","Daily score: kills + 500 per floor reached + 1,000 per boss + 5,000 for clearing. UTC daily seed; your shrine upgrades and mastery perks apply. No server or global leaderboard.","menu-note"));
         }
         function renderRunHistory(){
           const body=menuBase("RUN HISTORY","hub","Last 20 runs for "+slots[activeSlot].name);
@@ -3922,6 +3950,186 @@
           if(!visiblePoint(o.x,o.y,24))return true;
           ctx.fillStyle=o.type==="nightGold"?"#e8bd65":"#d0a4f3";ctx.strokeStyle="#19131c";ctx.lineWidth=2;
           ctx.beginPath();ctx.arc(o.x,o.y,o.type==="nightGold"?5:10,0,7);ctx.fill();ctx.stroke();return true;
+        }
+
+        // v73 new heroes and additive mastery; existing hero attacks remain unchanged.
+        let bloodDaggers=[],iceWalls=[],newBloodFx=[];
+        const newHeroKeys=["rogue","frostwarden"];
+        function isNewBloodHero(){return newHeroKeys.includes(hero?.class);}
+        function newHeroElements(){return hero.class==="rogue"?["poison","shadow","shared"]:["ice","earth","shared"];}
+        function applyNewBloodProfile(prior={}){
+          Object.assign(profile,EmberMastery.normalize(prior));
+          profile.rogue=!!prior?.rogue||(Number(prior?.bosses)||0)>=5;
+          profile.frostwarden=!!prior?.frostwarden||(Number(prior?.bestFloor)||0)>=4;
+          for(const kind of newHeroKeys){profile.bestTorment[kind] ??=0;profile.bestDepth[kind]=Math.min(20,Math.max(0,Number(prior?.bestDepth?.[kind])||0));}
+          if(newHeroKeys.includes(prior?.selectedHero)&&profile[prior.selectedHero])selectedHero=prior.selectedHero;
+        }
+        function masteryRunId(){const id=new Uint32Array(1);crypto.getRandomValues(id);return Date.now().toString(36)+"-"+id[0];}
+        function ensureMasteryRun(){
+          if(typeof hero.masteryRunId!=="string"||!/^[a-z0-9]+-[0-9]+$/.test(hero.masteryRunId))hero.masteryRunId=masteryRunId();
+          if(floorCheckpoint)floorCheckpoint.hero.masteryRunId=hero.masteryRunId;
+        }
+        function ensureNewBloodFields(){
+          if(!isNewBloodHero())return;
+          for(const key of ["venomTips","toxicVial","virulence","shadowLace","mirrorEdge","umbralPrecision","rimeBash","frozenBulwark","glacialEcho","graniteMantle","seismicCounter","stoneWake"])hero[key] ||=0;
+          hero.veilUntil ||=0;hero.fortressUntil ||=0;hero.wallCd ??=4;hero.vialCd ??=3;hero.stoneCd ??=1;hero.bashCount ||=0;
+        }
+        function initializeNewBloodRun(){
+          bloodDaggers=[];iceWalls=[];newBloodFx=[];
+          ensureMasteryRun();
+          if(isNewBloodHero()){
+            const rogue=hero.class==="rogue",u=profile.upgrades;
+            hero.hp=hero.maxHp=(rogue?90:180)+10*(u.vigor||0);
+            hero.armor=hero.maxArmor=(rogue?25:80)+10*(u.armor||0);
+            hero.speed=Math.round((rogue?315:215)*(1+.05*(u.fleet||0)));
+            hero.damage=Math.round((rogue?32:66)*(1+.05*(u.power||0)));
+            hero.baseRate=hero.rate=rogue?.20:.5;hero.range=rogue?220:125;hero.armorStyle=rogue?"light":"heavy";
+            ensureNewBloodFields();
+          }
+          const rank=EmberMastery.level(profile.mastery[hero.class].xp),perks=EmberMastery.perks(rank);
+          hero.rerolls+=perks.rerolls;
+          if(perks.token){hero.relics.push("wanderer");hero.pickupBonus+=8;}
+        }
+        function resetNewBloodActors(){bloodDaggers=[];iceWalls=[];newBloodFx=[];if(isNewBloodHero()){ensureNewBloodFields();hero.decoy=null;hero.veilMemory=null;}}
+        function awardHeroMastery(clear=false){
+          if(!hero||activeSlot<0)return;ensureMasteryRun();
+          const floor=isDescent()?Math.max(0,dungeon.floor-(clear?0:1)):0;
+          const total=EmberMastery.earned(floor,runStats.bosses,kills,endgameRun?.torment||0);
+          EmberMastery.grant(profile,hero.class,hero.masteryRunId,total);saveProfile();
+        }
+        function newBloodAttack(){
+          if(!isNewBloodHero())return false;
+          const target=nearestVisible(hero.x,hero.y,hero.range);
+          if(hero.class==="rogue"){
+            if(!target){attack=.04;return true;}
+            const angle=Math.atan2(target.y-hero.y,target.x-hero.x);
+            hero.faceX=Math.cos(angle);hero.faceY=Math.sin(angle);
+            for(let i=0;i<hero.projectiles&&bloodDaggers.length<32;i++)fireRogueDagger(hero,angle+(i-(hero.projectiles-1)/2)*.09,1);
+            hero.cast=.18;sfx("shoot");
+          }else{
+            const angle=target?Math.atan2(target.y-hero.y,target.x-hero.x):Math.atan2(hero.faceY||1,hero.faceX||0);
+            hero.faceX=Math.cos(angle);hero.faceY=Math.sin(angle);hero.bashCount++;
+            shieldBash(angle,false);
+            for(let i=1;i<hero.projectiles;i++)shieldBash(angle+Math.PI,true);
+            hero.cast=.28;sfx("shoot");
+            if(hero.seismicCounter&&hero.bashCount%4===0)prototypeArea(hero.x,hero.y,hero.range+25,hero.damage*.25*hero.seismicCounter*(hero.evolutions.includes("avalanche")?2:1),"earth");
+          }
+          attack=hero.baseRate/(1+hero.attackHaste)/(hero.hasteUntil>clock?1.25:1);return true;
+        }
+        function fireRogueDagger(origin,angle,power){
+          if(bloodDaggers.length>=32)return;
+          const crit=hero.veilUntil>clock||gameRandom()<hero.critChance;
+          bloodDaggers.push({x:origin.x,y:origin.y,vx:Math.cos(angle)*610,vy:Math.sin(angle)*610,left:hero.range,damage:hero.damage*power*(crit?hero.critMultiplier:1),crit,angle,shadow:origin!==hero});
+        }
+        function shieldBash(angle,behind){
+          newBloodFx.push({kind:"bash",x:hero.x,y:hero.y,angle,r:hero.range,life:.25,total:.25});
+          for(const e of [...enemies]){const dx=e.x-hero.x,dy=e.y-hero.y,d=Math.hypot(dx,dy);
+            if(d<hero.range+e.r&&(dx*Math.cos(angle)+dy*Math.sin(angle))/(d||1)>=Math.cos(Math.PI*5/12)&&!segmentBlocked(hero.x,hero.y,e.x,e.y)){
+              const crit=gameRandom()<hero.critChance;damageEnemy(e,hero.damage*(crit?hero.critMultiplier:1),hero.weaponEffect==="earth"?"earth":"frost",0,true,crit);
+              if(hero.rimeBash||hero.weaponEffect==="frost")afflict(e,"frost",hero.damage*(.25+.1*hero.rimeBash));
+              if(hero.evolutions.includes("permafrost"))e.stunUntil=Math.max(e.stunUntil||0,clock+.25);
+            }
+          }
+          if(newBloodFx.length>20)newBloodFx.shift();
+        }
+        function newBloodDash(){
+          if(hero.class!=="rogue")return;
+          hero.decoy={x:hero.x,y:hero.y,r:14,hp:100000,until:clock+2,cd:0,faceX:hero.faceX,faceY:hero.faceY};
+        }
+        function useNewBloodUltimate(){
+          if(hero.class==="rogue"){hero.veilUntil=clock+3;hero.inv=Math.max(hero.inv,3);hero.veilMemory={x:hero.x,y:hero.y};}
+          if(hero.class==="frostwarden"){hero.fortressUntil=clock+5;hero.fortressX=hero.x;hero.fortressY=hero.y;}
+        }
+        function newBloodHitScale(){if(hero?.class==="rogue"&&hero.veilUntil>clock)return 0;return hero?.class==="frostwarden"&&hero.fortressUntil>clock&&Math.hypot(hero.x-hero.fortressX,hero.y-hero.fortressY)<190?.35:1;}
+        function newBloodDeath(e){
+          if(hero.class==="rogue"&&hero.evolutions.includes("nightbloom")&&clock-(hero.nightbloomAt??-99)>.25){hero.nightbloomAt=clock;prototypeArea(e.x,e.y,70,hero.damage*.4,"poison");rings.push({x:e.x,y:e.y,r:8,life:.35,speed:200,color:elementColors.poison});}
+        }
+        function updateNewBlood(dt){
+          if(!isNewBloodHero())return;
+          ensureNewBloodFields();
+          for(let i=newBloodFx.length-1;i>=0;i--){newBloodFx[i].life-=dt;if(newBloodFx[i].life<=0)newBloodFx.splice(i,1);}
+          if(hero.class==="rogue"){
+            if(hero.decoy?.until>clock&&(hero.mirrorEdge||hero.evolutions.includes("phantoms"))){hero.decoy.cd-=dt;if(hero.decoy.cd<=0){const target=nearestVisible(hero.decoy.x,hero.decoy.y,hero.range);if(target){hero.decoy.cd=hero.evolutions.includes("phantoms")?.4:.7;fireRogueDagger(hero.decoy,Math.atan2(target.y-hero.decoy.y,target.x-hero.decoy.x),.12*hero.mirrorEdge+(hero.evolutions.includes("phantoms")?.3:0));}}}
+            hero.vialCd-=dt;
+            if(hero.toxicVial&&hero.vialCd<=0){const target=nearestVisible(hero.x,hero.y,hero.range);if(target){hero.vialCd=5;prototypeArea(target.x,target.y,40+10*hero.toxicVial,hero.damage*.2*hero.toxicVial,"poison");rings.push({x:target.x,y:target.y,r:10,life:.4,speed:130,color:elementColors.poison});}}
+            for(let i=bloodDaggers.length-1;i>=0;i--){const dagger=bloodDaggers[i],step=610*dt,n=Math.max(1,Math.ceil(step/8));let hit=false;
+              for(let k=0;k<n;k++){dagger.x+=dagger.vx*dt/n;dagger.y+=dagger.vy*dt/n;dagger.left-=step/n;
+                if(wallAt(dagger.x,dagger.y,3)||dagger.left<=0){hit=true;break;}
+                const e=enemies.find(foe=>Math.hypot(foe.x-dagger.x,foe.y-dagger.y)<foe.r+4);
+                if(e){afflict(e,"poison",hero.damage*(.22+.1*hero.venomTips+.06*hero.virulence));damageEnemy(e,dagger.damage,dagger.shadow||hero.weaponEffect==="shadow"?"shadow":"poison",0,true,dagger.crit);if(hero.shadowLace&&enemies.includes(e))damageEnemy(e,hero.damage*.12*hero.shadowLace,"shadow");hit=true;break;}
+              }
+              if(hit)bloodDaggers.splice(i,1);
+            }
+          }else{
+            hero.wallCd-=dt;
+            if(hero.wallCd<=0){hero.wallCd=8/(1+.2*hero.frozenBulwark);const target=nearestVisible(hero.x,hero.y,280),a=target?Math.atan2(target.y-hero.y,target.x-hero.x):Math.atan2(hero.faceY||1,hero.faceX||0),x=hero.x+Math.cos(a)*105,y=hero.y+Math.sin(a)*105;
+              if(icePlacementAllowed(x,y,a)){iceWalls.push({x1:x-Math.sin(a)*70,y1:y+Math.cos(a)*70,x2:x+Math.sin(a)*70,y2:y-Math.cos(a)*70,until:clock+3+.5*hero.frozenBulwark});if(iceWalls.length>2)iceWalls.shift();}
+            }
+            iceWalls=iceWalls.filter(wall=>wall.until>clock);
+            if(hero.graniteMantle&&clock-hero.lastHit>4)hero.armor=Math.min(hero.maxArmor,hero.armor+.8*hero.graniteMantle*dt);
+            hero.stoneCd-=dt;if(hero.stoneWake&&hero.moving&&hero.stoneCd<=0){hero.stoneCd=2.5;prototypeArea(hero.x,hero.y,75,hero.damage*.22*hero.stoneWake,"earth");}
+            if(hero.glacialEcho&&(hero.echoCd??0)<=clock){hero.echoCd=clock+1;for(const wall of iceWalls){const x=(wall.x1+wall.x2)/2,y=(wall.y1+wall.y2)/2;prototypeArea(x,y,65,hero.damage*.08*hero.glacialEcho,"frost");}}
+          }
+        }
+        function icePlacementAllowed(x,y,a){
+          if(wallAt(x,y,8))return false;
+          for(const t of [-70,0,70]){const px=x-Math.sin(a)*t,py=y+Math.cos(a)*t;if(wallAt(px,py,8))return false;if(isDescent()&&(Math.hypot(px-24.5*80,py-10*80)<110||dungeon.stairs&&Math.hypot(px-dungeon.stairs.x,py-dungeon.stairs.y)<100||(dungeon.shop?.pads||[]).some(p=>Math.hypot(px-p.x,py-p.y)<60)))return false;}
+          return true;
+        }
+        function closestIcePoint(x,y,wall){const dx=wall.x2-wall.x1,dy=wall.y2-wall.y1,t=Math.max(0,Math.min(1,((x-wall.x1)*dx+(y-wall.y1)*dy)/(dx*dx+dy*dy)));return {x:wall.x1+dx*t,y:wall.y1+dy*t};}
+        function resolveIceCollision(o,origin){
+          if(!origin||!iceWalls.length)return;
+          const n=Math.max(1,Math.ceil(Math.hypot(o.x-origin.x,o.y-origin.y)/8));
+          for(const wall of iceWalls){let blocked=false;for(let k=1;k<=n;k++){const x=origin.x+(o.x-origin.x)*k/n,y=origin.y+(o.y-origin.y)*k/n,p=closestIcePoint(x,y,wall);if(Math.hypot(x-p.x,y-p.y)<(o.r||14)+6){blocked=true;break;}}
+            if(!blocked)continue;o.x=origin.x;o.y=origin.y;return;
+          }
+        }
+        function describeNewBloodShared(options){
+          for(const card of options){
+            if(card.name==="Quick Hands")card.text="+10% "+(hero.class==="rogue"?"dagger throw":"shield bash")+" haste · rank "+(Math.round(hero.attackHaste*10)+1)+"/3";
+            if(card.name==="Twin Flame")card.text=(hero.class==="rogue"?"Throw one extra dagger":"Add one rear shield bash")+" · rank "+hero.projectiles+"/5";
+            if(card.name==="Long Reach")card.text=(hero.class==="rogue"?"Daggers travel farther":"Increase shield bash radius")+" · +25 reach";
+          }
+        }
+        function newBloodCards(){
+          if(!isNewBloodHero())return [];
+          const options=[],rank=(name,element,key,text,extra)=>{const value=hero[key]||0;if(value<3)options.push({name,element,text:text+" · rank "+(value+1)+"/3",apply:()=>{hero[key]=value+1;if(extra)extra();}});};
+          if(hero.class==="rogue"){
+            rank("Venom Tips","poison","venomTips","Daggers inflict stronger poison");rank("Toxic Vial","poison","toxicVial","Automatic toxic bursts hit clustered foes every 5s");rank("Virulence","poison","virulence","Poison wounds deal more damage");
+            rank("Shadow Lace","shadow","shadowLace","Dagger hits deal an extra shadow strike");rank("Mirror Edge","shadow","mirrorEdge","Dash decoys throw shadow daggers; evolution strengthens them");rank("Umbral Precision","shadow","umbralPrecision","+3% critical chance",()=>hero.critChance+=.03);
+            for(const [kind,element,name]of [["venom","poison","Mire Wisp"],["shadow","shadow","Umbral Sprite"]])if(!hero.fairies.includes(kind))options.push({name,element,text:"A friendly spirit strikes nearby enemies",apply:()=>hero.fairies.push(kind)});
+          }else{
+            rank("Rime Bash","ice","rimeBash","Shield bashes chill enemies");rank("Frozen Bulwark","ice","frozenBulwark","Ice walls last longer and appear more often");rank("Glacial Echo","ice","glacialEcho","Ice walls pulse frost damage");
+            rank("Granite Mantle","earth","graniteMantle","+12 armor capacity, repair 12 and improve regeneration",()=>{hero.maxArmor+=12;hero.armor=Math.min(hero.maxArmor,hero.armor+12);hero.armorBonus+=12;});rank("Seismic Counter","earth","seismicCounter","Every fourth shield bash sends an earth pulse");rank("Stone Wake","earth","stoneWake","While moving, tremors damage nearby foes");
+            for(const [kind,element,name]of [["frost","ice","Rime Sprite"],["earth","earth","Stone Sprite"]])if(!hero.fairies.includes(kind))options.push({name,element,text:"A friendly spirit strikes nearby enemies",apply:()=>hero.fairies.push(kind)});
+          }return options;
+        }
+        function newBloodEvolutions(){if(!isNewBloodHero())return [];return [["nightbloom","poison","NIGHTBLOOM","Kills release a toxic burst"],["phantoms","shadow","PHANTOM LEGION","Dash decoys throw shadow daggers"],["permafrost","ice","PERMAFROST","Shield bashes briefly freeze enemies"],["avalanche","earth","STONE AVALANCHE","Double the fourth-bash earth pulse"]].map(([key,element,name,text])=>({key,element,name,text,ready:evolutionReady(key)}));}
+        function updateNewBloodUnlocks(){
+          const rogue=profile.rogue,warden=profile.frostwarden;
+          profile.rogue ||=profile.bosses>=5;profile.frostwarden ||=profile.bestFloor>=4;
+          if(profile.rogue!==rogue||profile.frostwarden!==warden){saveProfile();showToast(!rogue&&profile.rogue?"SHADOW ROGUE UNLOCKED":"FROST WARDEN UNLOCKED");}
+        }
+        function renderMastery(body,kind){
+          const item=profile.mastery[kind],rank=EmberMastery.level(item.xp);
+          body.append(menuText("p","MASTERY "+rank+"/20 · "+item.xp+" XP"+(rank<20?" / "+EmberMastery.goal(rank+1):" · MAX"),"menu-sub"),menuText("p","Earn mastery from kills, bosses and floors cleared, with bonus XP for Torment. Lv10: +1 starting reroll · Lv20: Wanderer's Token (+8 pickup radius).","menu-note"));
+          const limit=rank>=16?2:rank>=8?1:0;
+          body.append(menuButton("COLOR · "+["ORIGINAL","MOON SILVER","EMBER GOLD"][item.color],()=>{item.color=(item.color+1)%(limit+1);saveProfile();renderHeroScreen();},"Moon Silver at mastery 8 · Ember Gold at mastery 16"));
+        }
+        function loadNewHeroArt(){
+          for(const kind of ["rogue","frostwarden"]){const image=new Image();let fallback=false;image.onload=()=>{for(const [frame,key]of [[0,kind],[6,kind+"-side"],[12,kind+"-back"],[18,kind+"-cast"]]){const r=window.EmberHeroAnimation?.cell?.(kind,frame,image.naturalWidth,image.naturalHeight)||{sx:0,sy:0,sw:image.naturalWidth/6,sh:image.naturalHeight/5};registerSprite(image,key,r.sx,r.sy,r.sw,r.sh);}document.querySelectorAll("canvas.hero-art,canvas.slot-icon").forEach(canvas=>paintHeroPortrait(canvas,canvas.dataset.hero));};image.onerror=()=>{if(!fallback){fallback=true;image.src="assets/cinematic/"+kind+"-animation.png";}};image.src="assets/cinematic/"+kind+"-animation.webp";}
+        }
+        function drawNewBlood(){
+          if(hero.class==="rogue"){
+            for(const dagger of bloodDaggers){if(!visiblePoint(dagger.x,dagger.y,25))continue;ctx.save();ctx.translate(dagger.x,dagger.y);ctx.rotate(dagger.angle);ctx.fillStyle=dagger.shadow?"#c7a5ef":"#a9df80";ctx.beginPath();ctx.moveTo(12,0);ctx.lineTo(-8,-3);ctx.lineTo(-5,0);ctx.lineTo(-8,3);ctx.closePath();ctx.fill();ctx.restore();}
+            if(hero.decoy?.until>clock){const d=hero.decoy,img=art.rogue||art.gravecaller;sceneItem(d.x,d.y,()=>{ctx.save();ctx.globalAlpha=.4;drawGrounded(img,d.x,actorFoot(d.y,19),55,80,0,false,false,false);ctx.restore();});}
+          }
+          if(hero.class==="frostwarden"){
+            for(const wall of iceWalls){if(!visiblePoint((wall.x1+wall.x2)/2,(wall.y1+wall.y2)/2,110))continue;ctx.strokeStyle="#acdcef";ctx.lineWidth=9;ctx.beginPath();ctx.moveTo(wall.x1,wall.y1);ctx.lineTo(wall.x2,wall.y2);ctx.stroke();const pieces=visualQuality.maxAtmosphere>=18?10:5;for(let i=0;i<=pieces;i++){const x=wall.x1+(wall.x2-wall.x1)*i/pieces,y=wall.y1+(wall.y2-wall.y1)*i/pieces;billboard(x,y,()=>{ctx.fillStyle="#a5d4e588";ctx.beginPath();ctx.moveTo(-8,0);ctx.lineTo(-5,-22);ctx.lineTo(0,-32);ctx.lineTo(6,-22);ctx.lineTo(8,0);ctx.closePath();ctx.fill();});}}
+            if(hero.fortressUntil>clock){ctx.fillStyle="#86c3e41c";ctx.strokeStyle="#bce9ff";ctx.lineWidth=3;ctx.beginPath();ctx.arc(hero.fortressX,hero.fortressY,190,0,7);ctx.fill();ctx.stroke();billboard(hero.fortressX,hero.fortressY,()=>{ctx.strokeStyle="#b7e2f555";ctx.lineWidth=2;const count=visualQuality.maxAtmosphere>=18?5:3;for(let i=0;i<count;i++){ctx.beginPath();ctx.ellipse(0,-24,190-i*20,110,0,Math.PI,Math.PI*2);ctx.stroke();}});}
+            for(const fx of newBloodFx){ctx.save();ctx.globalAlpha=fx.life/fx.total;ctx.strokeStyle="#c3f0ff";ctx.lineWidth=6;ctx.beginPath();ctx.arc(fx.x,fx.y,fx.r,fx.angle-Math.PI*5/12,fx.angle+Math.PI*5/12);ctx.stroke();ctx.restore();}
+          }
+
         }
 
         // Dungeon geometry is a union of authored rooms and corridors on an 80px grid.
@@ -3981,6 +4189,7 @@
           ensureSkills(hero);hero.dashTime=0;hero.firestormTime=0;
           buildFloor(number);hero.x=400;hero.y=800;resetHeroActors();hero.inv=2;hero.finalBossSpawned=false;
           /* endgame-v72 */ prepareEndgameFloor(number);
+          /* new-blood-v73 */ resetNewBloodActors();
           hero.pactNext=clock+20;hero.pactUntil=0;
           enemies=[];shots=[];hazards=[];pools=[];drops=[];zoneHazards=[];meteors=[];bloodEffects=[];boss=null;
           dungeonEvent=null;trialChoicePending=0;spawn=1;attack=0;waveClock=0;wave=1+(number-1)*4;
@@ -4188,6 +4397,7 @@
           }
         }
         function moveAroundWalls(o, vx, vy, dt, guide = false) {
+          /* new-blood-v73 */ const frostOrigin=hero?.class==="frostwarden"&&guide?{x:o.x,y:o.y}:null;
           clearWall(o);
           if(isDescent()&&guide&&!o.treasure&&segmentBlocked(o.x,o.y,hero.x,hero.y,o.r||14)){
             const [cx,cy]=dungeonCell(o.x,o.y).split(",").map(Number);let target=null,best=navField.get(cx+","+cy)??Infinity;
@@ -4214,6 +4424,7 @@
               if (!wallAt(o.x + sx * step, o.y, r)) o.x += sx * step;
             }
           }
+          /* new-blood-v73 */ resolveIceCollision(o,frostOrigin);
         }
         function drawPaths(left, top) {
           let zone = currentZone(),
@@ -4565,6 +4776,8 @@
           }return p.waypoint||target;
         }
         function nearbyAlly(e){
+          if(hero.class==="rogue"&&hero.decoy?.until>clock&&!e.treasure&&Math.hypot(hero.decoy.x-e.x,hero.decoy.y-e.y)<260&&!segmentBlocked(e.x,e.y,hero.decoy.x,hero.decoy.y))return hero.decoy;
+          if(hero.class==="rogue"&&hero.veilUntil>clock&&hero.veilMemory&&!e.treasure)return hero.veilMemory;
           if(e.type==="boss"||e.treasure)return null;
           let ally=null,best=180;for(const p of companions){const d=Math.hypot(p.x-e.x,p.y-e.y);if(p.hp>0&&d<best&&!segmentBlocked(e.x,e.y,p.x,p.y)){ally=p;best=d;}}return ally;
         }
@@ -4655,11 +4868,12 @@
           for(const spirit of [...heroSpirits]){spirit.life-=dt;const target=nearestVisible(spirit.x,spirit.y,400);if(target){const d=Math.hypot(target.x-spirit.x,target.y-spirit.y)||1,step=Math.min(d,300*dt);spirit.x+=(target.x-spirit.x)/d*step;spirit.y+=(target.y-spirit.y)/d*step;if(d<target.r+8){damageEnemy(target,spirit.damage,"shadow");spirit.life=0;}}if(spirit.life<=0)heroSpirits.splice(heroSpirits.indexOf(spirit),1);}
         }
         function prototypeCardAllowed(o){
+          if(isNewBloodHero())return !o.element||o.element==="shared";
           if(!["gravecaller","ranger","sunwarden"].includes(hero.class)||!o.element||o.element==="shared")return true;
           return hero.class==="gravecaller"&&o.key==="blades";
         }
         function prototypeCards(){
-          const options=[];
+          const options=newBloodCards();
           function rank(name,element,key,max,text,extra){const value=hero[key]||0;if(value>=max)return;options.push({name,element,text:text+" · rank "+(value+1)+"/"+max,apply:()=>{hero[key]=value+1;if(extra)extra();}});}
           if(hero.class==="gravecaller"){
             rank("Raise Legion","shadow","capacityRank",3,"+1 skeleton capacity",()=>hero.minionCapacity=(hero.minionCapacity||4)+1);
@@ -4679,12 +4893,14 @@
           }return options;
         }
         function prototypeEvolutionAllowed(key){
+          if(isNewBloodHero())return Object.keys(newBloodRequirements).includes(key);
           if(hero.class==="gravecaller")return ["legion","ossuary","soulstorm"].includes(key);
           if(hero.class==="ranger")return ["shatter","alpha","blizzard"].includes(key);
           if(hero.class==="sunwarden")return ["dawn","eye","halo"].includes(key);
           return true;
         }
         function prototypeEvolutions(){return [
+          ...newBloodEvolutions().map(o=>[o.key,o.element,o.name,o.text]),
           ["legion","shadow","LEGION","Double skeleton capacity"],["ossuary","arcane","OSSUARY","Every five skeletons merge into a bone giant for 15s"],["soulstorm","shadow","SOUL STORM","Dying minions release three homing spirits"],
           ["alpha","lightning","ALPHA PACK","A second wolf joins you; wolf bites chain lightning"],["blizzard","frost","BLIZZARD LINE","Nearby traps link into freezing walls"],
           ["dawn","light","DAWNBREAKER","Your sweeping beam splits into three"],["eye","wind","EYE OF THE STORM","Wind gusts form a larger damaging ring"],["halo","light","HALO","Healing sanctuary zones follow you"]
@@ -5070,6 +5286,7 @@
           /* cosmetic-v69 */ fx("enemyDeath", e);
           enemies.splice(enemies.indexOf(e), 1);
           /* endgame-v72 */ endgameEnemyKilled(e);
+          /* new-blood-v73 */ newBloodDeath(e);
           if(hero.class==="gravecaller"&&gameRandom()<.35)raiseMinion(e.x,e.y);
           if(hero.evolutions?.includes("crimson")&&spreadDepth<2&&deathReactionBudget++<18) {
             bloodEffects.push({kind:"pulse",x:e.x,y:e.y,r:78,life:.4,color:elementColors.blood});
@@ -5330,7 +5547,7 @@
           for (const kind of ["poison", "burn", "frost"])
             if (e[kind + "Time"] > 0) e[kind + "Time"] = Math.max(0, e[kind + "Time"] - dt);
         }
-        const ultimateNames={ember:"FIRESTORM",bloodknight:"EARTHSPLITTER",gravecaller:"ARMY OF THE DEAD",ranger:"ARROW STORM",sunwarden:"SOLAR FLARE"};
+        const ultimateNames={rogue:"NIGHT VEIL",frostwarden:"GLACIER FORTRESS",ember:"FIRESTORM",bloodknight:"EARTHSPLITTER",gravecaller:"ARMY OF THE DEAD",ranger:"ARROW STORM",sunwarden:"SOLAR FLARE"};
         function ensureSkills(target,now=clock){
           target.ultimateUsedAt=Number.isFinite(target.ultimateUsedAt)?Math.max(0,Math.min(now,target.ultimateUsedAt)):now;
           target.ultimateWindow=Number.isInteger(target.ultimateWindow)?target.ultimateWindow:-1;
@@ -5370,6 +5587,7 @@
           hero.dashX=dx/length;hero.dashY=dy/length;hero.dashTime=.25;
           hero.dashCd=dashCooldown();hero.inv=Math.max(hero.inv,.25);
           hero.stunUntil=0;hero.slideX=hero.slideY=0;
+          /* new-blood-v73 */ newBloodDash();
           rings.push({x:hero.x,y:hero.y,r:12,life:.25,speed:180,color:"#c0e7ff"});
           ensureAudio();sfx("dash");updateSkillButtons();return true;
         }
@@ -5377,6 +5595,7 @@
           if(mode!=="play"||!hero||hero.ultimateCharge<100)return false;
           if(rpgPreview)rpgFx.push({kind:hero.class,x:hero.x,y:hero.y,r:hero.class==="bloodknight"?320:hero.class==="sunwarden"?235:125,life:1.1,total:1.1});
           hero.ultimateCharge=0;hero.ultimateUsedAt=clock;hero.cast=.4;flash=.45;shake=5;
+          /* new-blood-v73 */ useNewBloodUltimate();
           ensureAudio();sfx("ultimate");showToast(ultimateNames[hero.class]);
           const color=hero.class==="gravecaller"?"#cba4ff":hero.class==="ranger"?"#a9e6ff":hero.class==="bloodknight"?"#b88446":"#ffe4a0";
           rings.push({x:hero.x,y:hero.y,r:20,life:.65,speed:500,color});
@@ -5486,7 +5705,7 @@
         function drawRpgEffects(){
           if(!rpgPreview)return;
           for(const fx of rpgFx){
-            const t=1-fx.life/fx.total,r=fx.r*(.35+.65*t),color=fx.color||{gravecaller:"#b895ff",ranger:"#a4e6ff",ember:"#ffab65",bloodknight:"#c99b61",sunwarden:"#fff0b0"}[fx.kind];
+            const t=1-fx.life/fx.total,r=fx.r*(.35+.65*t),color=fx.color||{gravecaller:"#b895ff",ranger:"#a4e6ff",ember:"#ffab65",bloodknight:"#c99b61",sunwarden:"#fff0b0",rogue:"#b4ee82",frostwarden:"#a6e9ff"}[fx.kind];
             ctx.save();ctx.globalAlpha=Math.sin((1-t)*Math.PI*.75)*.75;ctx.strokeStyle=color;ctx.lineWidth=fx.kind==="impact"?3:2;
             ctx.beginPath();ctx.arc(fx.x,fx.y,r,0,Math.PI*2);ctx.stroke();
             if(fx.kind!=="impact"){
@@ -5499,6 +5718,7 @@
           for(const ghost of dashGhosts){const img=facingArt(ghost.kind,ghost.fx,ghost.fy,false);if(!img)continue;sceneItem(ghost.x,ghost.y,()=>{ctx.save();ctx.globalAlpha=ghost.life/.18*.25;drawGrounded(spriteMasks.get(img)||img,ghost.x,ghost.y,58,hero.class==="bloodknight"?90:80,0,false,projectVector(ghost.fx,ghost.fy).x<0,false);ctx.restore();});}
         }
         function takeHit(amount) {
+          /* new-blood-v73 */ amount *= newBloodHitScale();
           if(hero.dashTime>0)return 0;
           if (hero.shieldUntil > clock && hero.shieldCharges > 0) {
             sfx("block");
@@ -5574,6 +5794,7 @@
           if (mode !== "play") return;
           deathReactionBudget = 0;
           clock += dt;
+          /* new-blood-v73 */ updateNewBlood(dt);
           updateOpeningGuide();
           if (activeSlot >= 0) slotPlayUnstored += dt;
           shake = Math.max(0, shake - dt * 20);
@@ -5735,6 +5956,7 @@
           /* endgame-v72 */ spawn /= endgameFactors().density;
           }
           attack -= dt;
+          /* new-blood-v73 */ if(attack<=0)newBloodAttack();
           if(attack<=0&&hero.class==="sunwarden"){attack=hero.rate;}
           else if(attack<=0&&hero.class==="ranger"){fireRanger();}
           else if (attack <= 0 && hero.class === "bloodknight") {
@@ -6575,9 +6797,9 @@
         }
         function facingArt(name, x, y, casting) {
           if(rpgPreview){const direction=projectVector(x,y);x=direction.x;y=direction.y;}
-          if(["bloodknight","ranger","sunwarden","wolf"].includes(name)&&casting&&spriteReady(name+"-cast"))return art[name+"-cast"];
+          if(["bloodknight","ranger","sunwarden","rogue","frostwarden","wolf"].includes(name)&&casting&&spriteReady(name+"-cast"))return art[name+"-cast"];
           let base = name,
-            side = ["gravecaller","ranger","ember","bloodknight","sunwarden","wolf"].includes(base) && Math.abs(x) > Math.abs(y) * 0.72,
+            side = ["gravecaller","ranger","ember","bloodknight","sunwarden","rogue","frostwarden","wolf"].includes(base) && Math.abs(x) > Math.abs(y) * 0.72,
             back = !side && y < -0.15,
             key = base + (side ? "-side" : back ? "-back" : "") + (casting ? "-cast" : "");
           let direction=base+(side?"-side":back?"-back":"");
@@ -6709,7 +6931,7 @@
           let x = hero.x,
             y = hero.y,
             w = 55,
-            h = hero.class === "bloodknight" ? 90 : 80,
+            h = ["bloodknight","frostwarden"].includes(hero.class) ? 90 : 80,
             fx = hero.class==="ranger"&&hero.cast>.025 ? (hero.aimX??hero.faceX??0) : hero.faceX || 0,
             fy = hero.class==="ranger"&&hero.cast>.025 ? (hero.aimY??hero.faceY??1) : hero.faceY === undefined ? 1 : hero.faceY,
             poseCast = hero.cast,
@@ -6718,6 +6940,8 @@
             img = facingArt(heroArt, fx, fy, casting),
             side = Math.abs(projectVector(fx,fy).x) > Math.abs(projectVector(fx,fy).y) * 0.72;
           if(beamPulse){const pulse=clock%1.2;if(pulse<.18){poseCast=Math.max(poseCast,.18-pulse);casting=true;if(sunPulse!==Math.floor(clock/1.2)){sunPulse=Math.floor(clock/1.2);sfx("shoot");}}}
+          if(!window.EmberHeroAnimation?.ready(hero.class))img=window.EmberHeroAnimation?.tint?.(img,profile.mastery?.[hero.class]?.color||0)||img;
+
           if(img.cinematic)w=Math.min(92,h*img.naturalWidth/img.naturalHeight);
           groundShadow(x,actorFoot(y,18),20,7);
           drawHeroRing(x,actorFoot(y,18),hero.class);
@@ -6728,15 +6952,17 @@
           ctx.stroke();
           ctx.save();
           if (hero.inv > 0 && Math.floor(hero.inv * 16) % 2) ctx.globalAlpha = 0.45;
+          if(hero.class==="rogue"&&hero.veilUntil>clock)ctx.globalAlpha=.5;
           let heroHit=Math.max(0,1-(clock-(hero.lastHit??-99))/.18);
           let authored=false;
           if(window.EmberHeroAnimation?.ready(hero.class)){
             ctx.save();ctx.translate(x,actorFoot(y,19));cancelProjection();
-            authored=window.EmberHeroAnimation.draw(ctx,{kind:hero.class,height:h,direction:projectVector(fx,fy),phase:hero.stepPhase,moving:hero.moving,cast:poseCast,hit:heroHit,dead:hero.hp<=0});ctx.restore();
+            authored=window.EmberHeroAnimation.draw(ctx,{kind:hero.class,variant:profile.mastery?.[hero.class]?.color||0,height:h,direction:projectVector(fx,fy),phase:hero.stepPhase,moving:hero.moving,cast:poseCast,hit:heroHit,dead:hero.hp<=0});ctx.restore();
+
           }
           if(!authored)drawGrounded(img,x,actorFoot(y,19),w,h,hero.stepPhase||0,hero.moving,(side||hero.class==="ranger"&&casting)&&projectVector(fx,fy).x<0,casting,projectVector(fx,fy).x,heroHit,rpgPreview?Math.sin(Math.min(1,hero.cast/(hero.class==="bloodknight"?.2:.18))*Math.PI):0);
           ctx.restore();
-          if (casting && hero.class !== "bloodknight") {
+          if (casting && !["bloodknight","rogue","frostwarden"].includes(hero.class)) {
             let pulse = Math.sin(Math.min(1, hero.cast / 0.18) * Math.PI),
               staffX = x + (side ? Math.sign(fx) * 27 : fy < 0 ? 14 : -13),
               staffY = y - 40;
@@ -7317,7 +7543,7 @@
           drawSpellLighting();
           drawRpgEffects();
           drawSpellEffects(left, top);
-          drawPrototypeGround();
+          drawPrototypeGround();drawNewBlood();
           ctx.save();ctx.globalAlpha=.10;
           drawGlow(hero.x,hero.y,52,hero.class==="bloodknight"?"#d45768":hero.class==="ember"?"#ffb174":hero.class==="ranger"?"#99dfff":hero.class==="sunwarden"?"#ffe5a1":"#b9a0ef");ctx.restore();
           for (const e of enemies)

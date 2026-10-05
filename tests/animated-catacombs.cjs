@@ -8,7 +8,7 @@ const { chromium } = require('playwright');
 const root = path.resolve(__dirname, '..');
 const source = fs.readFileSync(path.join(root, 'index.html'), 'utf8').replace('function music(kind) {','function music(kind) { return;');
 for (const script of source.matchAll(/<script[^>]*>([\s\S]*?)<\/script>/g)) new Function(script[1]);
-const heroes = ['gravecaller', 'bloodknight','ranger','sunwarden','ember'];
+const heroes = ['gravecaller', 'bloodknight','ranger','sunwarden','ember','rogue','frostwarden'];
 const sizes = [{ width: 390, height: 844 }, { width: 844, height: 390 }];
 const errors = [];
 const report = { animation: [], scenes: [], compatibility: null, fallbacks: [], native: [], browserErrors: errors };
@@ -88,7 +88,7 @@ function summary(values) {
   try {
     const page = await browser.newPage({ viewport: sizes[0], hasTouch: true });
     await initialize(page); await page.goto(url); await loaded(page);
-    await page.waitForFunction(() => ['gravecaller','bloodknight','ranger','sunwarden','ember'].every(k=>EmberHeroAnimation.ready(k)));
+    await page.waitForFunction(() => ['gravecaller','bloodknight','ranger','sunwarden','ember','rogue','frostwarden'].every(k=>EmberHeroAnimation.ready(k)));
     report.animation = await page.evaluate(heroes => {
       const result = [], a = EmberHeroAnimation;
       function check(value, message) { if (!value) throw Error(message); }
@@ -115,7 +115,7 @@ function summary(values) {
         }
         check(Math.max(...baseline)-Math.min(...baseline)<=2, kind+' foot anchor jitter');
         check(a.choose({kind,direction:{x:-1,y:0}}).flip,kind+' left-facing mirrored');
-        const duration=kind==='bloodknight'?.24:.18, cast=[],poseExtents=[];
+        const duration=kind==='bloodknight'?.24:kind==='frostwarden'?.28:.18, cast=[],poseExtents=[];
         function inspectPose(options,expected){
           let tile;a.draw({save(){},restore(){},scale(){},drawImage(img){tile=img;}},options);
           const actual=a.diagnostics().lastDraw[kind];check(actual.index===expected,kind+' pose selector draw mismatch');
@@ -141,7 +141,8 @@ function summary(values) {
         finally{performance.now=realNow;a.draw({save(){},restore(){},scale(){},drawImage(){}},{kind,height:192});}
         result.push({kind,walk:directions,distinctFrameHashes:hashes,footBaseline:[Math.min(...baseline),Math.max(...baseline)],spriteExtents:extents,poseExtents,attackFrames:cast,hitFrames:hits.map(f=>f.index),deathFrames:deaths.map(f=>f.index)});
       }
-      check(a.diagnostics().frames===150,'Expected five bounded 30-frame caches');
+      check(a.diagnostics().frames===210,'Expected seven bounded 30-frame caches');
+
       return result;
     }, heroes);
     console.log('PASS: six distinct frames in each direction, attack/hit/death selectors, grounded uncropped sprites');
@@ -264,6 +265,9 @@ function summary(values) {
       assert(await p.evaluate(()=>gameTest.hero.ultimateCharge<100&&gameTest.mode==='play'),'Actual skill buttons failed');
       await p.evaluate(()=>{window.renderProbe=[];});await p.waitForFunction(()=>renderProbe.length>=60);
       const timings=await p.evaluate(()=>renderProbe.slice(0,60));report.native.push({kind,...size,deviceScaleFactor:3,...summary(timings),pixels:await p.locator('#view').evaluate(c=>c.width*c.height)});
+      const canvasCheck=await p.locator('#view').evaluate(c=>{const bytes=c.getContext('2d').getImageData(0,0,c.width,c.height).data,colors=new Set();for(let y=0;y<c.height;y+=20)for(let x=0;x<c.width;x+=20){const i=(y*c.width+x)*4;colors.add((bytes[i]<<16)|(bytes[i+1]<<8)|bytes[i+2]);}return colors.size;});
+      assert(canvasCheck>80,'Native world canvas blank: '+kind+'/'+size.width+' colors='+canvasCheck);
+      report.native[report.native.length-1].sampledCanvasColors=canvasCheck;
       await p.screenshot({path:`/tmp/animated-catacombs-native-${kind}-${size.width}.png`});await p.close();
     }
     const high=await browser.newPage({viewport:{width:1440,height:3200},deviceScaleFactor:3});await initialize(high);await high.goto(url);await loaded(high);await start(high,'bloodknight');

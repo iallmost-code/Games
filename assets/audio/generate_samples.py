@@ -133,3 +133,15 @@ render('boss-roar', .82, lambda t, lo, mid, hi:
        math.sin(TAU*(71*t-22*t*t))*.3*math.exp(-t*3),2707)
 print('v69 original mono WAV layers:', len(list(OUT.glob('*.wav'))),
       sum(p.stat().st_size for p in OUT.glob('*.wav')), 'bytes')
+
+# v73: close, dry dagger release and heavy ice/metal shield contact.
+render('dagger-whisper', 0.22, lambda t, lo, mid, hi:
+       (mid * .8 + hi * .24) * math.sin(math.pi * min(1, t / .22)) ** 2 +
+       modal(t, [(1200, .13, 1), (2200, .05, 2)], 55), 7301)
+render('glacial-bash', .36, lambda t, lo, mid, hi:
+       (lo * 1.5 + mid * .4) * math.exp(-t * 26) +
+       hi * .35 * math.exp(-t * 60) +
+       modal(t, [(95, .55, 1), (640, .14, 1.7), (1490, .12, 2)], 15), 7302)
+
+print('v73 original mono WAV layers:', len(list(OUT.glob('*.wav'))),
+      sum(p.stat().st_size for p in OUT.glob('*.wav')), 'bytes')

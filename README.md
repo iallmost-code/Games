@@ -132,3 +132,14 @@ Daily Challenge starts directly from Play: the UTC date fixes the seed, hero and
 Profiles stay v2 with additive defaults. Runs become v12: v9/v10/v11 and legacy EC1 codes migrate without discarding progress. Continue restarts the current floor using the same seed, hero, gold and RNG from its entry checkpoint; purchases and secret discoveries made later on that floor restart too. Endless restores the current saved state. All fields remain slot-isolated and travel in EC1 codes.
 
 This PR starts independently from the current main (v68, five heroes/five floors), as requested. It does not merge the separate v69–v71 branches. The room assembler accepts the floor specification supplied by the game so later floor releases can extend it.
+
+
+## v73 · NEW BLOOD
+
+Shadow Rogue (Poison + Shadow) unlocks after five total bosses; Frost Warden (Ice + Earth) unlocks upon reaching Descent floor 4. Rogue throws short-range single-target daggers automatically, leaves a two-second Dash decoy, and uses three seconds of Night Veil (invisibility, last-known-position targeting and guaranteed dagger crits). Warden automatically sweeps a 150° shield bash and raises temporary enemy-only ice walls. Glacier Fortress reduces incoming damage by 65% while inside its five-second dome. Doors, stairs and merchant pads are excluded from wall placement; the hero and allies always pass through ice. Ice cards use existing Frost combat weaknesses/resistances. Both heroes have distinct card names/pools and two evolutions; shared stat cards remain available with appropriate weapon descriptions.
+
+Mastery belongs to each hero within each character slot: levels 1–20, Moon Silver at 8, Ember Gold at 16, +1 starting reroll at 10, and a common Wanderer's Token at 20 (+8 pickup radius, no damage/HP bonus). XP is `(80 × floors cleared + 50 × bosses + floor(kills / 8)) × (1 + 0.1 × Torment)`, rounded down. Finished and abandoned runs award XP; a bounded run-credit ledger makes repeats/resumes pay only new progress. Mastery colors are cached, not per-frame filters.
+
+Builds on merged v72: both heroes participate in Descent/Endless, Random/Classic floors, UTC dailies, Torment records, champions, merchants and run history. Previously saved daily hero/seed/modifier metadata is preserved when the daily pool expands. Profile v2, run v12 and EC1 remain unchanged; absent mastery XP defaults to zero and existing shrine/currency/unlock/record fields are retained. No additional gameplay controls or changes to the existing five heroes' base balance.
+
+Verification: `tests/new-blood.cjs`, the expanded seven-hero animation suite, and the existing suites run on every PR. Normal-stat bot results for 35 runs are in `tests/new-blood-all-heroes-survival.json`; early floor clears are successful, censored observations rather than survival failures. The 25 original-hero outcomes match merged v72 exactly. Headless timing diagnostics are not a physical Android 60-FPS certification.

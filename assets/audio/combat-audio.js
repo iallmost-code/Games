@@ -6,13 +6,15 @@
     new URL('assets/audio/combat-audio.js', root.document ? root.document.baseURI : 'http://localhost/').href);
   const contexts = new WeakMap(), downloads = new Map();
   const MAX_VOICES = 12;
-  const SAMPLE_VERSION = '69';
+  const SAMPLE_VERSION = '73';
   const names = ['blade-air', 'dash-air', 'stone-impact', 'metal-impact', 'armor-hit',
     'shield-ring', 'bow-release', 'soul-cast', 'fire-crackle', 'crystal-chime',
     'pickup-gem', 'ember-blast', 'ultimate-rise', 'soul-fall', 'stone-door',
-    'thunder-string','holy-chime','fire-whoosh','death-bones','death-flesh','death-stone','death-spirit','chest-open','well-drink','forge-anvil','stairs-step','boss-roar'];
+    'dagger-whisper','glacial-bash','thunder-string','holy-chime','fire-whoosh','death-bones','death-flesh','death-stone','death-spirit','chest-open','well-drink','forge-anvil','stairs-step','boss-roar'];
   const layer = (name, gain, pitch = 1, delay = 0) => ({ name, gain, pitch, delay });
   const casts = {
+    rogue: [layer('dagger-whisper', .23),layer('blade-air', .07, 1.3)],
+    frostwarden: [layer('glacial-bash', .23),layer('shield-ring', .12, .75)],
     gravecaller: [layer('soul-cast', .24, .90), layer('blade-air', .09, .75, .018)],
     bloodknight: [layer('blade-air', .25, .84), layer('armor-hit', .08, 1.13, .016)],
     ranger: [layer('bow-release', .21), layer('thunder-string', .13, 1, .018)],

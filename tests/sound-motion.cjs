@@ -176,7 +176,7 @@ function musicMock() {
     await p.goto(url);
     await p.waitForFunction(
       () =>
-        EmberHeroAnimation.diagnostics().frames === 150 &&
+        EmberHeroAnimation.diagnostics().frames === 210 &&
         gameTest.art["prop-frost-brazier"] &&
         gameTest.art["prop-venom-coffin"],
     );
