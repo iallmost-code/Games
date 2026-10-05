@@ -2,6 +2,8 @@
 
 The game itself needs no dependencies or build. These development checks require Node.js, Playwright and Chromium. Install Playwright outside the repository if needed; set `NODE_PATH` to its node_modules directory. Set `BROWSER_PATH` only when selecting a particular Chromium executable.
 
+GitHub Actions (`.github/workflows/tests.yml`) runs every suite on each pull request and on pushes to `main`: a quick syntax and `visual-invariants.cjs` job, then one browser job per suite. Failed jobs upload their screenshots and results as artifacts.
+
 ```sh
 node tests/bloodknight.cjs
 ```

@@ -1,0 +1,80 @@
+name: Tests
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: tests-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  quick:
+    name: Syntax and gameplay invariants
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # suites compare against pinned baseline commits
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: JavaScript syntax
+        run: |
+          node -e '
+            const fs = require("fs");
+            for (const file of ["index.html", "sw.js"]) {
+              const source = fs.readFileSync(file, "utf8");
+              const blocks = file.endsWith(".html") ? [...source.matchAll(/<script>([\s\S]*?)<\/script>/g)].map(m => m[1]) : [source];
+              blocks.forEach(code => new Function(code));
+              console.log(file, "ok,", blocks.length, "script block(s)");
+            }
+            JSON.parse(fs.readFileSync("manifest.webmanifest", "utf8"));
+          '
+      - name: Gameplay and save functions unchanged
+        run: node tests/visual-invariants.cjs
+
+  browser:
+    name: ${{ matrix.suite }}
+    needs: quick
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      matrix:
+        suite: [action-rpg, landscape-skills, new-heroes, bloodknight, descent, descent-variety, descent-tuning]
+    env:
+      ARTIFACT_DIR: ${{ github.workspace }}/artifacts
+      NODE_PATH: ${{ github.workspace }}/.playwright/node_modules
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install Playwright Chromium
+        # Installed outside the game; it needs no build or dependencies.
+        run: |
+          npm install --no-save --no-package-lock --prefix .playwright playwright@1.56.1
+          .playwright/node_modules/.bin/playwright install --with-deps chromium
+          echo "BROWSER_PATH=$(node -e 'console.log(require("playwright").chromium.executablePath())')" >> "$GITHUB_ENV"
+      - name: Run ${{ matrix.suite }}
+        run: node tests/${{ matrix.suite }}.cjs
+      - name: Upload screenshots and results
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.suite }}-artifacts
+          path: |
+            artifacts/
+            /tmp/*.png
+            /tmp/*.json
+            tests/*.json
+          if-no-files-found: ignore

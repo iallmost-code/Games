@@ -756,6 +756,21 @@
     <script>
       (() => {
         "use strict";
+        const GAME_VERSION = "v67 · STABILITY";
+        // Recent script errors for Pause → REPORT A BUG. Never saved.
+        const recentErrors = [];
+        function noteError(kind, detail) {
+          try {
+            let at = "";
+            try { at = "t=" + clock.toFixed(1) + "s "; } catch {}
+            const text = at + kind + ": " + String(detail).split("\n").slice(0, 3).join(" | ").slice(0, 400);
+            if (recentErrors.length && recentErrors[recentErrors.length - 1].text === text) recentErrors[recentErrors.length - 1].count++;
+            else recentErrors.push({ text, count: 1 });
+            if (recentErrors.length > 10) recentErrors.shift();
+          } catch {}
+        }
+        addEventListener("error", (e) => noteError("error", (e.message || "") + (e.filename ? " @" + String(e.filename).split("/").pop() + ":" + e.lineno + ":" + e.colno : "")));
+        addEventListener("unhandledrejection", (e) => noteError("promise", e.reason && (e.reason.stack || e.reason.message) || e.reason));
         const $ = (id) => document.getElementById(id),
           canvas = $("view"),
           ctx = canvas.getContext("2d"),
@@ -803,7 +818,27 @@
         const cameraAngle=Math.PI/4,cameraTilt=.68;
         const masonryPatterns=[];
         function cameraFocusY(){return rpgPreview?(w>h?h*.62:h*.56):h/2;}
-        const visualQuality={maxLights:10,maxAtmosphere:32,pixelBudget:1800000};
+        // Auto quality steps down (never up) during a session when the phone can't hold the frame target.
+        const qualityTiers={high:{maxLights:10,maxAtmosphere:32,pixelBudget:1800000,dprCap:1.5,fps:60},
+          medium:{maxLights:6,maxAtmosphere:16,pixelBudget:1200000,dprCap:1.25,fps:60},
+          low:{maxLights:3,maxAtmosphere:8,pixelBudget:800000,dprCap:1,fps:40}};
+        let qualityPref="auto";
+        try{const q=localStorage.getItem("ember-crypt-quality");if(["auto","high","low"].includes(q))qualityPref=q;}catch{}
+        let qualityTier=qualityPref==="low"?"low":"high";
+        const visualQuality={...qualityTiers[qualityTier]};
+        let perfCallbackAt=0,perfRefresh=1000/60,perfFrames=0,perfTime=0,perfWarm=0,perfFps=60;
+        function setQualityTier(tier){qualityTier=tier;Object.assign(visualQuality,qualityTiers[tier]);perfFrames=perfTime=perfWarm=0;sizeCanvas();}
+        function trackQuality(interval){
+          if(!interval||interval>250||mode!=="play"){perfFrames=perfTime=perfWarm=0;return;}
+          perfFps+=(1000/interval-perfFps)*.05;
+          if(qualityPref!=="auto"||qualityTier==="low"||(perfWarm+=interval)<1000)return;
+          perfFrames++;perfTime+=interval;
+          if(perfTime<3000)return;
+          // Rendered frames land on display refreshes: a 90 Hz screen paces the 60 FPS target at 22 ms.
+          const refresh=Math.max(6.9,perfRefresh),expected=Math.ceil((1000/visualQuality.fps-.5)/refresh)*refresh,slow=perfTime/perfFrames>expected*1.2;
+          perfFrames=perfTime=0;
+          if(slow)setQualityTier(qualityTier==="high"?"medium":"low");
+        }
         let worldW=0,worldH=0,sceneQueue=[],queueScene=false,rpgFx=[],dashGhosts=[],footstepTime=0;
         function projectVector(x,y){return rpgPreview?{x:(x-y)*Math.SQRT1_2,y:(x+y)*Math.SQRT1_2*cameraTilt}:{x,y};}
         function inputVector(x,y){return rpgPreview?{x:(x+y/cameraTilt)*Math.SQRT1_2,y:(y/cameraTilt-x)*Math.SQRT1_2}:{x,y};}
@@ -1208,7 +1243,7 @@
             prompt.onclick=()=>renderMenu("slots");menuPage.append(prompt);
             menuPage.onclick=(e)=>{if(e.target===menuPage||e.target===title)renderMenu("slots");};
           }
-          menuPage.append(menuText("span","v66 · 2.5D POLISH","menu-version"));
+          menuPage.append(menuText("span",GAME_VERSION,"menu-version"));
           if(!menuEmbers.children.length)for(let i=0;i<22;i++){
             let ember=document.createElement("i");
             ember.style.setProperty("--x",(i*47%100)+"%");
@@ -1221,7 +1256,7 @@
         let currentMenuScreen = "hub";
         function renderMenu(screen) {
           currentMenuScreen = screen;
-          menuScreen=screen; mode=screen==="pause"||screen==="settings"&&settingsReturn==="pause"?"paused":"menu";
+          menuScreen=screen; mode=screen==="pause"||screen==="report"||screen==="settings"&&settingsReturn==="pause"?"paused":"menu";
           if(screen==="start") {showStartScreen();return;}
           if(screen==="slots") {
             let body=menuBase("SAVE SLOTS",activeSlot>=0?"hub":"start","Three independent characters on this device.");
@@ -1288,11 +1323,47 @@
             body.append(menuButton("RESUME",resumePaused,null,"primary"),
               menuButton("SETTINGS",()=>{settingsReturn="pause";renderMenu("settings");}));
             if(fullscreenSupported())body.append(fullscreenButton());
+            body.append(menuButton("REPORT A BUG",()=>renderMenu("report"),"Copies recent errors and your game state."));
             let quit=menuButton("QUIT RUN",()=>{quit.textContent="QUIT RUN · CONFIRM";
               quit.onclick=()=>{saveSlotClock();clearRun();hero=null;showTitleMenu();};},
               "Embers earned stay with this character.");body.append(quit);return;
           }
           if(screen==="settings") {renderSettings();return;}
+          if(screen==="report") {
+            let body=menuBase("REPORT A BUG","pause","Copy the report, then paste it to Claude or Codex, or open a GitHub issue.");
+            let note=document.createElement("textarea");note.className="menu-input";note.rows=2;note.maxLength=300;
+            note.placeholder="What happened? (optional)";note.setAttribute("aria-label","What happened");
+            let feedback=menuText("p","","menu-error"),copy=menuButton("COPY REPORT",()=>copyReport(note.value.trim(),copy,feedback,output),null,"primary");
+            let output=document.createElement("textarea");output.className="menu-input";output.rows=6;
+            output.readOnly=true;output.hidden=true;output.setAttribute("aria-label","Bug report");
+            body.append(menuText("label","WHAT HAPPENED","menu-label"),note,copy,
+              menuButton("OPEN GITHUB ISSUE",()=>{let text=bugReport(note.value.trim());
+                window.open("https://github.com/iallmost-code/Games/issues/new?title="+encodeURIComponent("Bug: "+(note.value.trim().slice(0,60)||"in-game report"))+
+                  "&body="+encodeURIComponent("```\n"+text.slice(0,5000)+"\n```"),"_blank","noopener");},"Opens GitHub in a new tab with the report filled in."),
+              feedback,output);
+            return;
+          }
+        }
+        function bugReport(note) {
+          let lines=["EMBER CRYPT BUG REPORT · "+GAME_VERSION,"When: "+new Date().toISOString()];
+          if(note)lines.push("What happened: "+note);
+          const add=(label,value)=>{try{lines.push(label+": "+value());}catch{lines.push(label+": ?");}};
+          add("Device",()=>navigator.userAgent);
+          add("Screen",()=>{const b=game.getBoundingClientRect();return Math.round(b.width)+"x"+Math.round(b.height)+" css · DPR "+(devicePixelRatio||1)+
+            " · canvas "+canvas.width+"x"+canvas.height+" · zoom "+viewZoom.toFixed(2)+(document.fullscreenElement||document.webkitFullscreenElement?" · fullscreen":"")+
+            (matchMedia("(display-mode: standalone), (display-mode: fullscreen)").matches?" · home screen app":"");});
+          add("Settings",()=>(rpgPreview?"isometric":"classic")+" · view "+viewPref+" · speed "+gameSpeed+"x · sound "+(soundEnabled?"on":"off"));
+          add("Performance",()=>"quality "+qualityPref+(qualityPref==="auto"?" ("+qualityTier+")":"")+" · ~"+Math.round(perfFps)+" FPS · refresh "+Math.round(1000/perfRefresh)+" Hz");
+          add("Run",()=>hero?runMode+(runMode==="descent"&&dungeon?" floor "+dungeon.floor:"")+" · wave "+wave+" · "+(heroNames[hero.class]||hero.class)+
+            " lv "+level+" · HP "+Math.ceil(hero.hp)+"/"+Math.ceil(hero.maxHp)+" · "+Math.floor(clock)+"s · "+enemies.length+" enemies · "+kills+" kills":"no active run");
+          lines.push("Errors: "+(recentErrors.length?"":"none"));
+          for(const e of recentErrors)lines.push("  "+e.text+(e.count>1?" (x"+e.count+")":""));
+          return lines.join("\n");
+        }
+        async function copyReport(note,button,feedback,output) {
+          let text=bugReport(note);
+          try{await navigator.clipboard.writeText(text);button.firstChild.textContent="REPORT COPIED";if(output)feedback.textContent="Report copied. Paste it anywhere.";}
+          catch{if(output){output.hidden=false;output.value=text;output.select();feedback.textContent="Copy this selected report.";}else feedback.textContent=text;}
         }
         const cryptNames=["Ash Warden","Vell the Pale","Rune Keeper","Cinder Vale","Morrow Knight","Thorn Seeker"];
         function validName(value) {let v=value.trim().replace(/\s+/g," ");return /^[A-Za-z0-9 ]{1,14}$/.test(v)?v:null;}
@@ -1368,6 +1439,9 @@
               vibrationEnabled=!vibrationEnabled;localStorage.setItem("ember-crypt-vibrate-"+activeSlot,vibrationEnabled?"1":"0");
               renderMenu("settings");}),
             menuButton("VIEW · "+viewPref.toUpperCase(),()=>{viewPref=viewPref==="near"?"normal":viewPref==="normal"?"far":"near";try{localStorage.setItem("ember-crypt-view",viewPref);}catch{}resize();renderMenu("settings");},"Near · Normal · Far. Far shows more of the dungeon."),
+            menuButton("QUALITY · "+qualityPref.toUpperCase()+(qualityPref==="auto"?" ("+qualityTier.toUpperCase()+")":""),()=>{
+              qualityPref=qualityPref==="auto"?"high":qualityPref==="high"?"low":"auto";try{localStorage.setItem("ember-crypt-quality",qualityPref);}catch{}
+              setQualityTier(qualityPref==="low"?"low":"high");renderMenu("settings");},"Auto lowers effects if your phone can't hold 60 FPS. Low runs at 40 FPS and saves battery."),
             menuButton("GRAPHICS · "+(rpgPreview?"ISOMETRIC":"CLASSIC"),()=>{rpgPreview=!rpgPreview;try{localStorage.setItem("ember-crypt-rpg-preview",rpgPreview?"1":"0");}catch{}resetJoy();refreshCameraBounds();renderMenu("settings");},"Angled camera, raised stonework, upright actors and skill animations."),
             menuButton("RESET TIPS",()=>{profile.tips={};tipQueue=[];activeTip=null;saveProfile();renderMenu("settings");},"Show first-run tips again for this character."),
             menuButton("RENAME CHARACTER",()=>renderNameEntry(activeSlot,true)),
@@ -2040,7 +2114,10 @@
           w = b.width / viewZoom;
           h = b.height / viewZoom;
           refreshCameraBounds();
-          dpr = Math.min(devicePixelRatio || 1, 1.5, Math.sqrt(visualQuality.pixelBudget / Math.max(1,b.width*b.height)));
+          sizeCanvas(b);
+        }
+        function sizeCanvas(b = game.getBoundingClientRect()) {
+          dpr = Math.min(devicePixelRatio || 1, visualQuality.dprCap, Math.sqrt(visualQuality.pixelBudget / Math.max(1,b.width*b.height)));
           canvas.width = b.width * dpr;
           canvas.height = b.height * dpr;
           ctx.setTransform(dpr * viewZoom, 0, 0, dpr * viewZoom, 0, 0);
@@ -7147,10 +7224,13 @@
           }
         }
         function frame(t) {
-          if (last && t - last < 1000 / 60 - 0.5) {
+          if (perfCallbackAt && t > perfCallbackAt) perfRefresh = Math.min(perfRefresh, t - perfCallbackAt);
+          perfCallbackAt = t;
+          if (last && t - last < 1000 / visualQuality.fps - 0.5) {
             requestAnimationFrame(frame);
             return;
           }
+          const interval = last ? t - last : 0;
           let dt = Math.min((t - last) / 1000 || 0, 0.05);
           last = t;
           try {
@@ -7158,9 +7238,11 @@
               update(dt * gameSpeed);
               draw();
               frameErrors = 0;
+              trackQuality(interval);
             }
           } catch (err) {
             console.error("Ember Crypt frame error", err);
+            noteError("frame", err && (err.stack || err.message) || err);
             if (++frameErrors >= 2) {
               try {
                 saveRun(true);
@@ -7175,7 +7257,13 @@
                 " · Reopen this link and choose Continue Run.";
               start.hidden = true;
               resumeBtn.hidden = true;
-              choicesEl.replaceChildren();
+              const report = document.createElement("button");
+              report.type = "button";
+              report.className = "choice";
+              report.style.textAlign = "center";
+              report.textContent = "COPY BUG REPORT";
+              report.onclick = () => copyReport("The run crashed", report, descEl);
+              choicesEl.replaceChildren(report);
               panel.classList.remove("hidden");
             }
           }
