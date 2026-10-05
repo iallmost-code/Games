@@ -1,0 +1,79 @@
+[
+  {
+    "suite": "visual-invariants",
+    "exit": 0,
+    "seconds": 0.12
+  },
+  {
+    "suite": "action-rpg",
+    "exit": 0,
+    "seconds": 169.17
+  },
+  {
+    "suite": "landscape-skills",
+    "exit": 0,
+    "seconds": 150.62
+  },
+  {
+    "suite": "new-heroes",
+    "exit": 0,
+    "seconds": 61.8
+  },
+  {
+    "suite": "bloodknight",
+    "exit": 0,
+    "seconds": 15.5
+  },
+  {
+    "suite": "descent",
+    "exit": 0,
+    "seconds": 52.2
+  },
+  {
+    "suite": "descent-variety",
+    "exit": 0,
+    "seconds": 10.51
+  },
+  {
+    "suite": "descent-tuning",
+    "exit": 0,
+    "seconds": 251.79
+  },
+  {
+    "suite": "animated-catacombs",
+    "exit": 0,
+    "seconds": 258.46
+  },
+  {
+    "suite": "audio-presentation",
+    "exit": 0,
+    "seconds": 3.75
+  },
+  {
+    "suite": "ash-environment",
+    "exit": 0,
+    "seconds": 0.09
+  },
+  {
+    "suite": "sound-motion",
+    "exit": 0,
+    "seconds": null,
+    "rechecked": true,
+    "verification": "Rerun passed after using the audio clock for the unchanged 300ms fade assertion."
+  },
+  {
+    "suite": "endless-nights",
+    "exit": 0,
+    "seconds": 53.1
+  },
+  {
+    "suite": "new-blood",
+    "exit": 0,
+    "seconds": 22.85
+  },
+  {
+    "suite": "deeper-crypt",
+    "exit": 0,
+    "seconds": 97.16
+  }
+]

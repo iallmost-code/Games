@@ -1484,6 +1484,600 @@
         28,
         29
       ]
+    },
+    {
+      "kind": "rogue",
+      "walk": [
+        {
+          "row": 0,
+          "frames": 6
+        },
+        {
+          "row": 1,
+          "frames": 6
+        },
+        {
+          "row": 2,
+          "frames": 6
+        }
+      ],
+      "distinctFrameHashes": [
+        [
+          2833156260,
+          3289013403,
+          2313467392,
+          1198926258,
+          2413935794,
+          1350925114
+        ],
+        [
+          840760134,
+          3177049686,
+          2371655027,
+          2909624759,
+          3838912256,
+          256279623
+        ],
+        [
+          1147743857,
+          762262535,
+          1802887298,
+          1675779988,
+          3861258042,
+          89105145
+        ]
+      ],
+      "footBaseline": [
+        188,
+        188
+      ],
+      "spriteExtents": [
+        {
+          "row": 0,
+          "col": 0,
+          "left": 76,
+          "right": 192,
+          "top": 46,
+          "bottom": 188
+        },
+        {
+          "row": 0,
+          "col": 1,
+          "left": 57,
+          "right": 176,
+          "top": 46,
+          "bottom": 188
+        },
+        {
+          "row": 0,
+          "col": 2,
+          "left": 52,
+          "right": 172,
+          "top": 46,
+          "bottom": 188
+        },
+        {
+          "row": 0,
+          "col": 3,
+          "left": 49,
+          "right": 174,
+          "top": 46,
+          "bottom": 188
+        },
+        {
+          "row": 0,
+          "col": 4,
+          "left": 50,
+          "right": 175,
+          "top": 46,
+          "bottom": 188
+        },
+        {
+          "row": 0,
+          "col": 5,
+          "left": 40,
+          "right": 159,
+          "top": 46,
+          "bottom": 188
+        },
+        {
+          "row": 1,
+          "col": 0,
+          "left": 56,
+          "right": 196,
+          "top": 39,
+          "bottom": 188
+        },
+        {
+          "row": 1,
+          "col": 1,
+          "left": 52,
+          "right": 182,
+          "top": 39,
+          "bottom": 188
+        },
+        {
+          "row": 1,
+          "col": 2,
+          "left": 38,
+          "right": 185,
+          "top": 37,
+          "bottom": 188
+        },
+        {
+          "row": 1,
+          "col": 3,
+          "left": 38,
+          "right": 182,
+          "top": 38,
+          "bottom": 188
+        },
+        {
+          "row": 1,
+          "col": 4,
+          "left": 45,
+          "right": 184,
+          "top": 37,
+          "bottom": 188
+        },
+        {
+          "row": 1,
+          "col": 5,
+          "left": 41,
+          "right": 175,
+          "top": 37,
+          "bottom": 188
+        },
+        {
+          "row": 2,
+          "col": 0,
+          "left": 61,
+          "right": 191,
+          "top": 31,
+          "bottom": 188
+        },
+        {
+          "row": 2,
+          "col": 1,
+          "left": 48,
+          "right": 176,
+          "top": 31,
+          "bottom": 188
+        },
+        {
+          "row": 2,
+          "col": 2,
+          "left": 45,
+          "right": 183,
+          "top": 30,
+          "bottom": 188
+        },
+        {
+          "row": 2,
+          "col": 3,
+          "left": 39,
+          "right": 189,
+          "top": 30,
+          "bottom": 188
+        },
+        {
+          "row": 2,
+          "col": 4,
+          "left": 42,
+          "right": 173,
+          "top": 31,
+          "bottom": 188
+        },
+        {
+          "row": 2,
+          "col": 5,
+          "left": 39,
+          "right": 169,
+          "top": 30,
+          "bottom": 188
+        }
+      ],
+      "poseExtents": [
+        {
+          "index": 18,
+          "left": 47,
+          "right": 197,
+          "top": 54,
+          "bottom": 188
+        },
+        {
+          "index": 19,
+          "left": 49,
+          "right": 175,
+          "top": 56,
+          "bottom": 188
+        },
+        {
+          "index": 20,
+          "left": 33,
+          "right": 197,
+          "top": 59,
+          "bottom": 188
+        },
+        {
+          "index": 21,
+          "left": 51,
+          "right": 177,
+          "top": 62,
+          "bottom": 188
+        },
+        {
+          "index": 22,
+          "left": 9,
+          "right": 210,
+          "top": 59,
+          "bottom": 188
+        },
+        {
+          "index": 23,
+          "left": 34,
+          "right": 169,
+          "top": 58,
+          "bottom": 188
+        },
+        {
+          "index": 24,
+          "left": 56,
+          "right": 168,
+          "top": 61,
+          "bottom": 188
+        },
+        {
+          "index": 25,
+          "left": 68,
+          "right": 184,
+          "top": 63,
+          "bottom": 188
+        },
+        {
+          "index": 26,
+          "left": 54,
+          "right": 176,
+          "top": 85,
+          "bottom": 188
+        },
+        {
+          "index": 27,
+          "left": 35,
+          "right": 193,
+          "top": 102,
+          "bottom": 188
+        },
+        {
+          "index": 28,
+          "left": 30,
+          "right": 193,
+          "top": 126,
+          "bottom": 188
+        },
+        {
+          "index": 29,
+          "left": 12,
+          "right": 193,
+          "top": 130,
+          "bottom": 188
+        }
+      ],
+      "attackFrames": [
+        18,
+        19,
+        20,
+        21,
+        22,
+        23
+      ],
+      "hitFrames": [
+        24,
+        25,
+        26
+      ],
+      "deathFrames": [
+        27,
+        28,
+        29
+      ]
+    },
+    {
+      "kind": "frostwarden",
+      "walk": [
+        {
+          "row": 0,
+          "frames": 6
+        },
+        {
+          "row": 1,
+          "frames": 6
+        },
+        {
+          "row": 2,
+          "frames": 6
+        }
+      ],
+      "distinctFrameHashes": [
+        [
+          134946947,
+          369407889,
+          3102640861,
+          747659333,
+          1770799105,
+          313420486
+        ],
+        [
+          320031049,
+          753251746,
+          2568982762,
+          2503299440,
+          2460577910,
+          2699226584
+        ],
+        [
+          3766581922,
+          2276541750,
+          596855874,
+          3551355627,
+          554073519,
+          174897100
+        ]
+      ],
+      "footBaseline": [
+        187,
+        188
+      ],
+      "spriteExtents": [
+        {
+          "row": 0,
+          "col": 0,
+          "left": 47,
+          "right": 190,
+          "top": 33,
+          "bottom": 188
+        },
+        {
+          "row": 0,
+          "col": 1,
+          "left": 42,
+          "right": 180,
+          "top": 33,
+          "bottom": 188
+        },
+        {
+          "row": 0,
+          "col": 2,
+          "left": 39,
+          "right": 179,
+          "top": 33,
+          "bottom": 188
+        },
+        {
+          "row": 0,
+          "col": 3,
+          "left": 46,
+          "right": 180,
+          "top": 32,
+          "bottom": 187
+        },
+        {
+          "row": 0,
+          "col": 4,
+          "left": 45,
+          "right": 182,
+          "top": 32,
+          "bottom": 188
+        },
+        {
+          "row": 0,
+          "col": 5,
+          "left": 38,
+          "right": 176,
+          "top": 32,
+          "bottom": 188
+        },
+        {
+          "row": 1,
+          "col": 0,
+          "left": 43,
+          "right": 193,
+          "top": 38,
+          "bottom": 188
+        },
+        {
+          "row": 1,
+          "col": 1,
+          "left": 33,
+          "right": 191,
+          "top": 38,
+          "bottom": 188
+        },
+        {
+          "row": 1,
+          "col": 2,
+          "left": 36,
+          "right": 187,
+          "top": 37,
+          "bottom": 188
+        },
+        {
+          "row": 1,
+          "col": 3,
+          "left": 35,
+          "right": 188,
+          "top": 37,
+          "bottom": 188
+        },
+        {
+          "row": 1,
+          "col": 4,
+          "left": 35,
+          "right": 187,
+          "top": 40,
+          "bottom": 188
+        },
+        {
+          "row": 1,
+          "col": 5,
+          "left": 35,
+          "right": 181,
+          "top": 38,
+          "bottom": 188
+        },
+        {
+          "row": 2,
+          "col": 0,
+          "left": 47,
+          "right": 191,
+          "top": 28,
+          "bottom": 187
+        },
+        {
+          "row": 2,
+          "col": 1,
+          "left": 38,
+          "right": 187,
+          "top": 28,
+          "bottom": 188
+        },
+        {
+          "row": 2,
+          "col": 2,
+          "left": 39,
+          "right": 188,
+          "top": 27,
+          "bottom": 188
+        },
+        {
+          "row": 2,
+          "col": 3,
+          "left": 37,
+          "right": 182,
+          "top": 32,
+          "bottom": 188
+        },
+        {
+          "row": 2,
+          "col": 4,
+          "left": 40,
+          "right": 184,
+          "top": 27,
+          "bottom": 188
+        },
+        {
+          "row": 2,
+          "col": 5,
+          "left": 38,
+          "right": 183,
+          "top": 28,
+          "bottom": 188
+        }
+      ],
+      "poseExtents": [
+        {
+          "index": 18,
+          "left": 41,
+          "right": 196,
+          "top": 30,
+          "bottom": 188
+        },
+        {
+          "index": 19,
+          "left": 40,
+          "right": 191,
+          "top": 41,
+          "bottom": 188
+        },
+        {
+          "index": 20,
+          "left": 14,
+          "right": 213,
+          "top": 45,
+          "bottom": 188
+        },
+        {
+          "index": 21,
+          "left": 27,
+          "right": 196,
+          "top": 37,
+          "bottom": 188
+        },
+        {
+          "index": 22,
+          "left": 31,
+          "right": 192,
+          "top": 48,
+          "bottom": 188
+        },
+        {
+          "index": 23,
+          "left": 35,
+          "right": 171,
+          "top": 37,
+          "bottom": 188
+        },
+        {
+          "index": 24,
+          "left": 48,
+          "right": 184,
+          "top": 59,
+          "bottom": 188
+        },
+        {
+          "index": 25,
+          "left": 51,
+          "right": 188,
+          "top": 60,
+          "bottom": 188
+        },
+        {
+          "index": 26,
+          "left": 20,
+          "right": 193,
+          "top": 63,
+          "bottom": 188
+        },
+        {
+          "index": 27,
+          "left": 34,
+          "right": 197,
+          "top": 98,
+          "bottom": 188
+        },
+        {
+          "index": 28,
+          "left": 32,
+          "right": 194,
+          "top": 109,
+          "bottom": 188
+        },
+        {
+          "index": 29,
+          "left": 23,
+          "right": 181,
+          "top": 115,
+          "bottom": 188
+        }
+      ],
+      "attackFrames": [
+        18,
+        19,
+        20,
+        21,
+        22,
+        23
+      ],
+      "hitFrames": [
+        24,
+        25,
+        26
+      ],
+      "deathFrames": [
+        27,
+        28,
+        29
+      ]
     }
   ],
   "scenes": [
@@ -1553,6 +2147,32 @@
       "paused": "game and cosmetic clocks stop"
     },
     {
+      "kind": "rogue",
+      "width": 390,
+      "height": 844,
+      "movement": 94.49999999999932,
+      "renderPurity": "hero/enemies/dungeon and combat RNG unchanged",
+      "controls": [
+        "dashButton",
+        "pauseControl",
+        "ultimateButton"
+      ],
+      "paused": "game and cosmetic clocks stop"
+    },
+    {
+      "kind": "frostwarden",
+      "width": 390,
+      "height": 844,
+      "movement": 64.49999999999932,
+      "renderPurity": "hero/enemies/dungeon and combat RNG unchanged",
+      "controls": [
+        "dashButton",
+        "pauseControl",
+        "ultimateButton"
+      ],
+      "paused": "game and cosmetic clocks stop"
+    },
+    {
       "kind": "gravecaller",
       "width": 844,
       "height": 390,
@@ -1616,6 +2236,32 @@
         "ultimateButton"
       ],
       "paused": "game and cosmetic clocks stop"
+    },
+    {
+      "kind": "rogue",
+      "width": 844,
+      "height": 390,
+      "movement": 94.49999999999932,
+      "renderPurity": "hero/enemies/dungeon and combat RNG unchanged",
+      "controls": [
+        "dashButton",
+        "pauseControl",
+        "ultimateButton"
+      ],
+      "paused": "game and cosmetic clocks stop"
+    },
+    {
+      "kind": "frostwarden",
+      "width": 844,
+      "height": 390,
+      "movement": 64.49999999999932,
+      "renderPurity": "hero/enemies/dungeon and combat RNG unchanged",
+      "controls": [
+        "dashButton",
+        "pauseControl",
+        "ultimateButton"
+      ],
+      "paused": "game and cosmetic clocks stop"
     }
   ],
   "compatibility": {
@@ -1631,11 +2277,13 @@
       "legacyAudioNodes": 0,
       "mode": "play",
       "pngRequests": [
-        "/assets/cinematic/ranger-animation.png",
         "/assets/cinematic/gravecaller-animation.png",
         "/assets/cinematic/bloodknight-animation.png",
+        "/assets/cinematic/ranger-animation.png",
         "/assets/cinematic/sunwarden-animation.png",
         "/assets/cinematic/ember-animation.png",
+        "/assets/cinematic/rogue-animation.png",
+        "/assets/cinematic/frostwarden-animation.png",
         "/assets/cinematic/ash-props.png"
       ]
     },
@@ -1650,6 +2298,8 @@
         "/assets/cinematic/ranger-animation.png",
         "/assets/cinematic/sunwarden-animation.png",
         "/assets/cinematic/ember-animation.png",
+        "/assets/cinematic/rogue-animation.png",
+        "/assets/cinematic/frostwarden-animation.png",
         "/assets/cinematic/ash-props.png"
       ]
     },
@@ -1659,7 +2309,9 @@
       "legacyAudioNodes": 1,
       "mode": "play",
       "pngRequests": [
-        "/assets/cinematic/ash-props.png"
+        "/assets/cinematic/ash-props.png",
+        "/assets/cinematic/rogue-animation.png",
+        "/assets/cinematic/frostwarden-animation.png"
       ]
     }
   ],
@@ -1670,10 +2322,11 @@
       "height": 844,
       "deviceScaleFactor": 3,
       "frames": 60,
-      "medianMs": 3.1,
-      "p95Ms": 11.5,
-      "maxMs": 38.4,
-      "pixels": 513785
+      "medianMs": 4.3,
+      "p95Ms": 39.7,
+      "maxMs": 47.1,
+      "pixels": 513785,
+      "sampledCanvasColors": 835
     },
     {
       "kind": "bloodknight",
@@ -1681,10 +2334,11 @@
       "height": 844,
       "deviceScaleFactor": 3,
       "frames": 60,
-      "medianMs": 2.5,
-      "p95Ms": 12.4,
-      "maxMs": 18.9,
-      "pixels": 513785
+      "medianMs": 2.4,
+      "p95Ms": 36.7,
+      "maxMs": 39.4,
+      "pixels": 513785,
+      "sampledCanvasColors": 836
     },
     {
       "kind": "ranger",
@@ -1692,10 +2346,11 @@
       "height": 844,
       "deviceScaleFactor": 3,
       "frames": 60,
-      "medianMs": 2.3,
-      "p95Ms": 17.1,
-      "maxMs": 28.7,
-      "pixels": 513785
+      "medianMs": 2.9,
+      "p95Ms": 34.7,
+      "maxMs": 43.7,
+      "pixels": 513785,
+      "sampledCanvasColors": 838
     },
     {
       "kind": "sunwarden",
@@ -1703,10 +2358,11 @@
       "height": 844,
       "deviceScaleFactor": 3,
       "frames": 60,
-      "medianMs": 2.5,
-      "p95Ms": 3.8,
-      "maxMs": 17,
-      "pixels": 513785
+      "medianMs": 3,
+      "p95Ms": 7.6,
+      "maxMs": 39.9,
+      "pixels": 513785,
+      "sampledCanvasColors": 848
     },
     {
       "kind": "ember",
@@ -1714,10 +2370,35 @@
       "height": 844,
       "deviceScaleFactor": 3,
       "frames": 60,
-      "medianMs": 2.4,
-      "p95Ms": 6.7,
-      "maxMs": 25.5,
-      "pixels": 513785
+      "medianMs": 3.1,
+      "p95Ms": 38.7,
+      "maxMs": 57,
+      "pixels": 513785,
+      "sampledCanvasColors": 846
+    },
+    {
+      "kind": "rogue",
+      "width": 390,
+      "height": 844,
+      "deviceScaleFactor": 3,
+      "frames": 60,
+      "medianMs": 2.9,
+      "p95Ms": 7.6,
+      "maxMs": 37.4,
+      "pixels": 513785,
+      "sampledCanvasColors": 859
+    },
+    {
+      "kind": "frostwarden",
+      "width": 390,
+      "height": 844,
+      "deviceScaleFactor": 3,
+      "frames": 60,
+      "medianMs": 3.9,
+      "p95Ms": 34.1,
+      "maxMs": 39.7,
+      "pixels": 513785,
+      "sampledCanvasColors": 843
     },
     {
       "kind": "gravecaller",
@@ -1725,10 +2406,11 @@
       "height": 390,
       "deviceScaleFactor": 3,
       "frames": 60,
-      "medianMs": 2.3,
-      "p95Ms": 6.1,
-      "maxMs": 6.6,
-      "pixels": 513785
+      "medianMs": 3.5,
+      "p95Ms": 40.5,
+      "maxMs": 42.2,
+      "pixels": 513785,
+      "sampledCanvasColors": 730
     },
     {
       "kind": "bloodknight",
@@ -1736,10 +2418,11 @@
       "height": 390,
       "deviceScaleFactor": 3,
       "frames": 60,
-      "medianMs": 2.4,
-      "p95Ms": 4.4,
-      "maxMs": 5.9,
-      "pixels": 513785
+      "medianMs": 2.5,
+      "p95Ms": 11.4,
+      "maxMs": 19.1,
+      "pixels": 513785,
+      "sampledCanvasColors": 1016
     },
     {
       "kind": "ranger",
@@ -1747,10 +2430,11 @@
       "height": 390,
       "deviceScaleFactor": 3,
       "frames": 60,
-      "medianMs": 2.5,
-      "p95Ms": 12.7,
-      "maxMs": 13.4,
-      "pixels": 513785
+      "medianMs": 3.3,
+      "p95Ms": 18.7,
+      "maxMs": 37.2,
+      "pixels": 513785,
+      "sampledCanvasColors": 1036
     },
     {
       "kind": "sunwarden",
@@ -1758,10 +2442,11 @@
       "height": 390,
       "deviceScaleFactor": 3,
       "frames": 60,
-      "medianMs": 2.1,
-      "p95Ms": 4.2,
-      "maxMs": 12.6,
-      "pixels": 513785
+      "medianMs": 2.7,
+      "p95Ms": 35.3,
+      "maxMs": 42.1,
+      "pixels": 513785,
+      "sampledCanvasColors": 1026
     },
     {
       "kind": "ember",
@@ -1770,9 +2455,34 @@
       "deviceScaleFactor": 3,
       "frames": 60,
       "medianMs": 2.4,
-      "p95Ms": 3,
-      "maxMs": 3.3,
-      "pixels": 513785
+      "p95Ms": 2.9,
+      "maxMs": 3.1,
+      "pixels": 513785,
+      "sampledCanvasColors": 1126
+    },
+    {
+      "kind": "rogue",
+      "width": 844,
+      "height": 390,
+      "deviceScaleFactor": 3,
+      "frames": 60,
+      "medianMs": 2.4,
+      "p95Ms": 3.2,
+      "maxMs": 7.2,
+      "pixels": 740610,
+      "sampledCanvasColors": 1390
+    },
+    {
+      "kind": "frostwarden",
+      "width": 844,
+      "height": 390,
+      "deviceScaleFactor": 3,
+      "frames": 60,
+      "medianMs": 1.9,
+      "p95Ms": 3.3,
+      "maxMs": 9.3,
+      "pixels": 740610,
+      "sampledCanvasColors": 1442
     }
   ],
   "browserErrors": [],

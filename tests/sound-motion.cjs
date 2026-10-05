@@ -176,7 +176,7 @@ function musicMock() {
     await p.goto(url);
     await p.waitForFunction(
       () =>
-        EmberHeroAnimation.diagnostics().frames === 150 &&
+        EmberHeroAnimation.diagnostics().frames === 210 &&
         gameTest.art["prop-frost-brazier"] &&
         gameTest.art["prop-venom-coffin"],
     );
@@ -392,6 +392,13 @@ function musicMock() {
     await score.click("#unlock");
     report.music = await score.evaluate(async () => {
       const a = EmberMusic;
+      // Audio automation uses the audio clock, which can lag wall time on a busy browser worker.
+      const waitForFade = async () => {
+        const target = ctx.currentTime + .3, deadline = performance.now() + 10000;
+        while (ctx.currentTime < target && performance.now() < deadline)
+          await new Promise(r => setTimeout(r, 25));
+        if (ctx.currentTime < target) throw Error("Audio clock stalled during fade");
+      };
       const menu = a.stats(ctx);
       if (menu.loops !== 1) throw Error("Menu theme missing");
       for (const zone of [0, 1, 2])
@@ -406,7 +413,7 @@ function musicMock() {
       if (a.stats(ctx).stings !== 0) throw Error("Sting nodes leaked");
       if (!a.sting(ctx, "Death")) throw Error("Death sting missing");
       a.update(ctx, { scene: "pause" });
-      await new Promise((r) => setTimeout(r, 300));
+      await waitForFade();
       if (a.stats(ctx).musicLevel > 0.001)
         throw Error("Pause did not fade output");
       if (a.sting(ctx, "Level")) throw Error("Pause still admits music");
@@ -423,7 +430,7 @@ function musicMock() {
       if (a.stats(ctx).unlocked) throw Error("Resumed without gesture");
       a.unlock(ctx);
       a.update(ctx, { enabled: false });
-      await new Promise((r) => setTimeout(r, 300));
+      await waitForFade();
       if (a.stats(ctx).musicLevel > 0.001)
         throw Error("Music toggle did not fade output");
       const result = a.stats(ctx);

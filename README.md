@@ -1,6 +1,6 @@
 # Ember Crypt
 
-**v72 · ENDLESS NIGHTS (includes v69 SOUND & MOTION).**
+**v74 · DEEPER CRYPT (feature branch; includes v73 NEW BLOOD).**
 The public links below still serve the published main build.
 Play: https://iallmost-code.github.io/Games/ (GitHub Pages, deployed from `main`)
 ChatGPT Sites copy: https://ember-crypt.alpine0-0.chatgpt.site
@@ -13,8 +13,8 @@ Select this repository and its default branch, `main`, in a Codex Cloud environm
 
 ## Current game
 
-- Five heroes: Gravecaller (Shadow/Arcane, starter summoner), Storm Ranger (Frost/Lightning, bow/wolf/traps, unlocked after one boss), Emberweaver (Fire/Poison), Bloodknight (Blood/Earth, unlocked after three cumulative bosses), and Sunwarden (Light/Wind, unlocked at Descent floor 3).
-- THE DESCENT (default): five authored floors with rooms, corridors, locked guardian chambers, stairs and an explored-room minimap.
+- Seven heroes: Gravecaller (Shadow/Arcane, starter summoner), Storm Ranger (Frost/Lightning, bow/wolf/traps, unlocked after one boss), Emberweaver (Fire/Poison), Bloodknight (Blood/Earth, unlocked after three cumulative bosses), Sunwarden (Light/Wind, unlocked at Descent floor 3), Shadow Rogue (Poison/Shadow, five bosses), and Frost Warden (Ice/Earth, floor 4).
+- THE DESCENT (default): the original five floors and victory, then optional DESCEND DEEPER for the Sunken Cathedral (6–7), Infernal Forge (8–9) and the three-phase Heart of the Crypt (10). Both Classic and seeded Random layouts support rooms, corridors, locked chambers, stairs, secret rooms, merchants and the minimap.
 - ENDLESS: the original arena, wave 20 Crypt Heart and subsequent endless tiers. Both modes retain zone hazards, relics, evolutions, depth modifiers, treasure imps and elite events.
 - Three named local save slots, mode-specific depth/kill records, shrine, bestiary, achievements, and save-code export/import. First-run tips are tracked per character and can be reset in Settings.
 - Joystick + Dash + Ultimate controls: automatic attacks, pause control, sound and speed in Settings. Landscape fills the screen with a floating left joystick and 72px right skill buttons; portrait keeps the bottom-center joystick and smaller right buttons.
@@ -35,7 +35,7 @@ Bloodknight trades ranged attacks for a 150° greatsword sweep with a 95px start
 
 Bloodletting, Crimson Thirst, Berserk, Blood Pact, Stone Skin, Shockwave, Earth Spikes and Quake Step support the Crimson Tide, Tremor and Juggernaut evolutions. The Bestiary preserves existing matchups and adds Blood/Earth weaknesses and resistances.
 
-Profiles now carry version 2 and run saves use v11. Existing profile keys, embers, shrine upgrades, achievements, slots and mode records remain intact. Crypt Mage characters and depth records migrate to Gravecaller; Stormcaller characters, unlocks and records migrate to Storm Ranger. Existing v9/v10 run keys and EC1 save codes are accepted. Removed-hero runs restart safely as their replacement with shared stats retained and obsolete elemental builds cleared. Descent resumes its current floor entry checkpoint; Endless clears its old encounter and restores full HP/armor. Other heroes keep their existing run state. Temporary allies/traps/spirits/zones serialize in Endless and rebuild at a Descent floor restart.
+Profiles now carry version 2 and run saves use v12. Existing profile keys, embers, shrine upgrades, achievements, slots and mode records remain intact. Crypt Mage characters and depth records migrate to Gravecaller; Stormcaller characters, unlocks and records migrate to Storm Ranger. Existing v9/v10 run keys and EC1 save codes are accepted. Removed-hero runs restart safely as their replacement with shared stats retained and obsolete elemental builds cleared. Descent resumes its current floor entry checkpoint; Endless clears its old encounter and restores full HP/armor. Other heroes keep their existing run state. Temporary allies/traps/spirits/zones serialize in Endless and rebuild at a Descent floor restart.
 
 Boss doors open after 180 seconds or the floor kill goal. Defeat the guardian and walk onto the stairs. Ash Catacombs, Frost Vault, Venom Hollow, The Sunken Halls and The Heart Chamber culminate in the Crypt Heart victory. Walls block movement, projectiles and blade swings. See [tests/README.md](tests/README.md) for browser checks and the seeded Endless balance simulation.
 
@@ -132,3 +132,24 @@ Daily Challenge starts directly from Play: the UTC date fixes the seed, hero and
 Profiles stay v2 with additive defaults. Runs become v12: v9/v10/v11 and legacy EC1 codes migrate without discarding progress. Continue restarts the current floor using the same seed, hero, gold and RNG from its entry checkpoint; purchases and secret discoveries made later on that floor restart too. Endless restores the current saved state. All fields remain slot-isolated and travel in EC1 codes.
 
 This PR starts independently from the current main (v68, five heroes/five floors), as requested. It does not merge the separate v69–v71 branches. The room assembler accepts the floor specification supplied by the game so later floor releases can extend it.
+
+
+## v73 · NEW BLOOD
+
+Shadow Rogue (Poison + Shadow) unlocks after five total bosses; Frost Warden (Ice + Earth) unlocks upon reaching Descent floor 4. Rogue throws short-range single-target daggers automatically, leaves a two-second Dash decoy, and uses three seconds of Night Veil (invisibility, last-known-position targeting and guaranteed dagger crits). Warden automatically sweeps a 150° shield bash and raises temporary enemy-only ice walls. Glacier Fortress reduces incoming damage by 65% while inside its five-second dome. Doors, stairs and merchant pads are excluded from wall placement; the hero and allies always pass through ice. Ice cards use existing Frost combat weaknesses/resistances. Both heroes have distinct card names/pools and two evolutions; shared stat cards remain available with appropriate weapon descriptions.
+
+Mastery belongs to each hero within each character slot: levels 1–20, Moon Silver at 8, Ember Gold at 16, +1 starting reroll at 10, and a common Wanderer's Token at 20 (+8 pickup radius, no damage/HP bonus). XP is `(80 × floors cleared + 50 × bosses + floor(kills / 8)) × (1 + 0.1 × Torment)`, rounded down. Finished and abandoned runs award XP; a bounded run-credit ledger makes repeats/resumes pay only new progress. Mastery colors are cached, not per-frame filters.
+
+Builds on merged v72: both heroes participate in Descent/Endless, Random/Classic floors, UTC dailies, Torment records, champions, merchants and run history. Previously saved daily hero/seed/modifier metadata is preserved when the daily pool expands. Profile v2, run v12 and EC1 remain unchanged; absent mastery XP defaults to zero and existing shrine/currency/unlock/record fields are retained. No additional gameplay controls or changes to the existing five heroes' base balance.
+
+Verification: `tests/new-blood.cjs`, the expanded seven-hero animation suite, and the existing suites run on every PR. Normal-stat bot results for 35 runs are in `tests/new-blood-all-heroes-survival.json`; early floor clears are successful, censored observations rather than survival failures. The 25 original-hero outcomes match merged v72 exactly. Headless timing diagnostics are not a physical Android 60-FPS certification.
+
+## v74 · Deeper Crypt
+
+Floor 5 still pays its original victory rewards and unlocks Torment and Random layouts. Choose **DESCEND DEEPER** on that victory screen to keep your hero, powers, relics, run gold and mastery run ID. Retiring there still ends the original five-floor journey. New floors open their boss doors on the same three-minute/kill-goal rule; stairs continue through Floor 9. The Floor 10 victory includes credits and a further ember award.
+
+Cathedral water slows enemies only. Ghost choirs mark ranged pulses and drowned knights advance through flooded halls. Forge bridges cross solid lava voids; pistons and conveyors are cosmetic. Machine golems telegraph slams, slag spitters wind up volleys, and furnace imps pursue. The Drowned Bishop uses choir arcs; the Iron Foundry uses slams and slag volleys. The final Heart progresses through crushing, choir and furnace phases at 66% and 33% HP.
+
+Run v12/profile v2/EC1 stay unchanged: floors 6–10 use existing floor-entry checkpoints, and missing additive hero flags are safe. Continue restarts the saved floor, preserving its seed and entry state. Floor 5 and Floor 10 mastery use the same bounded credit ledger, so the deeper victory pays only additional earned XP. History advances to Floor 10, and Torment, daily challenges, shops, secrets and champions use existing systems. Endless keeps its original zone rotation and wave progression.
+
+`node tests/deeper-crypt.cjs` checks 5,005 deep layouts, fourteen assisted ten-floor browser journeys (all seven heroes, Classic/Random, Torment 2), boss doors/stairs/phases, water, decoys, lethal pulses, shops/secrets/champions/daily records, checkpoints, migrations, EC1 import and slot isolation, PNG fallback and native phone controls. These are automated browser checks, not a human balance or physical Android FPS measurement.

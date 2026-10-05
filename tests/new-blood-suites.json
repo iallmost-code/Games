@@ -1,0 +1,74 @@
+[
+  {
+    "suite": "visual-invariants",
+    "exit": 0,
+    "seconds": 0.07
+  },
+  {
+    "suite": "action-rpg",
+    "exit": 0,
+    "seconds": 155.7
+  },
+  {
+    "suite": "landscape-skills",
+    "exit": 0,
+    "seconds": 144.11
+  },
+  {
+    "suite": "new-heroes",
+    "exit": 0,
+    "seconds": 58.34
+  },
+  {
+    "suite": "bloodknight",
+    "exit": 0,
+    "seconds": 14.41
+  },
+  {
+    "suite": "descent",
+    "exit": 0,
+    "seconds": 53.04
+  },
+  {
+    "suite": "descent-variety",
+    "exit": 0,
+    "seconds": 8.91
+  },
+  {
+    "suite": "descent-tuning",
+    "exit": 0,
+    "seconds": 216.04
+  },
+  {
+    "suite": "animated-catacombs",
+    "exit": 0,
+    "seconds": 229.5,
+    "followUp": "Native nonblank-canvas sampling passed for all seven heroes in both orientations."
+  },
+  {
+    "suite": "audio-presentation",
+    "exit": 0,
+    "seconds": 3.36
+  },
+  {
+    "suite": "ash-environment",
+    "exit": 0,
+    "seconds": 0.03
+  },
+  {
+    "suite": "sound-motion",
+    "exit": 0,
+    "seconds": 18.01
+  },
+  {
+    "suite": "endless-nights",
+    "exit": 0,
+    "seconds": 31.2
+  },
+  {
+    "suite": "new-blood",
+    "exit": 0,
+    "seconds": 23.79,
+    "followUp": "Expanded actual EC1 import, Endless continuation, all merchant purchases and secret-room checks also passed."
+  }
+]
