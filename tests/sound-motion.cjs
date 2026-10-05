@@ -8,7 +8,7 @@ const fs = require("node:fs"),
 const { chromium } = require("playwright"),
   root = path.resolve(__dirname, "..");
 const raw = fs.readFileSync(path.join(root, "index.html"), "utf8");
-assert(raw.includes("v69 · SOUND & MOTION"));
+assert(Number(/GAME_VERSION = "v(\d+) · /.exec(raw)?.[1]) >= 69, "Version label older than v69 SOUND & MOTION");
 assert(raw.includes("function sfx(kind) {"));
 assert(raw.includes("function music(kind) {"));
 const source = raw
@@ -353,7 +353,7 @@ function musicMock() {
       g.saveRun(true);
       const run = g.readRun(),
         code = g.loadSaveCode(g.makeSaveCode());
-      if (run.version !== 11 || code.profile.version !== 2)
+      if (run.version < 11 || code.profile.version !== 2) // v72 moves runs to v12 with its own migration
         throw Error("Save formats changed");
       if (
         /EmberMusic|EmberMotion|musicEnabled|shakeEnabled|cosmetic/.test(

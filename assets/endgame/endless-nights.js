@@ -37,6 +37,8 @@
       ...prior,
       descentCleared:
         !!prior.descentCleared ||
+        // Every pre-v72 victory raised unlockedDepth to at least 1, even at depth 0.
+        Number(prior.unlockedDepth) > 0 ||
         Object.values(prior.records?.descent?.bestDepth || {}).some(
           (value) => Number(value) > 0,
         ),

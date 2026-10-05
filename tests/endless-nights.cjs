@@ -60,6 +60,14 @@ assert.equal(
   true,
   "Prior recorded clear lost",
 );
+assert.equal(
+  E.profile({
+    unlockedDepth: 1,
+    records: { descent: { bestDepth: { gravecaller: 0, ranger: 0 } } },
+  }).descentCleared,
+  true,
+  "Depth-0 victory before v72 does not unlock Torment",
+);
 const shapes = new Set();
 for (let seed = 0; seed < 1000; seed++)
   for (let floor = 1; floor <= floors.length; floor++) {
