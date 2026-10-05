@@ -1,6 +1,6 @@
 # Ember Crypt development notes
 
-- This is the v65 action RPG presentation prototype, built on the five-hero and landscape/skills branches. Keep the game working from root `index.html` with relative `assets/` paths and no required build or external service.
+- Ember Crypt is a single-file mobile action RPG: five heroes, THE DESCENT and ENDLESS modes, landscape/portrait controls and the isometric camera are all merged and live. Keep the game working from root `index.html` with relative `assets/` paths and no required build or external service.
 - Preserve gameplay, all five heroes and their element-restricted upgrades, three zones, depth modifiers, achievements, shrine, relics, save slots, save-code export/import, and wave 20 victory unless the task changes them.
 - Controls: joystick + Dash + Ultimate; no other in-game buttons. Automatic attacks stay automatic. Preserve the pause control and Settings sound/speed controls. Landscape uses a floating left joystick and right skill buttons; portrait keeps the bottom-center joystick. Desktop uses WASD/arrows, Space = Dash, E = Ultimate.
 - Preserve localStorage save compatibility. Profiles are v2 and runs are v11. Migrate Mage→Gravecaller and Stormcaller→Storm Ranger without losing progress; v9 runs migrate to ENDLESS; change format/version and write a migration only when changing serialized run structure.
@@ -12,11 +12,12 @@
 
 - Descent room-edge arrivals have a one-second shadow warning with glow, shadow, audio and offscreen cues. Announce offscreen arrivals without changing enemy movement, targeting or damage timing.
 
-- This hero lineup is PROTOTYPE ONLY on `codex/new-heroes`. Open a PR for owner playtesting; DO NOT merge or push to main. Keep the authored floor layouts and arrival cues.
+- Heroes are Gravecaller, Storm Ranger, Sunwarden, Emberweaver and Bloodknight. Keep the authored floor layouts and arrival cues. v11 skill fields (Dash/Ultimate) are additive and must default safely for old runs.
 
-- The landscape/skills prototype lives on `codex/landscape-skills`. Open a PR for playtesting; DO NOT merge or push main. v11 skill fields are additive and must default safely for old runs.
-
-- `codex/action-rpg-preview` adds a selectable isometric camera and visual skill animations. Keep it unmerged for owner playtesting. Isometric screen input must go through `inputVector`; physics, ranges, dungeon cells and saved coordinates stay in world space. Spawn visibility, camera culling and navigation cues must use the projected viewport.
-- Depth-sort upright actors, props, raised masonry and heighted projectiles; keep foreground walls translucent near the hero. Cosmetic queues/effects are transient and must never enter run/profile saves. Classic remains available in Settings. Historical world-axis bot suites select Classic through `tests/classic-camera-fixture.cjs`; `tests/action-rpg.cjs` validates the new camera/input/render path.
+- The isometric camera is the default view; Classic remains available in Settings. Isometric screen input must go through `inputVector`; physics, ranges, dungeon cells and saved coordinates stay in world space. Spawn visibility, camera culling and navigation cues must use the projected viewport (`worldW`/`worldH`, not screen `w`/`h`).
+- Depth-sort upright actors, props, raised masonry and heighted projectiles; keep foreground walls translucent near the hero. Cosmetic queues/effects are transient and must never enter run/profile saves. Historical world-axis bot suites select Classic through `tests/classic-camera-fixture.cjs`; `tests/action-rpg.cjs` validates the new camera/input/render path.
 
 - Short landscape screens (height under 390px, e.g. phones with a browser bar) zoom the camera out via `computeViewZoom` and use the compact HUD media query (height under 450px). Portrait and full-height layouts keep their original framing; Settings → VIEW (Near/Normal/Far) adjusts zoom. Screen-to-world input must divide by `viewZoom`.
+
+- Always work on a branch and open a PR; the owner playtests and approves merges to `main`. GitHub Actions runs the browser suites in `tests/` on every PR (`.github/workflows/tests.yml`); keep them passing and update their assertions when a deliberate change makes one obsolete.
+- Pause → REPORT A BUG copies recent errors plus game state for the owner to paste into an issue. Automatic quality (Settings → QUALITY: Auto/High/Low) lowers the frame rate cap and effect counts when a phone cannot hold 60 FPS; it must never change gameplay timing, ranges or saves.
