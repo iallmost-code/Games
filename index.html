@@ -3381,16 +3381,19 @@
           let event = dungeonEvent;
           if (!event || event.phase === "reward") return;
           let color = eventColors[event.kind], x = event.x, y = event.y;
-          if (x > left - 70 && x < left + w + 70 && y > top - 70 && y < top + h + 70) {
+          if (x > left - 70 && x < left + worldW + 70 && y > top - 70 && y < top + worldH + 70) {
             ctx.fillStyle = "#15212cb8"; ctx.beginPath(); ctx.arc(x, y, 28, 0, 7); ctx.fill();
             ctx.strokeStyle = color; ctx.lineWidth = 3; ctx.beginPath();
             ctx.arc(x, y, 27 + 2 * Math.sin(clock * 4), 0, 7); ctx.stroke();
-            ctx.fillStyle = color; ctx.font = "bold 22px system-ui"; ctx.textAlign = "center";
-            ctx.fillText(event.kind === "chest" ? "◆" : event.kind === "altar" ? "✦" : "✧", x, y + 8);
-            ctx.font = "bold 12px system-ui";
-            ctx.fillText(event.phase === "waiting" ? eventNames[event.kind] :
+            const label = event.phase === "waiting" ? eventNames[event.kind] :
               event.kind === "altar" ? "SURVIVE " + Math.ceil(Math.max(0, event.endAt - clock)) + "s" :
-              "GUARDIANS " + enemies.filter((e) => e.eventMark === event.id).length, x, y - 40);
+              "GUARDIANS " + enemies.filter((e) => e.eventMark === event.id).length;
+            billboard(x, y, () => {
+              ctx.fillStyle = color; ctx.font = "bold 22px system-ui"; ctx.textAlign = "center";
+              ctx.fillText(event.kind === "chest" ? "◆" : event.kind === "altar" ? "✦" : "✧", 0, 8);
+              ctx.font = "bold 12px system-ui";
+              ctx.fillText(label, 0, rpgPreview ? -48 : -40);
+            });
           }
           if (event.mark) {
             let mark = event.mark;
@@ -3742,7 +3745,7 @@
           const color=["#ffb66e","#a5e4ff","#b7db78"][currentZone()];
           for(const door of dungeon.entrances){
             if(!door.primary)continue;
-            if(door.x<left-50||door.y<top-50||door.x>left+w+190||door.y>top+h+190)continue;
+            if(door.x<left-50||door.y<top-50||door.x>left+worldW+190||door.y>top+worldH+190)continue;
             ctx.save();ctx.translate(door.x,door.y);ctx.rotate(door.angle);
             ctx.fillStyle="#030609e8";ctx.beginPath();ctx.ellipse(-13,0,13,24,0,0,7);ctx.fill();
             ctx.strokeStyle="#8c847144";ctx.lineWidth=3;ctx.beginPath();ctx.ellipse(-13,0,14,25,0,0,7);ctx.stroke();ctx.restore();
@@ -3910,10 +3913,10 @@
           let zone = currentZone(),
             palette = ["#b88e5b", "#83bacd", "#8da868"][zone],
             base = ["#92795a12", "#86bec918", "#87aa6714"][zone];
-          for (let gx = Math.floor(left / chamberSize) * chamberSize; gx < left + w + 150; gx += chamberSize)
+          for (let gx = Math.floor(left / chamberSize) * chamberSize; gx < left + worldW + 150; gx += chamberSize)
             for (
               let gy = Math.floor(top / chamberSize) * chamberSize;
-              gy < top + h + 150;
+              gy < top + worldH + 150;
               gy += chamberSize
             ) {
               ctx.fillStyle = base;
@@ -3997,8 +4000,8 @@
         }
         function drawMapDetails(left, top) {
           let zone = currentZone();
-          for (let gx = Math.floor(left / 480) * 480; gx < left + w + 120; gx += 480)
-            for (let gy = Math.floor(top / 420) * 420; gy < top + h + 120; gy += 420) {
+          for (let gx = Math.floor(left / 480) * 480; gx < left + worldW + 120; gx += 480)
+            for (let gy = Math.floor(top / 420) * 420; gy < top + worldH + 120; gy += 420) {
               let seed = Math.abs(Math.sin(gx * 0.021 + gy * 0.047)),
                 kind = Math.floor(seed * 4),
                 x = gx + 220 + Math.sin(gy * 0.03) * 60,
@@ -4055,9 +4058,9 @@
             if (
               site.used ||
               site.x < left - 90 ||
-              site.x > left + w + 230 ||
+              site.x > left + worldW + 230 ||
               site.y < top - 90 ||
-              site.y > top + h + 230
+              site.y > top + worldH + 230
             )
               continue;
             let x = site.x,
@@ -4068,7 +4071,7 @@
               groundShadow(x,y+13,31,10);
               ctx.save();ctx.globalAlpha=.25;drawGlow(x,y,23,color);ctx.restore();
               drawProp(site.kind==="well"?"prop-well":site.kind==="forge"?"prop-brazier":"prop-chest",x,y+22,67,68);
-              ctx.fillStyle=color;ctx.font="bold 11px system-ui";ctx.textAlign="center";ctx.fillText(siteNames[site.kind],x,y-55);continue;
+              billboard(x,y,()=>{ctx.fillStyle=color;ctx.font="bold 11px system-ui";ctx.textAlign="center";ctx.fillText(siteNames[site.kind],0,rpgPreview?-78:-55);});continue;
             }
             ctx.fillStyle = "#090f1699";
             ctx.beginPath();
@@ -6158,8 +6161,8 @@
             ctx.fillRect(left, top, worldW + 140, worldH + 140);
           }
           drawPaths(left, top);
-          for (let ix = Math.floor(left / 576) * 576; ix < left + w + 110; ix += 576)
-            for (let iy = Math.floor(top / 432) * 432; iy < top + h + 110; iy += 432) {
+          for (let ix = Math.floor(left / 576) * 576; ix < left + worldW + 110; ix += 576)
+            for (let iy = Math.floor(top / 432) * 432; iy < top + worldH + 110; iy += 432) {
               const x = ix + 90,
                 y = iy + 80;
               if(spriteReady("prop-brazier")){
@@ -6859,7 +6862,7 @@
                 ctx.stroke();
                 drawGlow(e.x,e.y-e.r-8,9,"#ff694c");
                 ctx.fillStyle="#fff1d3";ctx.font="900 18px system-ui";ctx.textAlign="center";
-                ctx.fillText("!",e.x,e.y-e.r-6);
+                if(rpgPreview)billboard(e.x,e.y,()=>ctx.fillText("!",0,-e.r*2.6));else ctx.fillText("!",e.x,e.y-e.r-6);
               }
               if (e.type === "charger") {
                 ctx.strokeStyle = e.dash ? "#ffb4a0" : "#f36863";
@@ -6976,7 +6979,8 @@
               ctx.fillStyle = "#15202a";
               ctx.textAlign = "center";
               ctx.font = "900 12px system-ui";
-              ctx.fillText(o.type === "nuke" ? "✦" : o.type === "shield" ? "S" : "»", o.x, o.y + 4);
+              const icon = o.type === "nuke" ? "✦" : o.type === "shield" ? "S" : "»";
+              if (rpgPreview) billboard(o.x, o.y, () => ctx.fillText(icon, 0, 4)); else ctx.fillText(icon, o.x, o.y + 4);
             }
           }
           drawCompanions();
