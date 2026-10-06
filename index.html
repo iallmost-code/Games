@@ -611,6 +611,9 @@
       @media (prefers-reduced-motion:reduce) { .menu-embers i,.start-prompt { animation:none; } }
       .choice.light {border-color:#e5c46d;background:linear-gradient(135deg,#342a1b,#171b22);}
       .choice.wind {border-color:#6fc1b4;background:linear-gradient(135deg,#1c3432,#171b22);}
+      .camp-scene{position:relative;min-height:150px;overflow:hidden;border:1px solid #947044;border-radius:12px;background:radial-gradient(ellipse at 50% 95%,#bc5a2680,transparent 45%),linear-gradient(155deg,#10151c,#30231d);padding:24px;text-align:center;box-shadow:inset 0 0 40px #0008}
+      .camp-scene:before,.camp-scene:after{content:"";position:absolute;bottom:0;width:24%;height:100px;background:linear-gradient(90deg,#222a2d,#0b0c0e);border:2px solid #6a5c48;clip-path:polygon(0 100%,0 28%,20% 28%,20% 0,80% 0,80% 28%,100% 28%,100% 100%)}
+      .camp-people{display:flex;justify-content:center;gap:24px;position:relative;z-index:1;margin-bottom:12px}.camp-person{display:flex;flex-direction:column;align-items:center;color:#c7b798}.camp-person small{font-size:8px;letter-spacing:1px}.camp-scene:before{left:0}.camp-scene:after{right:0}.camp-title,.camp-caption,.camp-moon{position:relative;z-index:1}.camp-title{display:block;color:#ffe0a8;letter-spacing:2px}.camp-caption{font-size:12px;max-width:310px;margin:14px auto;color:#c8bbaa}.camp-moon{display:block;color:#efba69;font-size:32px}
     </style>
     <style>
       #dungeonMap{position:fixed;left:12px;top:142px;width:101px;height:66px;opacity:.75;z-index:4;pointer-events:none;border:1px solid #847157;border-radius:5px}
@@ -757,6 +760,7 @@
     <script src="assets/cinematic/ash-environment.js"></script>
     <script src="assets/cinematic/zone-environment.js"></script>
     <script src="assets/cinematic/motion.js"></script>
+    <script src="assets/adventure/combat-loot.js"></script>
     <script src="assets/audio/combat-audio.js"></script>
     <script src="assets/audio/music.js"></script>
     <script src="assets/endgame/endless-nights.js"></script>
@@ -764,7 +768,7 @@
     <script>
       (() => {
         "use strict";
-        const GAME_VERSION = "v74 · DEEPER CRYPT";
+        const GAME_VERSION = "v75 · COMBAT & LOOT";
 
         // Recent script errors for Pause → REPORT A BUG. Never saved.
         const recentErrors = [];
@@ -1144,6 +1148,7 @@
           profile=blankProfile(); selectedHero="gravecaller"; selectedDepth=0;
           /* endgame-v72 */ Object.assign(profile, EmberEndgame.profile(prior || {}));
           /* new-blood-v73 */ applyNewBloodProfile(prior);
+          /* combat-loot-v75 */ applyAdventureProfile(prior);
           profile.tips={};profile.records={descent:{kills:0,bestDepth:{}},endless:{kills:0,bestDepth:{}}};
           if (!prior || typeof prior!=="object") return;
           profile.tips=prior.tips&&typeof prior.tips==="object"?{...prior.tips}:{};
@@ -1276,7 +1281,8 @@
         let currentMenuScreen = "hub";
         function renderMenu(screen) {
           currentMenuScreen = screen;
-          menuScreen=screen; mode=screen==="pause"||screen==="report"||screen==="settings"&&settingsReturn==="pause"?"paused":"menu";
+          menuScreen=screen; mode=screen==="pause"||screen==="build"||screen==="report"||screen==="settings"&&settingsReturn==="pause"?"paused":"menu";
+          if(renderAdventureMenu(screen))return;
           if(screen==="start") {showStartScreen();return;}
           if(screen==="slots") {
             let body=menuBase("SAVE SLOTS",activeSlot>=0?"hub":"start","Three independent characters on this device.");
@@ -1315,6 +1321,7 @@
               menuButton("ACHIEVEMENTS",()=>renderMenu("achievements")),
               menuButton("RUN HISTORY",()=>renderMenu("history")),
               menuButton("SETTINGS",()=>{settingsReturn="hub";renderMenu("settings");}));
+            decorateCamp(body);
             if(fullscreenSupported())body.append(fullscreenButton());return;
           }
           if(screen==="history"){renderRunHistory();return;}
@@ -1346,6 +1353,7 @@
             body.append(menuButton("RESUME",resumePaused,null,"primary"),
               menuButton("SETTINGS",()=>{settingsReturn="pause";renderMenu("settings");}));
             if(fullscreenSupported())body.append(fullscreenButton());
+            body.append(menuButton("YOUR BUILD",()=>renderMenu("build")));
             body.append(menuButton("REPORT A BUG",()=>renderMenu("report"),"Copies recent errors and your game state."));
             let quit=menuButton("QUIT RUN",()=>{quit.textContent="QUIT RUN · CONFIRM";
               quit.onclick=()=>{recordEndgameResult(false,"Abandoned");awardHeroMastery(false);saveSlotClock();clearRun();hero=null;showTitleMenu();};},
@@ -2113,6 +2121,7 @@
           needed = saved.needed;
           lastLevelClock = saved.lastLevelClock ?? clock - 1;
           runStats = saved.runStats || { damage: 0, hpLost: 0, armorBlocked: 0, bosses: 0 };
+          /* combat-loot-v75 */ restoreAdventure();
           weaponDryStreak = saved.weaponDryStreak || 0;
           weapon = saved.weapon || null;
           armor = saved.armor || null;
@@ -2281,6 +2290,7 @@
           resetHeroActors();
           /* endgame-v72 */ startEndgameRun();
           /* new-blood-v73 */ initializeNewBloodRun();
+          /* combat-loot-v75 */ startAdventure();
           runStats = { damage: 0, hpLost: 0, armorBlocked: 0, bosses: 0 };
           weaponDryStreak = 0;
           enemies = [];
@@ -2747,6 +2757,7 @@
               let b = document.createElement("button");
               b.className = "choice " + (p.element || "shared") + (p.name.startsWith("EVOLUTION") ? " evolution" : "");
               b.append(menuText("span", p.name), menuText("small", p.text));
+              /* combat-loot-v75 */ adventureChoice(b,p);
               b.append(menuText("small", (p.element || "shared").toUpperCase() + (p.element && p.element !== "shared" ? " · HERO ELEMENT" : " · ANY BUILD"), "power-kind"));
               const paths = evolutionPaths.filter((path) =>
                 evolutionRequirements[path.key].some(([label]) => p.name.toLowerCase().startsWith(label.toLowerCase())));
@@ -2755,6 +2766,7 @@
               b.onclick = () => {
                 sfx("loot");
                 p.apply();
+                /* combat-loot-v75 */ adventurePick(p);
                 panel.classList.add("hidden");
                 mode = "play";
                 updateHud();
@@ -3192,6 +3204,7 @@
             " / " +
             (armor?.name || (hero.class === "bloodknight" ? "Crimson Plate" : "Cloth Robe")) +
             ' · <span class="next-unlock">NEXT: ' + nextUnlock() + '</span>';
+          decorateAdventureSummary();
           choicesEl.replaceChildren();
           let homeButton=document.createElement("button"); homeButton.className="choice";
           homeButton.textContent="MAIN MENU"; homeButton.onclick=showTitleMenu; choicesEl.append(homeButton);
@@ -3244,6 +3257,7 @@
           start.hidden = isDescent();
           if(isDescent())descEl.innerHTML=descEl.innerHTML.split(" Endless grows")[0]+" All five floors cleared.";
           decorateDeepVictory();
+          decorateAdventureSummary();
           panel.classList.remove("hidden");
         }
         function continueEndless() {
@@ -3910,7 +3924,9 @@
           if(!hero||!endgameRun)return;
           Object.assign(profile,EmberEndgame.profile(profile));
           EmberEndgame.record(profile,endgameRun,{hero:hero.class,mode:runMode,floor:isDescent()?dungeon.floor:0,time:clock,kills,bosses:runStats.bosses,clear,cause:cause||(clear?"Victory":endgameRun.cause)});
-          endgameRun.recorded=true;saveProfile();
+          endgameRun.recorded=true;
+          const entry=profile.runHistory.find(r=>r.id===endgameRun.id);if(entry){entry.damage={...(hero.adventure?.damage||{})};entry.sources={...(hero.adventure?.sources||{})};entry.legend=hero.adventure?.legend||"";}
+          saveProfile();
         }
         function renderEndgameOptions(body){
           body.append(menuText("h3","ENDLESS NIGHTS","menu-head"));
@@ -3934,7 +3950,7 @@
         function renderRunHistory(){
           const body=menuBase("RUN HISTORY","hub","Last 20 runs for "+slots[activeSlot].name);
           if(!profile.runHistory.length)body.append(menuText("p","Your next finished run will appear here.","menu-sub"));
-          for(const r of profile.runHistory){const card=menuText("section","","slot-card");card.append(menuText("b",heroNames[r.hero]+" · "+r.mode.toUpperCase()+" · T"+r.torment),menuText("p","FLOOR "+r.floor+" · "+Math.floor(r.time/60)+":"+String(r.time%60).padStart(2,"0")+" · "+r.kills+" KILLS","menu-sub"),menuText("p",r.cause+(r.daily?" · DAILY "+r.daily+" · SCORE "+r.score:""),"menu-note"));body.append(card);}
+          for(const r of profile.runHistory){const card=menuText("section","","slot-card");card.append(menuText("b",heroNames[r.hero]+" · "+r.mode.toUpperCase()+" · T"+r.torment),menuText("p","FLOOR "+r.floor+" · "+Math.floor(r.time/60)+":"+String(r.time%60).padStart(2,"0")+" · "+r.kills+" KILLS","menu-sub"),menuText("p",r.cause+(r.daily?" · DAILY "+r.daily+" · SCORE "+r.score:""),"menu-note"));if(r.damage)card.append(menuText("p","DAMAGE · "+(window.EmberAdventure?.breakdown(r.damage)||"Unavailable")+" · LEGENDARY: "+(window.EmberAdventure?.gear[r.legend]?.name||"None"),"menu-note"));body.append(card);}
         }
         function drawEndgameRooms(){
           if(!isDescent())return;
@@ -4142,6 +4158,158 @@
 
         }
 
+        // v75: optional loot and encounters; existing hero stats and Floor 1 remain unchanged.
+        let adventurePads=[],adventureBossPads=[],adventureBoss=null,adventureFootprints=[],adventureBurns=[],adventureDamageQueue=[],adventureHazards=[],adventureHazardAt=0,adventureProc=false;
+        function adventureState(){
+          if(!hero||!window.EmberAdventure)return null;
+          return hero.adventure ||= EmberAdventure.state({},hero.class);
+        }
+        function applyAdventureProfile(prior){profile.adventure=window.EmberAdventure?.profile(prior?.adventure)||{collection:[],equipped:[],provision:0};}
+        function startAdventure(){
+          adventurePads=[];adventureBossPads=[];adventureBoss=null;adventureFootprints=[];adventureBurns=[];adventureDamageQueue=[];adventureHazards=[];adventureHazardAt=0;
+          if(!hero||!window.EmberAdventure)return;
+          hero.adventure=EmberAdventure.state({},hero.class);
+          if(!endgameRun?.daily&&profile.adventure?.equipped?.includes(hero.class))hero.adventure.legend=hero.class;
+          if(!endgameRun?.daily&&profile.adventure?.provision){hero.rerolls++;profile.adventure.provision=0;saveProfile();}
+        }
+        function restoreAdventure(){
+          adventurePads=[];adventureBossPads=[];adventureBoss=null;adventureFootprints=[];adventureBurns=[];adventureDamageQueue=[];adventureHazards=[];adventureHazardAt=clock+6;
+          if(hero&&window.EmberAdventure)hero.adventure=EmberAdventure.state(hero.adventure,hero.class);
+        }
+        function adventureFloor(){
+          adventurePads=[];adventureBossPads=[];adventureBoss=null;adventureFootprints=[];adventureBurns=[];adventureDamageQueue=[];adventureHazards=[];adventureHazardAt=0;
+          if(hero&&window.EmberAdventure)hero.adventure=EmberAdventure.state(hero.adventure,hero.class);
+          if(!window.EmberAdventure||!isDescent()||dungeon.floor<2)return;
+          const room=floorSpec().rooms[5],x=(room[0]+.9)*80,y=(room[1]+.9)*80;
+          if(wallAt(x,y,35))return;
+          adventurePads.push({x,y,kind:dungeon.floor%2?'treasure':'rescue',hold:0,done:adventureState()?.rescued.includes(dungeon.floor)});
+        }
+        function equipAdventureLegend(){
+          const state=adventureState();if(!state||endgameRun?.daily)return;
+          state.legend=hero.class;state.procAt=clock+1;
+          profile.adventure ||= EmberAdventure.profile();
+          if(!profile.adventure.collection.includes(hero.class))profile.adventure.collection.push(hero.class);
+          showToast('LEGENDARY · '+EmberAdventure.gear[hero.class].name.toUpperCase());sfx('loot');saveProfile();saveRun(true);
+        }
+        function adventureDash(){
+          if(adventureState()?.legend!=='frostwarden')return;
+          adventureProc=true;try{for(const e of [...enemies])if(Math.hypot(e.x-hero.x,e.y-hero.y)<95+e.r&&!segmentBlocked(hero.x,hero.y,e.x,e.y)){afflict(e,'frost',hero.damage*.35);damageEnemy(e,hero.damage*.35,'frost');}}finally{adventureProc=false;}
+          rings.push({x:hero.x,y:hero.y,r:8,life:.35,speed:270,color:'#b5edff'});
+        }
+        function adventureHit(e,dealt,element,bolt){
+          const state=adventureState();if(!state||dealt<=0)return;
+          state.damage[element]=(state.damage[element]||0)+dealt;
+          const source=adventureProc?'legendary':bolt?'automatic':'other';state.sources ||= {};state.sources[source]=(state.sources[source]||0)+dealt;
+          if(bolt&&element!=='neutral')sfx('hit');
+          // Bounded, non-blocking feedback: no hitstop, update timing or per-enemy filters.
+          if(visiblePoint(e.x,e.y,60)&&rpgFx.length<(visualQuality.maxAtmosphere>=32?24:visualQuality.maxAtmosphere>=16?16:8))rpgFx.push({kind:'impact',x:e.x,y:e.y,r:bolt?12:8,life:.16,total:.16,color:elementColors[element]||'#ffdf9f'});
+          if(adventureProc||state.legend!==hero.class)return;
+          if(state.legend==='bloodknight'&&bolt&&e.bleedUntil>clock)pushEnemy(e,hero.x,hero.y,-30);
+          if(clock<state.procAt)return;
+          if(state.legend==='gravecaller'&&e.hp<=0&&element==='shadow'){state.procAt=clock+6;raiseMinion(e.x,e.y);}
+          if(state.legend==='ember'&&element==='fire'&&adventureBurns.length<3){state.procAt=clock+4;adventureBurns.push({x:e.x,y:e.y,r:45,life:2,tick:.4,power:hero.damage*.12});}
+          if(state.legend==='rogue'&&bolt){
+            const other=enemies.find(o=>o!==e&&o.hp>0&&Math.hypot(o.x-e.x,o.y-e.y)<160&&!segmentBlocked(e.x,e.y,o.x,o.y)&&!segmentBlocked(o.x,o.y,hero.x,hero.y));
+            if(other){state.procAt=clock+2;arcs.push({x1:e.x,y1:e.y,x2:other.x,y2:other.y,life:.2,electric:true});if(adventureDamageQueue.length<8)adventureDamageQueue.push({enemy:other,damage:hero.damage*.35,kind:'poison'});}
+          }
+        }
+        function prepareAdventureBoss(){
+          if(adventureBoss===boss||!boss||!deepFloor())return;
+          adventureBoss=boss;adventureBossPads=[];
+          const kind=boss.variant==='bishop'?'choir':boss.variant==='foundry'?'vent':null;
+          if(!kind)return;
+          for(const [x,y] of [[27*80,8*80],[30*80,12*80]])if(!wallAt(x,y,30))adventureBossPads.push({x,y,kind,hold:0,done:false});
+          tipOnce('boss-'+kind,kind==='choir'?'Silence choir anchors: stand on a violet seal briefly between attacks.':'Vent overheated furnaces: stand on an amber valve briefly between attacks.');
+        }
+        function updateAdventure(dt){
+          if(mode!=='play'||!hero||!window.EmberAdventure)return;
+          const state=adventureState();prepareAdventureBoss();
+          // Resolve secondary strikes after the originating hit has finished its death/reward path.
+          for(const hit of adventureDamageQueue.splice(0,8)){adventureProc=true;try{damageEnemy(hit.enemy,hit.damage,hit.kind);}finally{adventureProc=false;}}
+          for(let i=adventureBurns.length-1;i>=0;i--){const p=adventureBurns[i];p.life-=dt;p.tick-=dt;if(p.life<=0){adventureBurns.splice(i,1);continue;}if(p.tick<=0){p.tick=.4;adventureProc=true;try{for(const e of [...enemies])if(Math.hypot(e.x-p.x,e.y-p.y)<p.r+e.r&&!segmentBlocked(p.x,p.y,e.x,e.y))damageEnemy(e,p.power,'fire');}finally{adventureProc=false;}}}
+          if(boss?.hp>0&&boss.variant==='cryptHeart'&&clock>=adventureHazardAt){
+            adventureHazardAt=clock+6;const phase=boss.deepPhase||1;
+            adventureHazards=[{x:hero.x,y:hero.y,r:phase===1?65:phase===2?85:105,time:1.4,color:['#ed887d','#9bdae7','#cca1ff'][phase-1]}];sfx('warning');
+          }
+          for(let i=adventureHazards.length-1;i>=0;i--){const m=adventureHazards[i];m.time-=dt;if(!boss||boss.hp<=0){adventureHazards.splice(i,1);continue;}if(m.time<=0){adventureHazards.splice(i,1);rings.push({x:m.x,y:m.y,r:8,life:.4,speed:200,color:m.color});if(hero.inv<=0&&Math.hypot(hero.x-m.x,hero.y-m.y)<m.r+hero.r&&!segmentBlocked(m.x,m.y,hero.x,hero.y)){takeHit(14);hero.inv=.45;if(endgameRun)endgameRun.cause='Heart arena collapse';if(hero.hp<=0){updateHud();gameOver();return true;}}}}
+
+          for(const pad of adventurePads){
+            if(pad.done)continue;
+            const near=Math.hypot(hero.x-pad.x,hero.y-pad.y)<52;
+            pad.hold=near&&!hero.moving&&!enemies.some(e=>e.hp>0&&Math.hypot(e.x-pad.x,e.y-pad.y)<160)?pad.hold+dt:0;
+            if(pad.hold>=1.25){pad.done=true;state.rescued.push(dungeon.floor);
+              if(pad.kind==='rescue'){hero.hp=Math.min(hero.maxHp,hero.hp+20);hero.rerolls++;showToast('CRYPT PILGRIM RESCUED · +1 REROLL · +20 HP');sfx('well');}
+              else if(!endgameRun?.daily&&state.legend!==hero.class)equipAdventureLegend();else {endgameRun.gold+=25;showToast('TREASURE · +25 GOLD');sfx('loot');}
+              saveRun(true);
+            }
+          }
+          for(const pad of adventureBossPads){
+            if(pad.done||!boss||boss.hp<=0)continue;
+            pad.hold=Math.hypot(hero.x-pad.x,hero.y-pad.y)<50&&!hero.moving?pad.hold+dt:0;
+            if(pad.hold>=1.1){pad.done=true;boss.deepCast=Math.max(boss.deepCast,4);if(boss.deepMark)boss.deepMark.damage*=.5;
+              if(pad.kind==='choir')boss.adventureChoirSilenced=(boss.adventureChoirSilenced||0)+1;
+              showToast(pad.kind==='choir'?'CHOIR ANCHOR SILENCED':'FURNACE VENTED');sfx('door');adventureProc=true;try{damageEnemy(boss,boss.max*.04,'neutral',0,false,false,false);}finally{adventureProc=false;}}
+          }
+          if(state.legend==='ranger'&&clock>=state.procAt){
+            for(const wolf of companions.filter(p=>p.kind==='wolf').slice(0,2)){const foe=enemies.find(e=>e.hp>0&&Math.hypot(e.x-wolf.x,e.y-wolf.y)<180&&!segmentBlocked(wolf.x,wolf.y,e.x,e.y));if(foe){state.procAt=clock+5;const dx=foe.x-wolf.x,dy=foe.y-wolf.y,d=Math.hypot(dx,dy)||1;moveAroundWalls(wolf,dx/d*Math.min(d,90),dy/d*Math.min(d,90),dt);if(Math.hypot(foe.x-wolf.x,foe.y-wolf.y)<90&&!segmentBlocked(wolf.x,wolf.y,foe.x,foe.y)){adventureProc=true;try{damageEnemy(foe,hero.damage*.85,'frost');}finally{adventureProc=false;}}}}
+          }
+          if(state.legend==='sunwarden'&&hero.moving&&clock>=state.procAt){state.procAt=clock+4;adventureFootprints.push({x:hero.x,y:hero.y,life:3});if(adventureFootprints.length>3)adventureFootprints.shift();}
+          for(let i=adventureFootprints.length-1;i>=0;i--){const p=adventureFootprints[i];p.life-=dt;if(p.life<=0)adventureFootprints.splice(i,1);else if(Math.hypot(hero.x-p.x,hero.y-p.y)<45)hero.hp=Math.min(hero.maxHp,hero.hp+2*dt);}
+        }
+        function drawAdventure(){
+          for(const m of adventureHazards){ctx.save();ctx.strokeStyle=m.color;ctx.fillStyle=m.color+'30';ctx.lineWidth=3;ctx.beginPath();ctx.arc(m.x,m.y,m.r,0,7);ctx.fill();ctx.stroke();ctx.restore();}
+          for(const p of [...adventureBurns]){if(!visiblePoint(p.x,p.y,80))continue;ctx.save();ctx.fillStyle='#ff914f38';ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,7);ctx.fill();ctx.restore();}
+          for(const p of [...adventurePads,...adventureBossPads,...adventureFootprints]){
+            if(p.done||!visiblePoint(p.x,p.y,100))continue;
+            const color=p.kind==='rescue'?'#a7e5bf':p.kind==='vent'?'#ffa96f':p.kind==='choir'?'#cbb0ff':'#efd28b';
+            ctx.save();ctx.strokeStyle=color;ctx.globalAlpha=.7;ctx.lineWidth=2;ctx.beginPath();ctx.arc(p.x,p.y,p.life?43:34,0,Math.PI*2);ctx.stroke();
+            if(p.hold){ctx.lineWidth=5;ctx.beginPath();ctx.arc(p.x,p.y,38,-Math.PI/2,-Math.PI/2+Math.PI*2*Math.min(1,p.hold/1.25));ctx.stroke();}ctx.restore();
+            if(p.kind)billboard(p.x,p.y-48,()=>{ctx.font='bold 11px system-ui';ctx.fillStyle=color;ctx.textAlign='center';ctx.fillText({rescue:'RESCUE · STAND HERE',treasure:'LEGENDARY CACHE',choir:'CHOIR ANCHOR',vent:'FURNACE VALVE'}[p.kind],0,0);});
+          }
+          if(isDescent()&&dungeon.secret&&!dungeon.secret.revealed&&visiblePoint(dungeon.secret.mouth.x,dungeon.secret.mouth.y,100))billboard(dungeon.secret.mouth.x,dungeon.secret.mouth.y-60,()=>{ctx.font='11px system-ui';ctx.fillStyle='#bda68d';ctx.textAlign='center';ctx.fillText('DUST TRAILS INTO THE CRACK',0,0);});
+        }
+        function adventureChoice(button,p){
+          if(!window.EmberAdventure)return;
+          const text=p.name.startsWith('Quick Hands')?'SWING / SHOT INTERVAL · '+hero.rate.toFixed(2)+'s → '+(hero.baseRate/(1+Math.min(.3,hero.attackHaste+.1))).toFixed(2)+'s':p.name.startsWith('Long Reach')?'REACH · '+Math.round(hero.range)+'px → '+Math.round(hero.range+25)+'px':p.name==='Iron Heart'?'MAX HP · '+hero.maxHp+' → '+(hero.maxHp+30):null;
+          if(text)button.append(menuText('small',text,'power-kind'));
+        }
+        function adventurePick(p){const state=adventureState();if(state){state.picks.push(p.name);if(state.picks.length>50)state.picks.shift();}}
+        function adventureReport(){return window.EmberAdventure?.breakdown(hero?.adventure?.damage)||'Damage breakdown unavailable.';}
+        function adventureSources(){const sources=hero?.adventure?.sources||{};return 'AUTOMATIC '+Math.round(sources.automatic||0).toLocaleString()+' · LEGENDARY PROCS '+Math.round(sources.legendary||0).toLocaleString()+' · OTHER SKILLS / COMPANIONS / DOT '+Math.round(sources.other||0).toLocaleString();}
+        function decorateAdventureSummary(){
+          if(!hero||!window.EmberAdventure)return;
+          const note=document.createElement('p');note.className='menu-note';note.textContent='DAMAGE BY ELEMENT · '+adventureReport()+' · SOURCES: '+adventureSources()+' · LEGENDARY: '+(EmberAdventure.gear[hero.adventure?.legend]?.name||'None');descEl.append(note);
+        }
+        function renderAdventureMenu(screen){
+          if(!window.EmberAdventure)return false;
+          if(screen==='collection'){
+            const body=menuBase('LEGENDARY COLLECTION','hub','Discover caches in side rooms on odd floors from Floor 3. Pack discovered gear for your next run in either mode, or leave it unequipped. One item per hero; daily challenges use gold instead.');
+            for(const [key,g] of Object.entries(EmberAdventure.gear)){body.append(menuText('h3',g.name+(profile.adventure?.collection.includes(key)?' · DISCOVERED':' · UNDISCOVERED'),'menu-head'),menuText('p',heroNames[key]+' · '+g.text,'menu-note'));if(profile.adventure?.collection.includes(key)){const packed=profile.adventure.equipped.includes(key);body.append(menuButton((packed?'UNPACK ':'PACK ')+g.name.toUpperCase(),()=>{profile.adventure.equipped=packed?profile.adventure.equipped.filter(k=>k!==key):[...profile.adventure.equipped,key];saveProfile();renderMenu('collection');},'Applies to new non-daily runs only. No base-stat bonus.'));}}return true;
+          }
+          if(screen==='quartermaster'){
+            const body=menuBase('CAMP QUARTERMASTER','hub','A single provision for your next non-daily run. Legendary items are found below, not bought.');
+            const owned=profile.adventure?.provision,button=menuButton(owned?'REROLL PROVISION · PACKED':'PACK +1 STARTING REROLL · 25 EMBERS',()=>{if(profile.embers<25||profile.adventure.provision)return;profile.embers-=25;profile.adventure.provision=1;saveProfile();renderMenu('quartermaster');},'Used once when starting a new run. Continue never consumes it.');button.disabled=owned||profile.embers<25;body.append(button);return true;
+          }
+          if(screen==='build'&&hero){
+            const body=menuBase('YOUR BUILD','pause',heroNames[hero.class]+' · '+Math.round(hero.damage)+' DAMAGE · '+hero.rate.toFixed(2)+'s INTERVAL · '+Math.round(hero.range)+'px REACH');
+            const back=menuPage.children[0]?.children[0];if(back)back.onclick=()=>renderMenu('pause');
+            body.append(menuText('p','DAMAGE BY ELEMENT · '+adventureReport(),'menu-note'),menuText('p',adventureSources(),'menu-note'),menuText('h3','LEGENDARY','menu-head'),menuText('p',EmberAdventure.gear[hero.adventure?.legend]?.text||'Explore side rooms for a legendary cache.','menu-note'));
+            for(const p of hero.adventure?.picks||[])body.append(menuText('p',p,'menu-note'));
+            body.append(menuText('h3','EVOLUTIONS','menu-head'));for(const key of Object.keys(evolutionRequirements).filter(k=>prototypeEvolutionAllowed(k)&&(hero.class!=='bloodknight'||['crimson','tremor','juggernaut'].includes(k))&&(hero.class!=='ember'||['inferno','plague','barrage','wildfire'].includes(k))))body.append(menuText('p',key.toUpperCase()+' · '+evolutionProgress(key)+(hero.evolutions.includes(key)?' · OWNED':''),'menu-note'));
+            return true;
+          }
+          return false;
+        }
+        function decorateCamp(body){
+          if(!window.EmberAdventure)return;
+          const scene=menuText('section','','camp-scene');scene.setAttribute('aria-label','Camp at the entrance to the crypt');
+          const people=menuText('div','','camp-people');for(const [kind,label] of [['sunwarden','SHRINE KEEPER'],['bloodknight','QUARTERMASTER'],['gravecaller','CRYPT GUIDE']]){const npc=menuText('div','','camp-person'),portrait=document.createElement('canvas');portrait.width=48;portrait.height=56;portrait.className='slot-icon';portrait.dataset.hero=kind;paintHeroPortrait(portrait,kind);npc.append(portrait,menuText('small',label));people.append(npc);}
+          scene.append(people,menuText('span','✧','camp-moon'),menuText('strong','THE LAST SAFE FIRE','camp-title'),menuText('p','The shrine keeper watches the gates. A quartermaster tends the fire. Your companions prepare to descend.','camp-caption'));
+          const loading=menuText('p','','menu-note');loading.setAttribute('role','status');loading.style.position='relative';loading.style.zIndex='1';scene.append(loading);
+          const showLoading=()=>{if(!loading.isConnected)return;const count=window.EmberHeroAnimation?.diagnostics().loaded.length||0;loading.textContent=count===7?'Hero art ready · adaptive 60 FPS rendering':'Preparing hero art '+count+'/7 · fallback sprites ready';if(count<7)setTimeout(showLoading,500);};setTimeout(showLoading,0);
+          body.prepend(scene);body.append(menuButton('CAMP QUARTERMASTER',()=>renderMenu('quartermaster')),menuButton('LEGENDARY COLLECTION',()=>renderMenu('collection')));
+        }
+
         // Dungeon geometry is a union of authored rooms and corridors on an 80px grid.
         let selectedMode = "descent", runMode = "descent", dungeon = null, floorCheckpoint = null;
         let tipQueue = [], activeTip = null, tipTime = 0, navTime = 0, navField = new Map();
@@ -4197,6 +4365,7 @@
         function deepSlow(o,vx,vy,guide){return guide&&deepWater(o.x,o.y)?[vx*.65,vy*.65]:[vx,vy];}
         function deepMarked(e,r,color,damage,pattern="pulse"){
           const target=nearbyAlly(e)||hero;
+          if(e.variant==="bishop"&&pattern==="choir")damage*=1-.2*Math.min(2,e.adventureChoirSilenced||0);
           e.deepMark={x:target.x,y:target.y,r,time:.9,total:.9,color,damage,pattern};
           if(pattern==="choir"){e.deepMark.x=e.x;e.deepMark.y=e.y;e.deepMark.r=r+40;}
           if(pattern==="volley"&&e.variant==="cryptHeart")e.deepMark.echoes=[{x:hero.x-130,y:hero.y+70},{x:hero.x+130,y:hero.y-70}].filter(p=>!wallAt(p.x,p.y,8));
@@ -4328,6 +4497,7 @@
           for(let i=4;i<7;i++){let [x,y,rw,rh]=floorSpec().rooms[i];sites.push({x:(x+rw/2)*80,y:(y+rh/2)*80,kind:["well","forge","cache"][i-4],used:false,r:35});}
           floorCheckpoint={floor:number,hero:structuredClone(hero),clock,kills,level,xp,needed,weapon:structuredClone(weapon),armor:structuredClone(armor),runStats:structuredClone(runStats),runEmbers,xpReserve};
           /* endgame-v72 */ floorCheckpoint.endgameRun=structuredClone(endgameRun);
+          /* combat-loot-v75 */ adventureFloor();
           if(number>1)tipOnce("zone"+number,floorSpec().hazard);toastTimer=0;toastEl.classList.remove("show");updateHud();
         }
         function tipOnce(key,message){
@@ -5406,6 +5576,7 @@
           if(earnsCharge)addUltimateCharge(dealt/(Math.max(24,hero.damage)*50)+(e.hp<=amount?.42:0));
           runStats.damage += dealt;
           e.hp -= amount;
+          /* combat-loot-v75 */ adventureHit(e,dealt,element,fromHeroBolt);
           e.hitFlash = 0.1;
           if(rpgPreview&&visiblePoint(e.x,e.y,50)&&(isCrit||amount>hero.damage*1.8)){shake=Math.max(shake,isCrit?2.1:1.2);rpgFx.push({kind:"impact",x:e.x,y:e.y,r:23,life:.25,total:.25,color:elementColors[element]||"#ffe2a8"});if(rpgFx.length>24)rpgFx.shift();}
           let color = resisted ? "#aab0b5" : weak ? elementColors[element] :
@@ -5722,6 +5893,7 @@
           hero.dashCd=dashCooldown();hero.inv=Math.max(hero.inv,.25);
           hero.stunUntil=0;hero.slideX=hero.slideY=0;
           /* new-blood-v73 */ newBloodDash();
+          /* combat-loot-v75 */ adventureDash();
           rings.push({x:hero.x,y:hero.y,r:12,life:.25,speed:180,color:"#c0e7ff"});
           ensureAudio();sfx("dash");updateSkillButtons();return true;
         }
@@ -5899,6 +6071,7 @@
         }
         function update(dt) {
           /* endgame-v72 */ updateEndgame(dt);
+          /* combat-loot-v75 */ if(updateAdventure(dt))return;
           updateTips(dt);
           for(let i=bloodEffects.length-1;i>=0;i--){const effect=bloodEffects[i];if(effect.delay>0)effect.delay-=dt;else effect.life-=dt;if(effect.life<=0)bloodEffects.splice(i,1);}
           toastTimer -= dt;
@@ -7673,6 +7846,7 @@
           window.EmberZones?.ground(ctx,ashScene);
           window.EmberZones?.foreground(ctx,ashScene);
           drawDeepMarks();
+          drawAdventure();
           window.EmberMotion?.draw(ctx,ashScene);
           drawZoneDepth(left,top);
           drawRpgLighting();

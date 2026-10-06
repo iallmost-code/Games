@@ -62,6 +62,9 @@
             date: String(r.date || "").slice(0, 30),
             daily: String(r.daily || "").slice(0, 10),
             score: integer(r.score),
+            damage: window.EmberAdventure?.state({damage:r.damage},r.hero).damage || {},
+            sources: window.EmberAdventure?.state({sources:r.sources},r.hero).sources || {},
+            legend: r.legend===r.hero ? r.hero : "",
           }))
       : [];
     const scores = {};

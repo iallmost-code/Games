@@ -29,7 +29,7 @@ jobs:
         run: |
           node -e '
             const fs = require("fs");
-            for (const file of ["index.html", "sw.js", "assets/cinematic/hero-animation.js", "assets/cinematic/ash-environment.js", "assets/audio/combat-audio.js", "assets/audio/music.js", "assets/cinematic/zone-environment.js", "assets/cinematic/motion.js", "assets/endgame/endless-nights.js", "assets/heroes/mastery.js"]) {
+            for (const file of ["index.html", "sw.js", "assets/cinematic/hero-animation.js", "assets/cinematic/ash-environment.js", "assets/audio/combat-audio.js", "assets/audio/music.js", "assets/cinematic/zone-environment.js", "assets/cinematic/motion.js", "assets/endgame/endless-nights.js", "assets/heroes/mastery.js", "assets/adventure/combat-loot.js"]) {
 
               const source = fs.readFileSync(file, "utf8");
               const blocks = file.endsWith(".html") ? [...source.matchAll(/<script>([\s\S]*?)<\/script>/g)].map(m => m[1]) : [source];
@@ -38,6 +38,14 @@ jobs:
             }
             JSON.parse(fs.readFileSync("manifest.webmanifest", "utf8"));
           '
+      - name: Service worker cache version follows asset changes
+        if: github.event_name == 'pull_request'
+        run: |
+          base="origin/${{ github.base_ref }}"
+          if git diff --name-only "$base"...HEAD | grep -q '^assets/' && ! git diff "$base"...HEAD -- sw.js | grep -q '^+const CACHE'; then
+            echo "Files under assets/ changed: bump CACHE in sw.js so phones drop cached art/audio." >&2
+            exit 1
+          fi
       - name: Gameplay and save functions unchanged
         run: node tests/visual-invariants.cjs
 
@@ -49,7 +57,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        suite: [action-rpg, landscape-skills, new-heroes, bloodknight, descent, descent-variety, descent-tuning, animated-catacombs, audio-presentation, ash-environment, sound-motion, endless-nights, new-blood, deeper-crypt]
+        suite: [action-rpg, landscape-skills, new-heroes, bloodknight, descent, descent-variety, descent-tuning, animated-catacombs, audio-presentation, ash-environment, sound-motion, endless-nights, new-blood, deeper-crypt, combat-loot]
 
     env:
       ARTIFACT_DIR: ${{ github.workspace }}/artifacts

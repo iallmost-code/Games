@@ -1,0 +1,92 @@
+{
+  "heroes": [
+    {
+      "hero": "gravecaller",
+      "item": "Lantern of the Lost",
+      "baseStatsPreserved": true
+    },
+    {
+      "hero": "ranger",
+      "item": "Howling Fang",
+      "baseStatsPreserved": true
+    },
+    {
+      "hero": "ember",
+      "item": "Cinderwake",
+      "baseStatsPreserved": true
+    },
+    {
+      "hero": "bloodknight",
+      "item": "Crimson Hook",
+      "baseStatsPreserved": true
+    },
+    {
+      "hero": "sunwarden",
+      "item": "Pilgrim’s Halo",
+      "baseStatsPreserved": true
+    },
+    {
+      "hero": "rogue",
+      "item": "Widow’s Return",
+      "baseStatsPreserved": true
+    },
+    {
+      "hero": "frostwarden",
+      "item": "Winter’s Oath",
+      "baseStatsPreserved": true
+    }
+  ],
+  "persistence": {
+    "checkpoint": true,
+    "profileV2": true,
+    "EC1": true,
+    "legacyDefaults": true,
+    "history": true,
+    "slotIsolation": true
+  },
+  "encounters": {
+    "rescue": true,
+    "legendaryCache": true,
+    "bishop": true,
+    "foundry": true,
+    "heartTelegraph": true,
+    "invulnerability": true
+  },
+  "phones": [
+    {
+      "width": 390,
+      "height": 844,
+      "dpr": 3,
+      "pixels": 740610,
+      "rendered": true,
+      "extraButtons": false
+    },
+    {
+      "width": 844,
+      "height": 390,
+      "dpr": 3,
+      "pixels": 740610,
+      "rendered": true,
+      "extraButtons": false
+    },
+    {
+      "width": 844,
+      "height": 360,
+      "dpr": 3,
+      "pixels": 683640,
+      "rendered": true,
+      "extraButtons": false
+    },
+    {
+      "width": 1440,
+      "height": 3200,
+      "dpr": 3,
+      "pixels": 1800000,
+      "rendered": true,
+      "extraButtons": false
+    }
+  ],
+  "errors": [],
+  "offlineShell": true,
+  "optionalModuleFallback": true
+}
