@@ -49,7 +49,8 @@ const server = http.createServer((req, res) => {
    g.clock=100;h.adventure.procAt=0;g.enemies=[];const e=enemy();g.enemies.push(e);
    if(kind==='bloodknight'){e.bleedUntil=120;g.damageEnemy(e,5,'blood',0,true);check(e.x<450,'Bleeding foe was not pulled');}
    if(kind==='ember'){g.damageEnemy(e,5,'fire',0,true);check(g.burns.length===1,'Fire patch absent');const hp=e.hp;g.updateAdventure(.5);check(e.hp<hp,'Patch did no damage');check(Number.isFinite(e.hp),'Patch damage invalid');}
-   if(kind==='rogue'){const other=enemy(480);g.enemies.push(other);g.damageEnemy(e,5,'poison',0,true);check(other.hp<200,'Returning dagger absent');const hp=other.hp;g.damageEnemy(e,5,'poison',0,true);check(other.hp===hp,'Cooldown bypassed');}
+   if(kind==='rogue'){const other=enemy(480);g.enemies.push(other);g.damageEnemy(e,5,'poison',0,true);g.updateAdventure(0);check(other.hp<200,'Returning dagger absent');const hp=other.hp;g.damageEnemy(e,5,'poison',0,true);g.updateAdventure(0);check(other.hp===hp,'Cooldown bypassed');
+     h.evolutions.push('nightbloom');h.nightbloomAt=-99;h.adventure.procAt=0;e.hp=1;other.hp=1;const unrelated=enemy(700);g.enemies=[e,other,unrelated];const before=g.kills;g.damageEnemy(e,5,'poison',0,true);g.updateAdventure(0);check(g.kills===before+2&&g.enemies.includes(unrelated)&&unrelated.hp===200,'Ricochet/explosion double-paid death');}
    if(kind==='gravecaller'){e.hp=1;g.damageEnemy(e,2,'shadow',0,true);check(g.companions.some(p=>p.kind!=='wolf'),'Extra skeleton absent');}
    if(kind==='ranger'){g.update(.025);const wolf=g.companions.find(p=>p.kind==='wolf');check(wolf,'Wolf absent');wolf.x=430;wolf.y=800;h.adventure.procAt=0;g.enemies=[e];const hp=e.hp;g.updateAdventure(.025);check(e.hp<hp,'Wolf charge absent');}
    if(kind==='sunwarden'){h.hp=50;h.moving=1;g.updateAdventure(.025);check(g.footprints.length===1,'Healing trail absent');h.moving=0;g.updateAdventure(.5);check(h.hp>50,'Trail failed to heal');}

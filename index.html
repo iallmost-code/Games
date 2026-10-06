@@ -614,7 +614,6 @@
       .camp-scene{position:relative;min-height:150px;overflow:hidden;border:1px solid #947044;border-radius:12px;background:radial-gradient(ellipse at 50% 95%,#bc5a2680,transparent 45%),linear-gradient(155deg,#10151c,#30231d);padding:24px;text-align:center;box-shadow:inset 0 0 40px #0008}
       .camp-scene:before,.camp-scene:after{content:"";position:absolute;bottom:0;width:24%;height:100px;background:linear-gradient(90deg,#222a2d,#0b0c0e);border:2px solid #6a5c48;clip-path:polygon(0 100%,0 28%,20% 28%,20% 0,80% 0,80% 28%,100% 28%,100% 100%)}
       .camp-people{display:flex;justify-content:center;gap:24px;position:relative;z-index:1;margin-bottom:12px}.camp-person{display:flex;flex-direction:column;align-items:center;color:#c7b798}.camp-person small{font-size:8px;letter-spacing:1px}.camp-scene:before{left:0}.camp-scene:after{right:0}.camp-title,.camp-caption,.camp-moon{position:relative;z-index:1}.camp-title{display:block;color:#ffe0a8;letter-spacing:2px}.camp-caption{font-size:12px;max-width:310px;margin:14px auto;color:#c8bbaa}.camp-moon{display:block;color:#efba69;font-size:32px}
-      @media(prefers-reduced-motion:reduce){.skill-button{animation:none!important}}
     </style>
     <style>
       #dungeonMap{position:fixed;left:12px;top:142px;width:101px;height:66px;opacity:.75;z-index:4;pointer-events:none;border:1px solid #847157;border-radius:5px}
@@ -4160,25 +4159,25 @@
         }
 
         // v75: optional loot and encounters; existing hero stats and Floor 1 remain unchanged.
-        let adventurePads=[],adventureBossPads=[],adventureBoss=null,adventureFootprints=[],adventureBurns=[],adventureHazards=[],adventureHazardAt=0,adventureProc=false;
+        let adventurePads=[],adventureBossPads=[],adventureBoss=null,adventureFootprints=[],adventureBurns=[],adventureDamageQueue=[],adventureHazards=[],adventureHazardAt=0,adventureProc=false;
         function adventureState(){
           if(!hero||!window.EmberAdventure)return null;
           return hero.adventure ||= EmberAdventure.state({},hero.class);
         }
         function applyAdventureProfile(prior){profile.adventure=window.EmberAdventure?.profile(prior?.adventure)||{collection:[],equipped:[],provision:0};}
         function startAdventure(){
-          adventurePads=[];adventureBossPads=[];adventureBoss=null;adventureFootprints=[];adventureBurns=[];adventureHazards=[];adventureHazardAt=0;
+          adventurePads=[];adventureBossPads=[];adventureBoss=null;adventureFootprints=[];adventureBurns=[];adventureDamageQueue=[];adventureHazards=[];adventureHazardAt=0;
           if(!hero||!window.EmberAdventure)return;
           hero.adventure=EmberAdventure.state({},hero.class);
           if(!endgameRun?.daily&&profile.adventure?.equipped?.includes(hero.class))hero.adventure.legend=hero.class;
           if(!endgameRun?.daily&&profile.adventure?.provision){hero.rerolls++;profile.adventure.provision=0;saveProfile();}
         }
         function restoreAdventure(){
-          adventurePads=[];adventureBossPads=[];adventureBoss=null;adventureFootprints=[];adventureBurns=[];adventureHazards=[];adventureHazardAt=clock+6;
+          adventurePads=[];adventureBossPads=[];adventureBoss=null;adventureFootprints=[];adventureBurns=[];adventureDamageQueue=[];adventureHazards=[];adventureHazardAt=clock+6;
           if(hero&&window.EmberAdventure)hero.adventure=EmberAdventure.state(hero.adventure,hero.class);
         }
         function adventureFloor(){
-          adventurePads=[];adventureBossPads=[];adventureBoss=null;adventureFootprints=[];adventureBurns=[];adventureHazards=[];adventureHazardAt=0;
+          adventurePads=[];adventureBossPads=[];adventureBoss=null;adventureFootprints=[];adventureBurns=[];adventureDamageQueue=[];adventureHazards=[];adventureHazardAt=0;
           if(hero&&window.EmberAdventure)hero.adventure=EmberAdventure.state(hero.adventure,hero.class);
           if(!window.EmberAdventure||!isDescent()||dungeon.floor<2)return;
           const room=floorSpec().rooms[5],x=(room[0]+.9)*80,y=(room[1]+.9)*80;
@@ -4211,7 +4210,7 @@
           if(state.legend==='ember'&&element==='fire'&&adventureBurns.length<3){state.procAt=clock+4;adventureBurns.push({x:e.x,y:e.y,r:45,life:2,tick:.4,power:hero.damage*.12});}
           if(state.legend==='rogue'&&bolt){
             const other=enemies.find(o=>o!==e&&o.hp>0&&Math.hypot(o.x-e.x,o.y-e.y)<160&&!segmentBlocked(e.x,e.y,o.x,o.y)&&!segmentBlocked(o.x,o.y,hero.x,hero.y));
-            if(other){state.procAt=clock+2;arcs.push({x1:e.x,y1:e.y,x2:other.x,y2:other.y,life:.2,electric:true});adventureProc=true;try{damageEnemy(other,hero.damage*.35,'poison');}finally{adventureProc=false;}}
+            if(other){state.procAt=clock+2;arcs.push({x1:e.x,y1:e.y,x2:other.x,y2:other.y,life:.2,electric:true});if(adventureDamageQueue.length<8)adventureDamageQueue.push({enemy:other,damage:hero.damage*.35,kind:'poison'});}
           }
         }
         function prepareAdventureBoss(){
@@ -4225,6 +4224,8 @@
         function updateAdventure(dt){
           if(mode!=='play'||!hero||!window.EmberAdventure)return;
           const state=adventureState();prepareAdventureBoss();
+          // Resolve secondary strikes after the originating hit has finished its death/reward path.
+          for(const hit of adventureDamageQueue.splice(0,8)){adventureProc=true;try{damageEnemy(hit.enemy,hit.damage,hit.kind);}finally{adventureProc=false;}}
           for(let i=adventureBurns.length-1;i>=0;i--){const p=adventureBurns[i];p.life-=dt;p.tick-=dt;if(p.life<=0){adventureBurns.splice(i,1);continue;}if(p.tick<=0){p.tick=.4;adventureProc=true;try{for(const e of [...enemies])if(Math.hypot(e.x-p.x,e.y-p.y)<p.r+e.r&&!segmentBlocked(p.x,p.y,e.x,e.y))damageEnemy(e,p.power,'fire');}finally{adventureProc=false;}}}
           if(boss?.hp>0&&boss.variant==='cryptHeart'&&clock>=adventureHazardAt){
             adventureHazardAt=clock+6;const phase=boss.deepPhase||1;
