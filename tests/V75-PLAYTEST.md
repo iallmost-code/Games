@@ -1,0 +1,13 @@
+# v75 · COMBAT & LOOT playtest
+
+The seven improvements are available on the feature branch. Core stats, controls, authored maps and opening-floor arrivals remain unchanged.
+
+1. Camp: open Camp Quartermaster (25 embers for one next-run reroll), Shrine and Legendary Collection. Continue must not consume a provision; daily challenges ignore it.
+2. Side rooms: Floor 2 and later even floors have a pilgrim rescue (+20 HP, +1 reroll). Odd floors from Floor 3 have a hero-specific legendary cache. Clear nearby enemies and stand on its ring for 1.25s. Daily caches pay 25 gold instead. There is one legendary slot; duplicate caches give 25 gold. Pack a discovered item in Legendary Collection to start a future non-daily run with it in either mode; leave it unpacked to retain the original opening balance. Cracked secret walls now show a dust clue.
+3. Try all seven items: Gravecaller extra skeleton on a shadow kill (6s); Ranger wolf charge (5s); Ember burning patch (4s); Bloodknight bleeding-foe pull; Sunwarden healing trail; Rogue poison ricochet (2s); Warden chilling Dash pulse. Wall-blocked targets must remain protected.
+4. Bishop: stand on each violet choir anchor for 1.1s. Each silenced anchor permanently reduces choir-pulse damage by 20% for that encounter, delays the next cast, and deals a one-time strike. Foundry: stand on an amber valve for 1.1s; venting weakens an active marked attack and delays the next cast. Heart: leave its additional 1.4s marked arena-collapse circle (radius increases with phase); Dash invulnerability works.
+5. Pause → Your Build shows current stats, picked powers, legendary behavior, evolution requirements and damage by element. End-run summaries and Run History retain element totals and the legendary name. Old runs have no pre-update damage attribution.
+6. Install/add to home screen, visit once online, then reopen offline. Cached shell/modules work; unavailable art retains existing fallback sprites. New releases use a fresh versioned cache.
+7. Physical Android check still required: test a midrange and a high-resolution phone in both orientations, 10 minutes per zone with crowded elites/bosses, thermal throttling, touch drag + skills, browser bars, audio interruption, background/resume and offline restart. Record device/browser, actual FPS and quality tier through Report a Bug. Browser-emulated DPR/pixel-budget checks are not physical-device FPS measurements.
+
+New gear and deep-boss interactions are gameplay additions for owner playtesting, not a rebalance of the original hero stats. Cosmetic feedback uses bounded existing impact FX without slowing simulation. Collection, provision and ledger defaults preserve profile v2/run v12/EC1; all slots stay separate.

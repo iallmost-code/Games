@@ -1,0 +1,82 @@
+[
+  {
+    "suite": "visual-invariants",
+    "exit": 0,
+    "seconds": 0
+  },
+  {
+    "suite": "action-rpg",
+    "exit": 0,
+    "seconds": 196
+  },
+  {
+    "suite": "landscape-skills",
+    "exit": 0,
+    "seconds": 189
+  },
+  {
+    "suite": "new-heroes",
+    "exit": 0,
+    "seconds": 67
+  },
+  {
+    "suite": "bloodknight",
+    "exit": 0,
+    "seconds": 21
+  },
+  {
+    "suite": "descent",
+    "exit": 0,
+    "seconds": 68
+  },
+  {
+    "suite": "descent-variety",
+    "exit": 0,
+    "seconds": 12
+  },
+  {
+    "suite": "descent-tuning",
+    "exit": 0,
+    "seconds": 288
+  },
+  {
+    "suite": "animated-catacombs",
+    "exit": 0,
+    "seconds": 284
+  },
+  {
+    "suite": "audio-presentation",
+    "exit": 0,
+    "seconds": 6
+  },
+  {
+    "suite": "ash-environment",
+    "exit": 0,
+    "seconds": 0
+  },
+  {
+    "suite": "sound-motion",
+    "exit": 0,
+    "seconds": 27
+  },
+  {
+    "suite": "endless-nights",
+    "exit": 0,
+    "seconds": 43
+  },
+  {
+    "suite": "new-blood",
+    "exit": 0,
+    "seconds": 22
+  },
+  {
+    "suite": "deeper-crypt",
+    "exit": 0,
+    "seconds": 100
+  },
+  {
+    "suite": "combat-loot",
+    "exit": 0,
+    "validation": "focused browser checks; final presentation pass rerun"
+  }
+]

@@ -3,7 +3,8 @@ const fs=require('node:fs'),cp=require('node:child_process'),assert=require('nod
 const base=cp.execFileSync('git',['show','c588c3f:index.html'],{encoding:'utf8'}),current=fs.readFileSync('index.html','utf8');
 const names=['update','damageEnemy','takeHit','begin','saveRun','restoreRun','applyProfile','makeSaveCode','loadSaveCode','moveAroundWalls','segmentBlocked','spawnEnemy','spawnBoss','floorEntry','buildFloor','useDash','useUltimate','updateHeroActors','fire','attack','levelUp'];
 function body(source,name){const match=new RegExp('function '+name+'\\s*\\(').exec(source);if(!match)return null;let start=source.indexOf('{',match.index),depth=1,i=start+1,quote=null,escape=false;for(;depth&&i<source.length;i++){const c=source[i];if(quote){if(escape)escape=false;else if(c==='\\')escape=true;else if(c===quote)quote=null;}else if(c==='"'||c==="'"||c==='`')quote=c;else if(c==='{')depth++;else if(c==='}')depth--;}return source.slice(match.index,i);}
-// Deliberate v72 endgame, v73 new-hero/mastery and v74 deep-floor extension points only; compare the remaining original bodies byte-for-byte.
+// Deliberate v72 endgame, v73 new-hero/mastery and v74 deep-floor and v75 optional loot/encounter extension points only; compare the remaining original bodies byte-for-byte.
+const adventureHooks=["applyAdventureProfile(prior);","startAdventure();","restoreAdventure();","adventureFloor();","if(updateAdventure(dt))return;","adventureHit(e,dealt,element,fromHeroBolt);","adventureDash();","adventureChoice(b,p);","adventurePick(p);"];
 const deepHooks=[
 'allowed.push("ghostChoir","drownedKnight","machineGolem","slagSpitter","furnaceImp","bishop","foundry","cryptHeart");',
 'const deepRequested=variantOverride;variantOverride=deepBossTemplate(variantOverride);',
@@ -54,7 +55,7 @@ const hooks = [
   "if(attack<=0)newBloodAttack();"
 ];
 function normalize(source){
- source=source.split('\n').filter(line=>!deepHooks.some(h=>line.trim()==='/* deeper-crypt-v74 */ '+h)&&!hooks.some(h=>(line.trim()==='/* endgame-v72 */ '+h||line.trim()==='/* new-blood-v73 */ '+h))&&line.trim()!=='/* cosmetic-v69 */ fx("enemyDeath", e);').join('\n');
+ source=source.split('\n').filter(line=>!adventureHooks.some(h=>line.trim()==='/* combat-loot-v75 */ '+h)&&!deepHooks.some(h=>line.trim()==='/* deeper-crypt-v74 */ '+h)&&!hooks.some(h=>(line.trim()==='/* endgame-v72 */ '+h||line.trim()==='/* new-blood-v73 */ '+h))&&line.trim()!=='/* cosmetic-v69 */ fx("enemyDeath", e);').join('\n');
  return source.replace('[.75,.85,.95,1,1.05,1.10,1.15,1.20,1.25,1.30]','[.75,.85,.95,1,1.05]').replace('Math.min(10,Number(prior.bestFloor)||0)','Math.min(5,Number(prior.bestFloor)||0)').replace('e.variant!==\"heart\"&&e.variant!==\"cryptHeart\"','e.variant!==\"heart\"').replace('showToast(matchupToast(boss, bossNames[boss.variant]));','showToast(matchupToast(boss, bossNames[variant]));').replaceAll('gameRandom()', 'Math.random()').replaceAll('assembled.rooms','spec.rooms').replaceAll('assembled.links','spec.links')
  .replace('version: 12,\n                balanceVersion: 12,','version: 11,\n                balanceVersion: 11,')
  .replace('          if(data.run)data.run=migrateEndgameRun(data.run);\n','')
@@ -62,5 +63,5 @@ function normalize(source){
 }
 
 let checked=0;for(const name of names){const old=body(base,name);if(old){assert.equal(normalize(body(current,name)),old,'Gameplay changed: '+name);checked++;}}
-assert(current.includes('1000 / visualQuality.fps - 0.5'));assert(current.includes('high:{maxLights:10,maxAtmosphere:32,pixelBudget:1800000,dprCap:1.5,fps:60}'));assert(/low:\{[^}]*fps:40\}/.test(current));console.log('PASS original gameplay/save bodies preserved around listed v72/v73/v74 hooks:',checked,'; 60 FPS target (40 FPS low tier), bounded pixels/lights');
+assert(current.includes('1000 / visualQuality.fps - 0.5'));assert(current.includes('high:{maxLights:10,maxAtmosphere:32,pixelBudget:1800000,dprCap:1.5,fps:60}'));assert(/low:\{[^}]*fps:40\}/.test(current));console.log('PASS original gameplay/save bodies preserved around listed v72/v73/v74/v75 hooks:',checked,'; 60 FPS target (40 FPS low tier), bounded pixels/lights');
 
