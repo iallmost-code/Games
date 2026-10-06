@@ -15,7 +15,9 @@ self.addEventListener('fetch', event => {
   if(request.method!=='GET'||url.origin!==self.location.origin||!url.href.startsWith(self.registration.scope))return;
   event.respondWith((async () => {
     const cache=await caches.open(CACHE),cached=await cache.match(request),asset=url.pathname.includes('/assets/');
-    if(asset&&cached)return cached;
+    // Art and audio are cache-first; game code always tries the network so a
+    // new index.html never runs against an older cached module.
+    if(asset&&cached&&!url.pathname.endsWith('.js'))return cached;
     try {
       const response=await fetch(request);
       if(response.ok&&(asset||request.mode==='navigate')){

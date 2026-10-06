@@ -38,6 +38,14 @@ jobs:
             }
             JSON.parse(fs.readFileSync("manifest.webmanifest", "utf8"));
           '
+      - name: Service worker cache version follows asset changes
+        if: github.event_name == 'pull_request'
+        run: |
+          base="origin/${{ github.base_ref }}"
+          if git diff --name-only "$base"...HEAD | grep -q '^assets/' && ! git diff "$base"...HEAD -- sw.js | grep -q '^+const CACHE'; then
+            echo "Files under assets/ changed: bump CACHE in sw.js so phones drop cached art/audio." >&2
+            exit 1
+          fi
       - name: Gameplay and save functions unchanged
         run: node tests/visual-invariants.cjs
 
