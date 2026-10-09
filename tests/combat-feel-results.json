@@ -1,0 +1,330 @@
+{
+  "browser": {
+    "scenes": [
+      {
+        "width": 390,
+        "height": 844,
+        "hero": "gravecaller",
+        "queued": 1,
+        "pixels": 740610,
+        "runVersion": 12,
+        "physicsPreserved": true
+      },
+      {
+        "width": 390,
+        "height": 844,
+        "hero": "bloodknight",
+        "queued": 1,
+        "pixels": 740610,
+        "runVersion": 12,
+        "physicsPreserved": true
+      },
+      {
+        "width": 390,
+        "height": 844,
+        "hero": "ranger",
+        "queued": 1,
+        "pixels": 740610,
+        "runVersion": 12,
+        "physicsPreserved": true
+      },
+      {
+        "width": 390,
+        "height": 844,
+        "hero": "sunwarden",
+        "queued": 1,
+        "pixels": 740610,
+        "runVersion": 12,
+        "physicsPreserved": true
+      },
+      {
+        "width": 390,
+        "height": 844,
+        "hero": "ember",
+        "queued": 1,
+        "pixels": 740610,
+        "runVersion": 12,
+        "physicsPreserved": true
+      },
+      {
+        "width": 390,
+        "height": 844,
+        "hero": "rogue",
+        "queued": 1,
+        "pixels": 740610,
+        "runVersion": 12,
+        "physicsPreserved": true
+      },
+      {
+        "width": 390,
+        "height": 844,
+        "hero": "frostwarden",
+        "queued": 1,
+        "pixels": 740610,
+        "runVersion": 12,
+        "physicsPreserved": true
+      },
+      {
+        "width": 844,
+        "height": 390,
+        "hero": "gravecaller",
+        "queued": 1,
+        "pixels": 740610,
+        "runVersion": 12,
+        "physicsPreserved": true
+      },
+      {
+        "width": 844,
+        "height": 390,
+        "hero": "bloodknight",
+        "queued": 1,
+        "pixels": 740610,
+        "runVersion": 12,
+        "physicsPreserved": true
+      },
+      {
+        "width": 844,
+        "height": 390,
+        "hero": "ranger",
+        "queued": 1,
+        "pixels": 740610,
+        "runVersion": 12,
+        "physicsPreserved": true
+      },
+      {
+        "width": 844,
+        "height": 390,
+        "hero": "sunwarden",
+        "queued": 1,
+        "pixels": 740610,
+        "runVersion": 12,
+        "physicsPreserved": true
+      },
+      {
+        "width": 844,
+        "height": 390,
+        "hero": "ember",
+        "queued": 1,
+        "pixels": 740610,
+        "runVersion": 12,
+        "physicsPreserved": true
+      },
+      {
+        "width": 844,
+        "height": 390,
+        "hero": "rogue",
+        "queued": 1,
+        "pixels": 740610,
+        "runVersion": 12,
+        "physicsPreserved": true
+      },
+      {
+        "width": 844,
+        "height": 390,
+        "hero": "frostwarden",
+        "queued": 1,
+        "pixels": 740610,
+        "runVersion": 12,
+        "physicsPreserved": true
+      }
+    ],
+    "errors": [],
+    "audio": {
+      "decoded": 29,
+      "active": 2,
+      "maximum": 6,
+      "scheduled": 8,
+      "limit": 12,
+      "coalesced": true,
+      "impactVoices": 2,
+      "stopped": 0
+    },
+    "periodic": {
+      "patchDamage": 8,
+      "periodicSuppressed": true,
+      "secondaryPoison": true
+    },
+    "classic": {
+      "strokes": 2,
+      "particles": 1
+    },
+    "controls": [
+      {
+        "hero": "gravecaller",
+        "moved": true,
+        "advanced": true,
+        "ultimate": true,
+        "onlySkills": true,
+        "feedback": {
+          "particles": 5,
+          "drawn": 1,
+          "queued": 1,
+          "pooled": 1
+        }
+      },
+      {
+        "hero": "bloodknight",
+        "moved": true,
+        "advanced": true,
+        "ultimate": true,
+        "onlySkills": true,
+        "feedback": {
+          "particles": 5,
+          "drawn": 1,
+          "queued": 1,
+          "pooled": 1
+        }
+      },
+      {
+        "hero": "ranger",
+        "moved": true,
+        "advanced": true,
+        "ultimate": true,
+        "onlySkills": true,
+        "feedback": {
+          "particles": 5,
+          "drawn": 1,
+          "queued": 1,
+          "pooled": 1
+        }
+      },
+      {
+        "hero": "sunwarden",
+        "moved": true,
+        "advanced": true,
+        "ultimate": true,
+        "onlySkills": true,
+        "feedback": {
+          "particles": 5,
+          "drawn": 1,
+          "queued": 1,
+          "pooled": 1
+        }
+      },
+      {
+        "hero": "ember",
+        "moved": true,
+        "advanced": true,
+        "ultimate": true,
+        "onlySkills": true,
+        "feedback": {
+          "particles": 0,
+          "drawn": 0,
+          "queued": 0,
+          "pooled": 2
+        }
+      },
+      {
+        "hero": "rogue",
+        "moved": true,
+        "advanced": true,
+        "ultimate": true,
+        "onlySkills": true,
+        "feedback": {
+          "particles": 5,
+          "drawn": 1,
+          "queued": 1,
+          "pooled": 1
+        }
+      },
+      {
+        "hero": "frostwarden",
+        "moved": true,
+        "advanced": true,
+        "ultimate": true,
+        "onlySkills": true,
+        "feedback": {
+          "particles": 0,
+          "drawn": 0,
+          "queued": 0,
+          "pooled": 2
+        }
+      }
+    ]
+  },
+  "regressionSuites": [
+    {
+      "suite": "action-rpg",
+      "exit": 0,
+      "seconds": 178.7
+    },
+    {
+      "suite": "landscape-skills",
+      "exit": 0,
+      "seconds": 152.7
+    },
+    {
+      "suite": "new-heroes",
+      "exit": 0,
+      "seconds": 65.0
+    },
+    {
+      "suite": "bloodknight",
+      "exit": 0,
+      "seconds": 16.1
+    },
+    {
+      "suite": "descent",
+      "exit": 0,
+      "seconds": 58.5
+    },
+    {
+      "suite": "descent-variety",
+      "exit": 0,
+      "seconds": 10.4
+    },
+    {
+      "suite": "descent-tuning",
+      "exit": 0,
+      "seconds": 262.0
+    },
+    {
+      "suite": "animated-catacombs",
+      "exit": 0,
+      "seconds": 278.2
+    },
+    {
+      "suite": "audio-presentation",
+      "exit": 0,
+      "seconds": 3.7
+    },
+    {
+      "suite": "ash-environment",
+      "exit": 0,
+      "seconds": 0.1
+    },
+    {
+      "suite": "sound-motion",
+      "exit": 0,
+      "seconds": 16.5
+    },
+    {
+      "suite": "endless-nights",
+      "exit": 0,
+      "seconds": 29.2
+    },
+    {
+      "suite": "new-blood",
+      "exit": 0,
+      "seconds": 13.8
+    },
+    {
+      "suite": "deeper-crypt",
+      "exit": 0,
+      "seconds": 90.3
+    },
+    {
+      "suite": "combat-loot",
+      "exit": 0,
+      "seconds": 79.0
+    },
+    {
+      "suite": "combat-feel",
+      "exit": 0,
+      "seconds": 28.1
+    }
+  ],
+  "gameplayBodiesPreserved": 18,
+  "syntax": "passed",
+  "physicalAndroidFPS": "not measured"
+}

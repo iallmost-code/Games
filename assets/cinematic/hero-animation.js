@@ -315,6 +315,8 @@
     } else deathStarted.delete(o.kind);
     const selected = choose(o);
     ctx.save();
+    const recoil = window.EmberCombatFeel?.pose(o);
+    if(recoil){ctx.translate(recoil.x,recoil.y);ctx.rotate(recoil.rotation);ctx.scale(recoil.scaleX,recoil.scaleY);}
     if (selected.flip) ctx.scale(-1, 1);
     const size = o.height / 192;
     ctx.drawImage(

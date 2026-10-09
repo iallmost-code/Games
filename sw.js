@@ -1,6 +1,6 @@
 // Versioned offline shell and bounded, same-origin asset cache. No save data is cached.
-const CACHE = 'ember-crypt-v75', LIMIT = 96;
-const CORE=['./','./index.html','./assets/cinematic/hero-animation.js','./assets/cinematic/ash-environment.js','./assets/cinematic/zone-environment.js','./assets/cinematic/motion.js','./assets/adventure/combat-loot.js','./assets/audio/combat-audio.js','./assets/audio/music.js','./assets/endgame/endless-nights.js','./assets/heroes/mastery.js'];
+const CACHE = 'ember-crypt-v76', LIMIT = 96;
+const CORE=['./','./index.html','./assets/cinematic/hero-animation.js','./assets/cinematic/ash-environment.js','./assets/cinematic/zone-environment.js','./assets/cinematic/motion.js','./assets/cinematic/combat-feel.js','./assets/adventure/combat-loot.js','./assets/audio/combat-audio.js','./assets/audio/music.js','./assets/endgame/endless-nights.js','./assets/heroes/mastery.js'];
 self.addEventListener('install', event => event.waitUntil((async () => {
   const cache = await caches.open(CACHE);
   await cache.addAll(CORE);

@@ -55,7 +55,8 @@ const hooks = [
   "if(attack<=0)newBloodAttack();"
 ];
 function normalize(source){
- source=source.split('\n').filter(line=>!adventureHooks.some(h=>line.trim()==='/* combat-loot-v75 */ '+h)&&!deepHooks.some(h=>line.trim()==='/* deeper-crypt-v74 */ '+h)&&!hooks.some(h=>(line.trim()==='/* endgame-v72 */ '+h||line.trim()==='/* new-blood-v73 */ '+h))&&line.trim()!=='/* cosmetic-v69 */ fx("enemyDeath", e);').join('\n');
+ source=source.replaceAll('/* cosmetic-v76-periodic */ fx("periodicHit", e);','');
+ source=source.split('\n').filter(line=>!adventureHooks.some(h=>line.trim()==='/* combat-loot-v75 */ '+h)&&!deepHooks.some(h=>line.trim()==='/* deeper-crypt-v74 */ '+h)&&!hooks.some(h=>(line.trim()==='/* endgame-v72 */ '+h||line.trim()==='/* new-blood-v73 */ '+h))&&line.trim()!=='/* cosmetic-v76-pool */ fx("periodicHit", pool.kind === "frozen" ? null : e);'&&line.trim()!=='/* cosmetic-v69 */ fx("enemyDeath", e);'&&line.trim()!=='/* cosmetic-v76 */ fx("combatHit", e, {element,isCrit:isCrit||kind==="crit",kind,fromHeroBolt});').join('\n');
  return source.replace('[.75,.85,.95,1,1.05,1.10,1.15,1.20,1.25,1.30]','[.75,.85,.95,1,1.05]').replace('Math.min(10,Number(prior.bestFloor)||0)','Math.min(5,Number(prior.bestFloor)||0)').replace('e.variant!==\"heart\"&&e.variant!==\"cryptHeart\"','e.variant!==\"heart\"').replace('showToast(matchupToast(boss, bossNames[boss.variant]));','showToast(matchupToast(boss, bossNames[variant]));').replaceAll('gameRandom()', 'Math.random()').replaceAll('assembled.rooms','spec.rooms').replaceAll('assembled.links','spec.links')
  .replace('version: 12,\n                balanceVersion: 12,','version: 11,\n                balanceVersion: 11,')
  .replace('          if(data.run)data.run=migrateEndgameRun(data.run);\n','')
