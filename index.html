@@ -760,6 +760,7 @@
     <script src="assets/cinematic/ash-environment.js"></script>
     <script src="assets/cinematic/zone-environment.js"></script>
     <script src="assets/cinematic/motion.js"></script>
+    <script src="assets/cinematic/combat-feel.js"></script>
     <script src="assets/adventure/combat-loot.js"></script>
     <script src="assets/audio/combat-audio.js"></script>
     <script src="assets/audio/music.js"></script>
@@ -768,7 +769,7 @@
     <script>
       (() => {
         "use strict";
-        const GAME_VERSION = "v75 · COMBAT & LOOT";
+        const GAME_VERSION = "v76 · COMBAT FEEL";
 
         // Recent script errors for Pause → REPORT A BUG. Never saved.
         const recentErrors = [];
@@ -1867,7 +1868,7 @@
           if(kind==="bossDown")music(mode==="victory"?"Victory":"Clear");
           if(kind==="death")music("Death");
           if (!soundEnabled || !audioCtx || audioCtx.state !== "running") return;
-          if(["chest","well","forge","unlock","stairs"].includes(kind)||kind.startsWith("enemy-")){window.EmberAudio?.play(kind,audioCtx,hero?.class);return;}
+          if(["impact","chest","well","forge","unlock","stairs"].includes(kind)||kind.startsWith("enemy-")){window.EmberAudio?.play(kind,audioCtx,hero?.class);return;}
           const sounds = {
             start: [410, 700, 0.17, 0.026, "sine", 0],
             cast: [350, 580, 0.07, 0.012, "triangle", 90],
@@ -4226,7 +4227,7 @@
           const state=adventureState();prepareAdventureBoss();
           // Resolve secondary strikes after the originating hit has finished its death/reward path.
           for(const hit of adventureDamageQueue.splice(0,8)){adventureProc=true;try{damageEnemy(hit.enemy,hit.damage,hit.kind);}finally{adventureProc=false;}}
-          for(let i=adventureBurns.length-1;i>=0;i--){const p=adventureBurns[i];p.life-=dt;p.tick-=dt;if(p.life<=0){adventureBurns.splice(i,1);continue;}if(p.tick<=0){p.tick=.4;adventureProc=true;try{for(const e of [...enemies])if(Math.hypot(e.x-p.x,e.y-p.y)<p.r+e.r&&!segmentBlocked(p.x,p.y,e.x,e.y))damageEnemy(e,p.power,'fire');}finally{adventureProc=false;}}}
+          for(let i=adventureBurns.length-1;i>=0;i--){const p=adventureBurns[i];p.life-=dt;p.tick-=dt;if(p.life<=0){adventureBurns.splice(i,1);continue;}if(p.tick<=0){p.tick=.4;adventureProc=true;try{for(const e of [...enemies])if(Math.hypot(e.x-p.x,e.y-p.y)<p.r+e.r&&!segmentBlocked(p.x,p.y,e.x,e.y)){fx("periodicHit",e);damageEnemy(e,p.power,'fire');}}finally{adventureProc=false;}}}
           if(boss?.hp>0&&boss.variant==='cryptHeart'&&clock>=adventureHazardAt){
             adventureHazardAt=clock+6;const phase=boss.deepPhase||1;
             adventureHazards=[{x:hero.x,y:hero.y,r:phase===1?65:phase===2?85:105,time:1.4,color:['#ed887d','#9bdae7','#cca1ff'][phase-1]}];sfx('warning');
@@ -5577,6 +5578,7 @@
           runStats.damage += dealt;
           e.hp -= amount;
           /* combat-loot-v75 */ adventureHit(e,dealt,element,fromHeroBolt);
+          /* cosmetic-v76 */ fx("combatHit", e, {element,isCrit:isCrit||kind==="crit",kind,fromHeroBolt});
           e.hitFlash = 0.1;
           if(rpgPreview&&visiblePoint(e.x,e.y,50)&&(isCrit||amount>hero.damage*1.8)){shake=Math.max(shake,isCrit?2.1:1.2);rpgFx.push({kind:"impact",x:e.x,y:e.y,r:23,life:.25,total:.25,color:elementColors[element]||"#ffe2a8"});if(rpgFx.length>24)rpgFx.shift();}
           let color = resisted ? "#aab0b5" : weak ? elementColors[element] :
@@ -5845,6 +5847,7 @@
               e.dotClock -= 0.5;
               for (const kind of active) {
                 if (!enemies.includes(e)) break;
+                fx("periodicHit", e);
                 damageEnemy(e, e[kind + "Power"] || 0, kind);
               }
             }
@@ -6540,7 +6543,7 @@
             tickStatuses(e, dt);
             if(e.bleedUntil>clock) {
               e.bleedTick=(e.bleedTick||0)-dt;
-              if(e.bleedTick<=0){e.bleedTick=.5;damageEnemy(e,e.bleedPower||0,"blood");}
+              if(e.bleedTick<=0){e.bleedTick=.5;/* cosmetic-v76-periodic */ fx("periodicHit", e);damageEnemy(e,e.bleedPower||0,"blood");}
             }
             if (!enemies.includes(e)) continue;
             if(e.stunUntil>clock){e.walking=0;continue;}
@@ -6836,6 +6839,7 @@
               if (pool.kind === "enemyPoison") continue;
               for (const e of [...enemies])
                 if (Math.hypot(e.x - pool.x, e.y - pool.y) < pool.r + e.r) {
+                  /* cosmetic-v76-pool */ fx("periodicHit", pool.kind === "frozen" ? null : e);
                   if (pool.kind === "frozen") afflict(e, "frost", pool.power);
                   else if (pool.kind === "cinder") damageEnemy(e, pool.power, "burn", 2);
                   else if (pool.kind === "flame") {
@@ -7135,7 +7139,7 @@
           }
           walkFrames.set(img, frames);
         }
-        function drawGrounded(img, x, foot, w, h, phase, walking, flip, casting, faceX=0, hit=0, attackBeat=0, rise=0) {
+        function drawGrounded(img, x, foot, w, h, phase, walking, flip, casting, faceX=0, hit=0, attackBeat=0, rise=0, feedback=null) {
           ctx.save();
           let moving=walking&&!casting,sway=moving?Math.sin(phase||0):0;
           ctx.translate(x,foot);cancelProjection();
@@ -7144,6 +7148,7 @@
           if(rpgPreview&&casting){ctx.translate(faceX*attackBeat*5,-attackBeat*2);ctx.rotate(faceX*attackBeat*.07);}
           if(moving)ctx.rotate(faceX*.045+sway*.022);
           if(hit)ctx.scale(1+hit*.13,1-hit*.16);
+          if(feedback){ctx.translate(feedback.x,feedback.y);ctx.rotate(feedback.rotation);if(feedback.scaleX)ctx.scale(feedback.scaleX,feedback.scaleY);}
           if (flip) ctx.scale(-1, 1);
           let frames = walking && !casting ? walkFrames.get(img) : null;
           if (frames)
@@ -7194,11 +7199,11 @@
           if (e.type === "burrower" && e.burrow > 0) ctx.globalAlpha = 0.38;
           let dangerColor=e.eventElite?"#f4bd5e":e.type==="caster"?"#e395fa":
             e.type==="charger"?(e.windup||e.dash?"#ff705b":"#b85d4d"):null;
-          let hit=Math.min(1,(e.hitFlash||0)*10);
+          let hit=Math.min(1,(e.hitFlash||0)*10), feedback=window.EmberCombatFeel?.reaction(e,clock,projectVector);
           if(dangerColor){
             ctx.save();ctx.globalAlpha=(e.windup&&e.windup.time>0)? .96 : .68+Math.sin(clock*5)*.12;
             drawGrounded(dangerOutline(img,dangerColor),x,actorFoot(y,r),width+8,height+8,
-              e.stepPhase||0,e.walking||0,projectVector(e.faceX||0,e.faceY??1).x<-.25,false,e.faceX||0,hit);
+              e.stepPhase||0,e.walking||0,projectVector(e.faceX||0,e.faceY??1).x<-.25,false,e.faceX||0,hit,0,0,feedback);
             ctx.restore();
           }
           drawGrounded(
@@ -7212,12 +7217,12 @@
             projectVector(e.faceX||0,e.faceY??1).x<-.25,
             false,
             e.faceX||0,
-            hit,
+            hit,0,0,feedback,
           );
           ctx.restore();
           if(e.hitFlash>0&&spriteMasks.has(img)){
             ctx.save();ctx.globalAlpha=Math.min(.55,e.hitFlash*5);
-            drawGrounded(window.EmberMotion?.tint(img,["#ffe0c0","#d7f4ff","#ddf7b9"][currentZone()])||spriteMasks.get(img),x,actorFoot(y,r),width,height,e.stepPhase||0,e.walking||0,projectVector(e.faceX||0,e.faceY??1).x<-.25,false,e.faceX||0,hit);
+            drawGrounded(window.EmberMotion?.tint(img,["#ffe0c0","#d7f4ff","#ddf7b9"][currentZone()])||spriteMasks.get(img),x,actorFoot(y,r),width,height,e.stepPhase||0,e.walking||0,projectVector(e.faceX||0,e.faceY??1).x<-.25,false,e.faceX||0,hit,0,0,feedback);
             ctx.restore();
           }
           if (e.frostTime > 0 || e.poisonTime > 0 || e.burnTime > 0 || e.bleedUntil > clock) {
@@ -7263,12 +7268,14 @@
           if(hero.class==="rogue"&&hero.veilUntil>clock)ctx.globalAlpha=.5;
           let heroHit=Math.max(0,1-(clock-(hero.lastHit??-99))/.18);
           let authored=false;
+          const attackVisual={kind:hero.class,height:h,direction:projectVector(fx,fy),cast:poseCast,hit:heroHit,dead:hero.hp<=0};
           if(window.EmberHeroAnimation?.ready(hero.class)){
             ctx.save();ctx.translate(x,actorFoot(y,19));cancelProjection();
             authored=window.EmberHeroAnimation.draw(ctx,{kind:hero.class,variant:profile.mastery?.[hero.class]?.color||0,height:h,direction:projectVector(fx,fy),phase:hero.stepPhase,moving:hero.moving,cast:poseCast,hit:heroHit,dead:hero.hp<=0});ctx.restore();
 
           }
-          if(!authored)drawGrounded(img,x,actorFoot(y,19),w,h,hero.stepPhase||0,hero.moving,(side||hero.class==="ranger"&&casting)&&projectVector(fx,fy).x<0,casting,projectVector(fx,fy).x,heroHit,rpgPreview?Math.sin(Math.min(1,hero.cast/(hero.class==="bloodknight"?.2:.18))*Math.PI):0);
+          if(!authored)drawGrounded(img,x,actorFoot(y,19),w,h,hero.stepPhase||0,hero.moving,(side||hero.class==="ranger"&&casting)&&projectVector(fx,fy).x<0,casting,projectVector(fx,fy).x,heroHit,0,0,window.EmberCombatFeel?.pose(attackVisual));
+          billboard(x,actorFoot(y,19),()=>window.EmberCombatFeel?.drawAttack(ctx,attackVisual));
           ctx.restore();
           if (casting && !["bloodknight","rogue","frostwarden"].includes(hero.class)) {
             let pulse = Math.sin(Math.min(1, hero.cast / 0.18) * Math.PI),
@@ -7810,10 +7817,18 @@
               }
 
         }
-        let motionHero=null,motionDungeon=null,motionLevel=0,sunPulse=-1;const motionBosses=new WeakSet();
+        let motionHero=null,motionDungeon=null,motionLevel=0,sunPulse=-1;const motionBosses=new WeakSet();let combatPeriodicHits=new WeakSet();
         function visualScene(){return {isDescent:isDescent(),isometric:rpgPreview,dungeon,floor:dungeon?.floor,zone:deepFloor()?(floorSpec().deepZone==="cathedral"?3:4):currentZone(),rooms:isDescent()?floorSpec().rooms:[],links:isDescent()?floorSpec().links:[],hero,clock,visiblePoint,sceneItem,billboard,inputVector,art,drawProp,quality:visualQuality};}
-        function fx(kind,o) {
+        function fx(kind,o,detail) {
+          if(kind==="periodicHit"){if(o)combatPeriodicHits.add(o);return;}
           if(!hero)return;
+          if(kind==="combatHit"){
+            const periodic=combatPeriodicHits.delete(o);
+            if(periodic||!visiblePoint(o.x,o.y,75))return;
+            window.EmberCombatFeel?.hit(o,{x:o.x-hero.x,y:o.y-hero.y,clock,color:elementColors[detail.element]||"#ffe0aa",crit:detail.isCrit,height:o.r*(o.type==="boss"?3.36:3.835)},visualQuality);
+            if(detail.element!=="neutral"&&!detail.isCrit)sfx("impact");
+            return;
+          }
           const data={x:o.x??hero.x,y:o.y??hero.y,zone:currentZone()};
           if(kind==="enemyDeath"){
             const key=o.type==="boss"?o.variant:o.type==="champion"?"brute":o.type==="charger"?"runner":o.type;
@@ -7827,7 +7842,7 @@
         }
         function draw() {
           music();
-          if(hero!==motionHero||dungeon!==motionDungeon){motionHero=hero;motionDungeon=dungeon;motionLevel=level;window.EmberMotion?.reset();}
+          if(hero!==motionHero||dungeon!==motionDungeon){motionHero=hero;motionDungeon=dungeon;motionLevel=level;window.EmberMotion?.reset();window.EmberCombatFeel?.reset();combatPeriodicHits=new WeakSet();}
           if(hero&&level>motionLevel){motionLevel=level;fx("level",hero);}
           if(boss&&boss.hp>0&&!motionBosses.has(boss)){motionBosses.add(boss);window.EmberMotion?.emit("bossIntro",{name:bossNames[boss.variant]||"CRYPT GUARDIAN"},visualQuality);}
 
@@ -7848,6 +7863,7 @@
           drawDeepMarks();
           drawAdventure();
           window.EmberMotion?.draw(ctx,ashScene);
+          if(rpgPreview)window.EmberCombatFeel?.draw(ctx,{...ashScene,projectVector});
           drawZoneDepth(left,top);
           drawRpgLighting();
           drawSpellLighting();
@@ -8000,7 +8016,7 @@
             ctx.stroke();
             ctx.shadowBlur = 0;
           }
-          if(rpgPreview){sceneItem(hero.x,hero.y,drawHeroLayer);flushScene();}else drawHeroLayer();
+          if(rpgPreview){sceneItem(hero.x,hero.y,drawHeroLayer);flushScene();}else {drawHeroLayer();window.EmberCombatFeel?.draw(ctx,{...ashScene,projectVector});}
           ctx.textAlign = "center";
           ctx.font = "bold 15px system-ui";
           for (const f of floaters) {

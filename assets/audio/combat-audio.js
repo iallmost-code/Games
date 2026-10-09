@@ -13,13 +13,22 @@
     'dagger-whisper','glacial-bash','thunder-string','holy-chime','fire-whoosh','death-bones','death-flesh','death-stone','death-spirit','chest-open','well-drink','forge-anvil','stairs-step','boss-roar'];
   const layer = (name, gain, pitch = 1, delay = 0) => ({ name, gain, pitch, delay });
   const casts = {
-    rogue: [layer('dagger-whisper', .23),layer('blade-air', .07, 1.3)],
-    frostwarden: [layer('glacial-bash', .23),layer('shield-ring', .12, .75)],
+    rogue: [layer('dagger-whisper', .24, 1.12),layer('blade-air', .06, 1.35, .012)],
+    frostwarden: [layer('glacial-bash', .25, .88),layer('shield-ring', .10, .75, .035)],
     gravecaller: [layer('soul-cast', .24, .90), layer('blade-air', .09, .75, .018)],
-    bloodknight: [layer('blade-air', .25, .84), layer('armor-hit', .08, 1.13, .016)],
-    ranger: [layer('bow-release', .21), layer('thunder-string', .13, 1, .018)],
-    ember: [layer('fire-whoosh', .22), layer('fire-crackle', .10, .86, .016)],
+    bloodknight: [layer('blade-air', .25, .84), layer('armor-hit', .11, .86, .028)],
+    ranger: [layer('bow-release', .21), layer('thunder-string', .12, 1.06, .03)],
+    ember: [layer('fire-whoosh', .22), layer('fire-crackle', .12, .86, .032)],
     sunwarden: [layer('holy-chime', .19), layer('blade-air', .10, 1.10)]
+  };
+  const impacts = {
+    gravecaller: [layer('soul-cast', .12, 1.2),layer('death-bones', .08, 1.3, .01)],
+    bloodknight: [layer('metal-impact', .21, .78),layer('armor-hit', .08, .85, .01)],
+    ranger: [layer('thunder-string', .13, 1.15),layer('stone-impact', .08, 1.2)],
+    sunwarden: [layer('holy-chime', .16, 1.2)],
+    ember: [layer('fire-crackle', .16, 1.13),layer('stone-impact', .06, .9)],
+    rogue: [layer('dagger-whisper', .13, 1.35),layer('metal-impact', .09, 1.25)],
+    frostwarden: [layer('glacial-bash', .16, .78),layer('crystal-chime', .09, .8, .012)]
   };
   const events = {
     chest:[layer('chest-open',.23),layer('pickup-gem',.1,1,.08)],
@@ -46,14 +55,15 @@
     bossDown: [layer('ember-blast', .20, .82), layer('crystal-chime', .22, .80, .11)]
   };
   // Admission is cosmetic. Only a bounded number of nodes is active even in dense fights.
-  const cooldown = { cast: .09, shoot: .09, hit: .14, swing: .14, crit: .15, hurt: .17,
+  const cooldown = { impact: .14, cast: .09, shoot: .09, hit: .14, swing: .14, crit: .15, hurt: .17,
     block: .18, blast: .35, pickup: .09, loot: .15, upgrade: .20, warning: .55,
     boss: .90, bossDown: .40, death: 1, door: 1.25, dash: .04, ultimate: .08, start: .04 };
-  const priorities = { hit: 0, swing: 0, cast: 0, shoot: 0, pickup: 0, loot: 1,
+  const priorities = { impact: 0, hit: 0, swing: 0, cast: 0, shoot: 0, pickup: 0, loot: 1,
     crit: 1, blast: 1, block: 2, hurt: 2, dash: 2, warning: 2,
     ultimate: 3, death: 3, boss: 3, bossDown: 3 };
 
   function definitions(kind, heroClass) {
+    if(kind==='impact'||kind==='hit')return impacts[heroClass]||events.hit;
     if(kind.startsWith('enemy-')){const type=kind.slice(6),family=['skeleton','sentinel','drownedKnight'].includes(type)?'bones':['frostGolem','burrower','heart','machineGolem','foundry','cryptHeart'].includes(type)?'stone':['wraith','caster','oracle','ghostChoir','bishop'].includes(type)?'spirit':'flesh';return [layer('death-'+family,.16,type==='brute'?.8:type==='cinderImp'?1.25:1)];}
     return (kind === 'cast' || kind === 'shoot') ? casts[heroClass] || events[kind] : events[kind];
   }
@@ -117,8 +127,8 @@
     const state = contexts.get(ctx), plan = definitions(kind, heroClass);
     if (!state) { ensure(ctx); return false; }
     if (!ready(kind, ctx, heroClass)) return false;
-    const now = ctx.currentTime, previous = state.last.get(kind);
-    if (previous !== undefined && now - previous < (cooldown[kind] || .04)) return false;
+    const now = ctx.currentTime, admission = kind === 'hit' ? 'impact' : kind, previous = state.last.get(admission);
+    if (previous !== undefined && now - previous < (cooldown[admission] || .04)) return false;
     const priority = priorities[kind] || 0;
     // Important cues may replace an older low-priority voice. Regular attacks never
     // steal a hero damage warning, Dash, Ultimate or death cue.
@@ -153,7 +163,7 @@
         }
       }
     }
-    if (count) state.last.set(kind, now);
+    if (count) state.last.set(admission, now);
     return count > 0;
   }
   function stop(ctx) {

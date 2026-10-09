@@ -99,6 +99,12 @@ async function mockChecks() {
   for (const hero of ['gravecaller', 'ranger', 'ember', 'bloodknight', 'sunwarden', 'rogue', 'frostwarden']) {
     ctx.currentTime += 1; assert(api.play('shoot', ctx, hero)); api.stop(ctx);
   }
+  ctx.currentTime += 1;
+  assert(api.play('hit',ctx,'ember'));
+  const impactVoices=api.stats(ctx).scheduled;
+  assert.equal(api.play('impact',ctx,'ember'),false,'Same elemental hit duplicated its impact layers');
+  assert.equal(api.stats(ctx).scheduled,impactVoices);
+  api.stop(ctx);
   const second = context(); await api.ensure(second);
   assert.equal(downloads, 29, 'Raw files cached across contexts'); assert.equal(second.decodes, 29);
   const failed = moduleWith(async () => { throw Error('Offline'); });

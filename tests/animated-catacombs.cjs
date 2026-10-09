@@ -92,6 +92,14 @@ function summary(values) {
     report.animation = await page.evaluate(heroes => {
       const result = [], a = EmberHeroAnimation;
       function check(value, message) { if (!value) throw Error(message); }
+      // Exercise authored motion with a real canvas; keep capturing source frames
+      // for the unchanged clipping/anchor assertions below.
+      function probe(paint){
+        const canvas=document.createElement('canvas');canvas.width=canvas.height=512;
+        const ctx=canvas.getContext('2d');ctx.translate(256,400);
+        const draw=ctx.drawImage.bind(ctx);ctx.drawImage=(img,...args)=>{paint(img);draw(img,...args);};
+        return ctx;
+      }
       for (const kind of heroes) {
         const hashes = [], baseline = [], extents = [], directions = [];
         for (const [row, direction] of [[0, {x:0,y:1}], [1, {x:1,y:0}], [2, {x:0,y:-1}]]) {
@@ -101,7 +109,7 @@ function summary(values) {
             const selected = a.choose(options);
             check(selected.row === row && selected.col === col, kind + ' walk selector');
             let tile;
-            a.draw({save(){},restore(){},scale(){},drawImage(img){tile=img;}}, options);
+            a.draw(probe(img=>{tile=img;}), options);
             const bytes = tile.getContext('2d').getImageData(0,0,tile.width,tile.height).data;
             let hash=2166136261, bottom=-1, x0=999, x1=0, y0=999;
             for (let i=0;i<bytes.length;i++) hash=Math.imul(hash^bytes[i],16777619);
@@ -117,7 +125,7 @@ function summary(values) {
         check(a.choose({kind,direction:{x:-1,y:0}}).flip,kind+' left-facing mirrored');
         const duration=kind==='bloodknight'?.24:kind==='frostwarden'?.28:.18, cast=[],poseExtents=[];
         function inspectPose(options,expected){
-          let tile;a.draw({save(){},restore(){},scale(){},drawImage(img){tile=img;}},options);
+          let tile;a.draw(probe(img=>{tile=img;}),options);
           const actual=a.diagnostics().lastDraw[kind];check(actual.index===expected,kind+' pose selector draw mismatch');
           const px=tile.getContext('2d').getImageData(0,0,tile.width,tile.height).data;
           let left=999,right=0,top=999,bottom=0;
@@ -137,8 +145,8 @@ function summary(values) {
         const deaths=[0,.4,.9].map(deathProgress=>a.choose({kind,dead:true,deathProgress}));
         check(deaths.every((f,i)=>f.row===4&&f.col===i+3),kind+' death sequence');
         const realNow=performance.now;let now=1000;performance.now=()=>now;
-        try{a.draw({save(){},restore(){},scale(){},drawImage(){}},{kind,height:192});for(const [i,progress]of [0,.4,.9].entries()){now=1000+progress*650;inspectPose({kind,height:192,dead:true},27+i);}}
-        finally{performance.now=realNow;a.draw({save(){},restore(){},scale(){},drawImage(){}},{kind,height:192});}
+        try{a.draw(probe(()=>{}),{kind,height:192});for(const [i,progress]of [0,.4,.9].entries()){now=1000+progress*650;inspectPose({kind,height:192,dead:true},27+i);}}
+        finally{performance.now=realNow;a.draw(probe(()=>{}),{kind,height:192});}
         result.push({kind,walk:directions,distinctFrameHashes:hashes,footBaseline:[Math.min(...baseline),Math.max(...baseline)],spriteExtents:extents,poseExtents,attackFrames:cast,hitFrames:hits.map(f=>f.index),deathFrames:deaths.map(f=>f.index)});
       }
       check(a.diagnostics().frames===210,'Expected seven bounded 30-frame caches');
