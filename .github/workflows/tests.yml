@@ -57,7 +57,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        suite: [action-rpg, landscape-skills, new-heroes, bloodknight, descent, descent-variety, descent-tuning, animated-catacombs, audio-presentation, ash-environment, sound-motion, endless-nights, new-blood, deeper-crypt, combat-loot, combat-feel, world-presence]
+        suite: [action-rpg, landscape-skills, new-heroes, bloodknight, descent, descent-variety, descent-tuning, animated-catacombs, audio-presentation, ash-environment, sound-motion, endless-nights, new-blood, deeper-crypt, combat-loot, combat-feel, difficulty, world-presence]
 
     env:
       ARTIFACT_DIR: ${{ github.workspace }}/artifacts

@@ -1,4 +1,4 @@
-# v77 · WORLD & PRESENCE
+# v78 · WORLD & PRESENCE
 
 This pass addresses the busy Frost Vault screenshot: the hero blending into large enemies, repeated tomb silhouettes and bright rectangular light bands. It changes presentation while retaining every collider, attack clock, target, damage value, save format and control.
 
@@ -17,7 +17,7 @@ Sunwarden's existing ground beam uses one cached, soft-edged texture with fading
 - Hero edge cache: at most 32 frames; one optional occlusion redraw per render.
 - One reusable beam texture; no new art downloads, per-enemy filters, particles, native timers or gameplay RNG calls.
 - Existing quality tiers, 1.8M High pixel budget, 60 FPS High target and 40 FPS Low cap remain in force.
-- Classic view and absent cosmetic modules use the existing fallback paths. Service-worker cache advances to v77 and includes the helper.
+- Classic view and absent cosmetic modules use the existing fallback paths. Service-worker cache advances to v78 and includes the helper.
 - Profiles remain v2, runs v12 and save codes EC1. The original gameplay-invariant baseline and exceptions are unchanged.
 
 ## Verification

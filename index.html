@@ -770,7 +770,7 @@
     <script>
       (() => {
         "use strict";
-        const GAME_VERSION = "v77 · WORLD & PRESENCE";
+        const GAME_VERSION = "v78 · WORLD & PRESENCE";
 
         // Recent script errors for Pause → REPORT A BUG. Never saved.
         const recentErrors = [];
@@ -1190,6 +1190,7 @@
           profile.records.endless.kills=Math.max(profile.records.endless.kills,best);
           slots[n].lastPlayed=Date.now(); persistSlots();
           try { vibrationEnabled=localStorage.getItem("ember-crypt-vibrate-"+n)!=="0"; } catch {}
+          loadDifficulty(n);
           slotPlayUnstored=0; hero=null;
           saveProfile();
           if(!profile.migrated){let previous=readRun();
@@ -1386,7 +1387,7 @@
           add("Screen",()=>{const b=game.getBoundingClientRect();return Math.round(b.width)+"x"+Math.round(b.height)+" css · DPR "+(devicePixelRatio||1)+
             " · canvas "+canvas.width+"x"+canvas.height+" · zoom "+viewZoom.toFixed(2)+(document.fullscreenElement||document.webkitFullscreenElement?" · fullscreen":"")+
             (matchMedia("(display-mode: standalone), (display-mode: fullscreen)").matches?" · home screen app":"");});
-          add("Settings",()=>(rpgPreview?"isometric":"classic")+" · view "+viewPref+" · speed "+gameSpeed+"x · sound "+(soundEnabled?"on":"off"));
+          add("Settings",()=>"difficulty "+difficultyLevel().key+" · "+(rpgPreview?"isometric":"classic")+" · view "+viewPref+" · speed "+gameSpeed+"x · sound "+(soundEnabled?"on":"off"));
           add("Performance",()=>"quality "+qualityPref+(qualityPref==="auto"?" ("+qualityTier+")":"")+" · ~"+Math.round(perfFps)+" FPS · refresh "+Math.round(1000/perfRefresh)+" Hz");
           add("Run",()=>hero?runMode+(runMode==="descent"&&dungeon?" floor "+dungeon.floor:"")+" · wave "+wave+" · "+(heroNames[hero.class]||hero.class)+
             " lv "+level+" · HP "+Math.ceil(hero.hp)+"/"+Math.ceil(hero.maxHp)+" · "+Math.floor(clock)+"s · "+enemies.length+" enemies · "+kills+" kills":"no active run");
@@ -1468,6 +1469,15 @@
         }
         function renderSettings(){
           let body=menuBase("SETTINGS",settingsReturn,slots[activeSlot]?.name||"");
+          const level=difficultyLevels[difficulty],diffRow=menuText("div","","menu-inline"),
+            setDifficulty=(i)=>{difficulty=Math.max(0,Math.min(difficultyLevels.length-1,i));try{localStorage.setItem("ember-crypt-difficulty-"+activeSlot,difficultyLevels[difficulty].key);}catch{}renderMenu("settings");},
+            easier=menuButton("EASIER",()=>setDifficulty(difficulty-1)),harder=menuButton("HARDER",()=>setDifficulty(difficulty+1));
+          easier.disabled=difficulty===0;harder.disabled=difficulty===difficultyLevels.length-1;
+          const diffName=menuText("strong",level.name);diffName.style.cssText="flex:1;text-align:center";
+          diffRow.append(easier,diffName,harder);
+          body.append(menuText("h3","DIFFICULTY","menu-head"),diffRow,
+            menuText("p","Enemy HP ×"+level.hp+" · damage ×"+level.damage+" · arrivals ×"+level.density+" · embers ×"+level.reward+
+              ". Applies right away, even mid-run; stacks with Torment. Daily challenges always use Normal.","menu-note"));
           body.append(menuButton("SOUND · "+(soundEnabled?"ON":"OFF"),()=>{soundToggle.click();renderMenu("settings");}),
             menuButton("MUSIC · "+(musicEnabled?"ON":"OFF"),()=>{musicEnabled=!musicEnabled;try{localStorage.setItem("ember-crypt-music-muted",musicEnabled?"0":"1");}catch{}ensureAudio();music("setting");renderMenu("settings");}),
             menuButton("SCREEN SHAKE · "+(shakeEnabled?"ON":"OFF"),()=>{shakeEnabled=!shakeEnabled;try{localStorage.setItem("ember-crypt-screen-shake",shakeEnabled?"1":"0");}catch{}renderMenu("settings");}),
@@ -3826,9 +3836,22 @@
           const bytes=new Uint32Array(1);crypto.getRandomValues(bytes);
           endgameRun=EmberEndgame.run({id:Date.now().toString(36)+"-"+bytes[0],seed:challenge?.seed??bytes[0],daily:challenge,random:challenge?true:!!profile.randomLayouts,torment:challenge?0:profile.descentCleared?profile.selectedTorment||0:0});
         }
+        // Settings → DIFFICULTY, per character slot. Daily challenges always play at Normal.
+        const difficultyLevels=[
+          {key:"easy",name:"EASY",hp:.7,damage:.6,density:.85,reward:.75,elite:.5},
+          {key:"normal",name:"NORMAL",hp:1,damage:1,density:1,reward:1,elite:1},
+          {key:"hard",name:"HARD",hp:1.4,damage:1.3,density:1.15,reward:1.3,elite:1.5},
+          {key:"brutal",name:"BRUTAL",hp:2,damage:1.6,density:1.3,reward:1.6,elite:2},
+          {key:"nightmare",name:"NIGHTMARE",hp:3,damage:2,density:1.45,reward:2,elite:3}];
+        let difficulty=1;
+        function loadDifficulty(slot){try{const i=difficultyLevels.findIndex(d=>d.key===localStorage.getItem("ember-crypt-difficulty-"+slot));difficulty=i<0?1:i;}catch{difficulty=1;}}
+        function difficultyLevel(){return difficultyLevels[endgameRun?.daily?1:difficulty];}
         function endgameFactors(){
-          const key=(endgameRun?.torment||0)+":"+(endgameRun?.daily?.modifier||"");
-          if(key!==endgameFactorKey||!endgameFactorCache){endgameFactorKey=key;endgameFactorCache=EmberEndgame.factors(endgameRun);}
+          const level=difficultyLevel(),key=(endgameRun?.torment||0)+":"+(endgameRun?.daily?.modifier||"")+":"+level.key;
+          if(key!==endgameFactorKey||!endgameFactorCache){
+            endgameFactorKey=key;const f=EmberEndgame.factors(endgameRun);
+            endgameFactorCache={...f,hp:f.hp*level.hp,damage:f.damage*level.damage,density:f.density*level.density,reward:f.reward*level.reward,elite:f.elite*level.elite};
+          }
           return endgameFactorCache;
         }
         function gameRandom(){

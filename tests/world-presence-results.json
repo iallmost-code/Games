@@ -642,6 +642,8 @@
     "edge": 0,
     "outside": 0
   },
+  "version": "v78 \u00b7 WORLD & PRESENCE",
+  "baseline": "c9a6022 (v77 DIFFICULTY)",
   "localSuites": [
     {
       "suite": "visual-invariants",
@@ -649,91 +651,96 @@
       "seconds": 0.1
     },
     {
+      "suite": "difficulty",
+      "exit": 0,
+      "seconds": 7.3
+    },
+    {
       "suite": "action-rpg",
       "exit": 0,
-      "seconds": 205.7
+      "seconds": 159.7
     },
     {
       "suite": "landscape-skills",
       "exit": 0,
-      "seconds": 187.5
+      "seconds": 146.9
     },
     {
       "suite": "new-heroes",
       "exit": 0,
-      "seconds": 82.1
+      "seconds": 66.0
     },
     {
       "suite": "bloodknight",
       "exit": 0,
-      "seconds": 17.4
+      "seconds": 16.3
     },
     {
       "suite": "descent",
       "exit": 0,
-      "seconds": 49.1
+      "seconds": 52.0
     },
     {
       "suite": "descent-variety",
       "exit": 0,
-      "seconds": 10.8
+      "seconds": 9.7
     },
     {
       "suite": "descent-tuning",
       "exit": 0,
-      "seconds": 244.2
+      "seconds": 221.5
     },
     {
       "suite": "animated-catacombs",
       "exit": 0,
-      "seconds": 246.9
+      "seconds": 241.8
     },
     {
       "suite": "audio-presentation",
       "exit": 0,
-      "seconds": 4.8
+      "seconds": 3.6
     },
     {
       "suite": "ash-environment",
       "exit": 0,
-      "seconds": 0.1
+      "seconds": 0.0
     },
     {
       "suite": "sound-motion",
       "exit": 0,
-      "seconds": 19.7
+      "seconds": 17.1
     },
     {
       "suite": "endless-nights",
       "exit": 0,
-      "seconds": 25.7
+      "seconds": 27.3
     },
     {
       "suite": "new-blood",
       "exit": 0,
-      "seconds": 14.2
+      "seconds": 17.1
     },
     {
       "suite": "deeper-crypt",
       "exit": 0,
-      "seconds": 74.3
+      "seconds": 73.0
     },
     {
       "suite": "combat-loot",
       "exit": 0,
-      "seconds": 61.5
+      "seconds": 62.2
     },
     {
       "suite": "combat-feel",
       "exit": 0,
-      "seconds": 36.9
+      "seconds": 39.5
     },
     {
       "suite": "world-presence",
       "exit": 0,
-      "seconds": 21.5
+      "seconds": 22.2
     }
   ],
   "syntax": "13 production files and manifest passed",
-  "review": "Independent review passed after label-overflow and legacy-outline fixes"
+  "review": "Independent review passed after label-overflow/legacy-outline fixes and latest-main integration"
 }
