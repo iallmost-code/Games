@@ -1,0 +1,739 @@
+{
+  "scenes": [
+    {
+      "width": 844,
+      "height": 390,
+      "hero": "gravecaller",
+      "mode": "endless",
+      "floor": 2,
+      "zone": 1,
+      "pixels": 740610,
+      "stats": {
+        "obstacles": 24,
+        "landmarks": 2,
+        "rescues": 1,
+        "edgeCache": 2
+      },
+      "physicsPreserved": true
+    },
+    {
+      "width": 844,
+      "height": 390,
+      "hero": "gravecaller",
+      "mode": "descent",
+      "floor": 2,
+      "zone": 1,
+      "pixels": 740610,
+      "stats": {
+        "obstacles": 0,
+        "landmarks": 2,
+        "rescues": 1,
+        "edgeCache": 2
+      },
+      "physicsPreserved": true
+    },
+    {
+      "width": 844,
+      "height": 390,
+      "hero": "bloodknight",
+      "mode": "endless",
+      "floor": 2,
+      "zone": 1,
+      "pixels": 740610,
+      "stats": {
+        "obstacles": 24,
+        "landmarks": 2,
+        "rescues": 1,
+        "edgeCache": 4
+      },
+      "physicsPreserved": true
+    },
+    {
+      "width": 844,
+      "height": 390,
+      "hero": "bloodknight",
+      "mode": "descent",
+      "floor": 2,
+      "zone": 1,
+      "pixels": 740610,
+      "stats": {
+        "obstacles": 0,
+        "landmarks": 2,
+        "rescues": 1,
+        "edgeCache": 4
+      },
+      "physicsPreserved": true
+    },
+    {
+      "width": 844,
+      "height": 390,
+      "hero": "ranger",
+      "mode": "endless",
+      "floor": 2,
+      "zone": 1,
+      "pixels": 740610,
+      "stats": {
+        "obstacles": 24,
+        "landmarks": 2,
+        "rescues": 1,
+        "edgeCache": 6
+      },
+      "physicsPreserved": true
+    },
+    {
+      "width": 844,
+      "height": 390,
+      "hero": "ranger",
+      "mode": "descent",
+      "floor": 2,
+      "zone": 1,
+      "pixels": 740610,
+      "stats": {
+        "obstacles": 0,
+        "landmarks": 2,
+        "rescues": 1,
+        "edgeCache": 6
+      },
+      "physicsPreserved": true
+    },
+    {
+      "width": 844,
+      "height": 390,
+      "hero": "sunwarden",
+      "mode": "endless",
+      "floor": 2,
+      "zone": 1,
+      "pixels": 740610,
+      "stats": {
+        "obstacles": 24,
+        "landmarks": 2,
+        "rescues": 1,
+        "edgeCache": 8
+      },
+      "physicsPreserved": true
+    },
+    {
+      "width": 844,
+      "height": 390,
+      "hero": "sunwarden",
+      "mode": "descent",
+      "floor": 2,
+      "zone": 1,
+      "pixels": 740610,
+      "stats": {
+        "obstacles": 0,
+        "landmarks": 2,
+        "rescues": 1,
+        "edgeCache": 8
+      },
+      "physicsPreserved": true
+    },
+    {
+      "width": 844,
+      "height": 390,
+      "hero": "ember",
+      "mode": "endless",
+      "floor": 2,
+      "zone": 1,
+      "pixels": 740610,
+      "stats": {
+        "obstacles": 24,
+        "landmarks": 2,
+        "rescues": 1,
+        "edgeCache": 10
+      },
+      "physicsPreserved": true
+    },
+    {
+      "width": 844,
+      "height": 390,
+      "hero": "ember",
+      "mode": "descent",
+      "floor": 2,
+      "zone": 1,
+      "pixels": 740610,
+      "stats": {
+        "obstacles": 0,
+        "landmarks": 2,
+        "rescues": 1,
+        "edgeCache": 10
+      },
+      "physicsPreserved": true
+    },
+    {
+      "width": 844,
+      "height": 390,
+      "hero": "rogue",
+      "mode": "endless",
+      "floor": 2,
+      "zone": 1,
+      "pixels": 740610,
+      "stats": {
+        "obstacles": 24,
+        "landmarks": 2,
+        "rescues": 1,
+        "edgeCache": 12
+      },
+      "physicsPreserved": true
+    },
+    {
+      "width": 844,
+      "height": 390,
+      "hero": "rogue",
+      "mode": "descent",
+      "floor": 2,
+      "zone": 1,
+      "pixels": 740610,
+      "stats": {
+        "obstacles": 0,
+        "landmarks": 2,
+        "rescues": 1,
+        "edgeCache": 12
+      },
+      "physicsPreserved": true
+    },
+    {
+      "width": 844,
+      "height": 390,
+      "hero": "frostwarden",
+      "mode": "endless",
+      "floor": 2,
+      "zone": 1,
+      "pixels": 740610,
+      "stats": {
+        "obstacles": 24,
+        "landmarks": 2,
+        "rescues": 1,
+        "edgeCache": 14
+      },
+      "physicsPreserved": true
+    },
+    {
+      "width": 844,
+      "height": 390,
+      "hero": "frostwarden",
+      "mode": "descent",
+      "floor": 2,
+      "zone": 1,
+      "pixels": 740610,
+      "stats": {
+        "obstacles": 0,
+        "landmarks": 2,
+        "rescues": 1,
+        "edgeCache": 14
+      },
+      "physicsPreserved": true
+    },
+    {
+      "width": 390,
+      "height": 844,
+      "hero": "gravecaller",
+      "mode": "endless",
+      "floor": 2,
+      "zone": 1,
+      "pixels": 740610,
+      "stats": {
+        "obstacles": 50,
+        "landmarks": 1,
+        "rescues": 1,
+        "edgeCache": 14
+      },
+      "physicsPreserved": true
+    },
+    {
+      "width": 390,
+      "height": 844,
+      "hero": "gravecaller",
+      "mode": "descent",
+      "floor": 2,
+      "zone": 1,
+      "pixels": 740610,
+      "stats": {
+        "obstacles": 0,
+        "landmarks": 1,
+        "rescues": 1,
+        "edgeCache": 14
+      },
+      "physicsPreserved": true
+    },
+    {
+      "width": 390,
+      "height": 844,
+      "hero": "bloodknight",
+      "mode": "endless",
+      "floor": 2,
+      "zone": 1,
+      "pixels": 740610,
+      "stats": {
+        "obstacles": 50,
+        "landmarks": 1,
+        "rescues": 1,
+        "edgeCache": 14
+      },
+      "physicsPreserved": true
+    },
+    {
+      "width": 390,
+      "height": 844,
+      "hero": "bloodknight",
+      "mode": "descent",
+      "floor": 2,
+      "zone": 1,
+      "pixels": 740610,
+      "stats": {
+        "obstacles": 0,
+        "landmarks": 1,
+        "rescues": 1,
+        "edgeCache": 14
+      },
+      "physicsPreserved": true
+    },
+    {
+      "width": 390,
+      "height": 844,
+      "hero": "ranger",
+      "mode": "endless",
+      "floor": 2,
+      "zone": 1,
+      "pixels": 740610,
+      "stats": {
+        "obstacles": 50,
+        "landmarks": 1,
+        "rescues": 1,
+        "edgeCache": 14
+      },
+      "physicsPreserved": true
+    },
+    {
+      "width": 390,
+      "height": 844,
+      "hero": "ranger",
+      "mode": "descent",
+      "floor": 2,
+      "zone": 1,
+      "pixels": 740610,
+      "stats": {
+        "obstacles": 0,
+        "landmarks": 1,
+        "rescues": 1,
+        "edgeCache": 14
+      },
+      "physicsPreserved": true
+    },
+    {
+      "width": 390,
+      "height": 844,
+      "hero": "sunwarden",
+      "mode": "endless",
+      "floor": 2,
+      "zone": 1,
+      "pixels": 740610,
+      "stats": {
+        "obstacles": 50,
+        "landmarks": 1,
+        "rescues": 1,
+        "edgeCache": 14
+      },
+      "physicsPreserved": true
+    },
+    {
+      "width": 390,
+      "height": 844,
+      "hero": "sunwarden",
+      "mode": "descent",
+      "floor": 2,
+      "zone": 1,
+      "pixels": 740610,
+      "stats": {
+        "obstacles": 0,
+        "landmarks": 1,
+        "rescues": 1,
+        "edgeCache": 14
+      },
+      "physicsPreserved": true
+    },
+    {
+      "width": 390,
+      "height": 844,
+      "hero": "ember",
+      "mode": "endless",
+      "floor": 2,
+      "zone": 1,
+      "pixels": 740610,
+      "stats": {
+        "obstacles": 50,
+        "landmarks": 1,
+        "rescues": 1,
+        "edgeCache": 14
+      },
+      "physicsPreserved": true
+    },
+    {
+      "width": 390,
+      "height": 844,
+      "hero": "ember",
+      "mode": "descent",
+      "floor": 2,
+      "zone": 1,
+      "pixels": 740610,
+      "stats": {
+        "obstacles": 0,
+        "landmarks": 1,
+        "rescues": 1,
+        "edgeCache": 14
+      },
+      "physicsPreserved": true
+    },
+    {
+      "width": 390,
+      "height": 844,
+      "hero": "rogue",
+      "mode": "endless",
+      "floor": 2,
+      "zone": 1,
+      "pixels": 740610,
+      "stats": {
+        "obstacles": 50,
+        "landmarks": 1,
+        "rescues": 1,
+        "edgeCache": 14
+      },
+      "physicsPreserved": true
+    },
+    {
+      "width": 390,
+      "height": 844,
+      "hero": "rogue",
+      "mode": "descent",
+      "floor": 2,
+      "zone": 1,
+      "pixels": 740610,
+      "stats": {
+        "obstacles": 0,
+        "landmarks": 1,
+        "rescues": 1,
+        "edgeCache": 14
+      },
+      "physicsPreserved": true
+    },
+    {
+      "width": 390,
+      "height": 844,
+      "hero": "frostwarden",
+      "mode": "endless",
+      "floor": 2,
+      "zone": 1,
+      "pixels": 740610,
+      "stats": {
+        "obstacles": 50,
+        "landmarks": 1,
+        "rescues": 1,
+        "edgeCache": 14
+      },
+      "physicsPreserved": true
+    },
+    {
+      "width": 390,
+      "height": 844,
+      "hero": "frostwarden",
+      "mode": "descent",
+      "floor": 2,
+      "zone": 1,
+      "pixels": 740610,
+      "stats": {
+        "obstacles": 0,
+        "landmarks": 1,
+        "rescues": 1,
+        "edgeCache": 14
+      },
+      "physicsPreserved": true
+    },
+    {
+      "hero": "sunwarden",
+      "mode": "descent",
+      "floor": 1,
+      "zone": 1,
+      "pixels": 740610,
+      "stats": {
+        "obstacles": 0,
+        "landmarks": 2,
+        "rescues": 1,
+        "edgeCache": 14
+      },
+      "physicsPreserved": true
+    },
+    {
+      "hero": "sunwarden",
+      "mode": "descent",
+      "floor": 2,
+      "zone": 1,
+      "pixels": 740610,
+      "stats": {
+        "obstacles": 0,
+        "landmarks": 1,
+        "rescues": 1,
+        "edgeCache": 14
+      },
+      "physicsPreserved": true
+    },
+    {
+      "hero": "sunwarden",
+      "mode": "descent",
+      "floor": 3,
+      "zone": 1,
+      "pixels": 740610,
+      "stats": {
+        "obstacles": 0,
+        "landmarks": 1,
+        "rescues": 1,
+        "edgeCache": 14
+      },
+      "physicsPreserved": true
+    },
+    {
+      "hero": "sunwarden",
+      "mode": "descent",
+      "floor": 4,
+      "zone": 1,
+      "pixels": 740610,
+      "stats": {
+        "obstacles": 0,
+        "landmarks": 2,
+        "rescues": 1,
+        "edgeCache": 14
+      },
+      "physicsPreserved": true
+    },
+    {
+      "hero": "sunwarden",
+      "mode": "descent",
+      "floor": 5,
+      "zone": 1,
+      "pixels": 740610,
+      "stats": {
+        "obstacles": 0,
+        "landmarks": 2,
+        "rescues": 1,
+        "edgeCache": 14
+      },
+      "physicsPreserved": true
+    },
+    {
+      "hero": "sunwarden",
+      "mode": "descent",
+      "floor": 6,
+      "zone": 1,
+      "pixels": 740610,
+      "stats": {
+        "obstacles": 0,
+        "landmarks": 2,
+        "rescues": 1,
+        "edgeCache": 14
+      },
+      "physicsPreserved": true
+    },
+    {
+      "hero": "sunwarden",
+      "mode": "descent",
+      "floor": 7,
+      "zone": 1,
+      "pixels": 740610,
+      "stats": {
+        "obstacles": 0,
+        "landmarks": 1,
+        "rescues": 1,
+        "edgeCache": 14
+      },
+      "physicsPreserved": true
+    },
+    {
+      "hero": "sunwarden",
+      "mode": "descent",
+      "floor": 8,
+      "zone": 1,
+      "pixels": 740610,
+      "stats": {
+        "obstacles": 0,
+        "landmarks": 1,
+        "rescues": 1,
+        "edgeCache": 14
+      },
+      "physicsPreserved": true
+    },
+    {
+      "hero": "sunwarden",
+      "mode": "descent",
+      "floor": 9,
+      "zone": 1,
+      "pixels": 740610,
+      "stats": {
+        "obstacles": 0,
+        "landmarks": 1,
+        "rescues": 1,
+        "edgeCache": 14
+      },
+      "physicsPreserved": true
+    },
+    {
+      "hero": "sunwarden",
+      "mode": "descent",
+      "floor": 10,
+      "zone": 1,
+      "pixels": 740610,
+      "stats": {
+        "obstacles": 0,
+        "landmarks": 1,
+        "rescues": 1,
+        "edgeCache": 14
+      },
+      "physicsPreserved": true
+    }
+  ],
+  "errors": [],
+  "quality": [
+    {
+      "tier": "high",
+      "hero": "sunwarden",
+      "mode": "endless",
+      "floor": 2,
+      "zone": 1,
+      "pixels": 740610,
+      "stats": {
+        "obstacles": 24,
+        "landmarks": 2,
+        "rescues": 1,
+        "edgeCache": 2
+      },
+      "physicsPreserved": true
+    },
+    {
+      "tier": "medium",
+      "hero": "sunwarden",
+      "mode": "endless",
+      "floor": 2,
+      "zone": 1,
+      "pixels": 513785,
+      "stats": {
+        "obstacles": 24,
+        "landmarks": 2,
+        "rescues": 1,
+        "edgeCache": 2
+      },
+      "physicsPreserved": true
+    },
+    {
+      "tier": "low",
+      "hero": "sunwarden",
+      "mode": "endless",
+      "floor": 2,
+      "zone": 1,
+      "pixels": 329160,
+      "stats": {
+        "obstacles": 24,
+        "landmarks": 1,
+        "rescues": 1,
+        "edgeCache": 2
+      },
+      "physicsPreserved": true
+    }
+  ],
+  "beam": {
+    "center": 45,
+    "edge": 0,
+    "outside": 0
+  },
+  "localSuites": [
+    {
+      "suite": "visual-invariants",
+      "exit": 0,
+      "seconds": 0.1
+    },
+    {
+      "suite": "action-rpg",
+      "exit": 0,
+      "seconds": 205.7
+    },
+    {
+      "suite": "landscape-skills",
+      "exit": 0,
+      "seconds": 187.5
+    },
+    {
+      "suite": "new-heroes",
+      "exit": 0,
+      "seconds": 82.1
+    },
+    {
+      "suite": "bloodknight",
+      "exit": 0,
+      "seconds": 17.4
+    },
+    {
+      "suite": "descent",
+      "exit": 0,
+      "seconds": 49.1
+    },
+    {
+      "suite": "descent-variety",
+      "exit": 0,
+      "seconds": 10.8
+    },
+    {
+      "suite": "descent-tuning",
+      "exit": 0,
+      "seconds": 244.2
+    },
+    {
+      "suite": "animated-catacombs",
+      "exit": 0,
+      "seconds": 246.9
+    },
+    {
+      "suite": "audio-presentation",
+      "exit": 0,
+      "seconds": 4.8
+    },
+    {
+      "suite": "ash-environment",
+      "exit": 0,
+      "seconds": 0.1
+    },
+    {
+      "suite": "sound-motion",
+      "exit": 0,
+      "seconds": 19.7
+    },
+    {
+      "suite": "endless-nights",
+      "exit": 0,
+      "seconds": 25.7
+    },
+    {
+      "suite": "new-blood",
+      "exit": 0,
+      "seconds": 14.2
+    },
+    {
+      "suite": "deeper-crypt",
+      "exit": 0,
+      "seconds": 74.3
+    },
+    {
+      "suite": "combat-loot",
+      "exit": 0,
+      "seconds": 61.5
+    },
+    {
+      "suite": "combat-feel",
+      "exit": 0,
+      "seconds": 36.9
+    },
+    {
+      "suite": "world-presence",
+      "exit": 0,
+      "seconds": 21.5
+    }
+  ],
+  "syntax": "13 production files and manifest passed",
+  "review": "Independent review passed after label-overflow and legacy-outline fixes"
+}
