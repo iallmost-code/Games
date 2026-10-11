@@ -40,10 +40,18 @@ const server=http.createServer((req,res)=>{const name=decodeURIComponent(req.url
     const keep=endgameRun;endgameRun={...endgameRun,daily:{date:"2026-01-01",modifier:""}};
     check(difficultyLevel().key==="normal"&&endgameFactors().hp===1,"Daily challenge used the Settings difficulty");endgameRun=keep;
     saveRun(true);check(!JSON.stringify(readRun()).includes("difficulty")&&!JSON.stringify(profile).includes("difficulty"),"Difficulty leaked into saves");
+    // Endless overtime compounds only after the wave-20 victory.
+    {const b=[...document.querySelectorAll("#menuPage button")].find(b=>b.textContent==="HARDER");b.click();}
+    check(difficultyLevel().key==="normal","Could not return to Normal");
+    wave=30;hero.endless=false;const pre=endgameFactors();check(pre.hp===1&&pre.damage===1,"Overtime applied before the wave-20 victory");
+    hero.endless=true;wave=20;const w20=endgameFactors();wave=30;const w30=endgameFactors();wave=40;const w40=endgameFactors();
+    check(w20.hp===1&&Math.abs(w30.hp-Math.pow(1.1,10))<1e-9&&Math.abs(w40.damage-Math.pow(1.05,20))<1e-9,"Overtime scaling wrong");
+    check(w30.reward>w20.reward&&w40.density<=2,"Overtime rewards/density wrong");
+    hero.endless=false;wave=1;
     selectSlot(1);check(difficultyLevel().key==="normal","Slot 2 inherited slot 1 difficulty");
-    selectSlot(0);check(difficultyLevel().key==="easy","Slot 1 difficulty not restored");
+    selectSlot(0);check(difficultyLevel().key==="normal","Slot 1 difficulty not restored");
     return {normal:normal.taken,nightmare:nightmare.taken,easy:easy.taken};})()`));
   assert.equal(errors.length,0,errors.join('\n'));
-  console.log('PASS difficulty: Easy/Normal/Nightmare scaling, mid-run change, caps, per-slot storage, daily stays Normal, no save fields',JSON.stringify(result));
+  console.log('PASS difficulty: Easy/Normal/Nightmare scaling, mid-run change, caps, per-slot storage, daily stays Normal, no save fields, Endless overtime scaling',JSON.stringify(result));
   await browser.close();server.close();
 })().catch(e=>{console.error(e);process.exit(1);});

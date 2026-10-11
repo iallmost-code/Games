@@ -769,7 +769,7 @@
     <script>
       (() => {
         "use strict";
-        const GAME_VERSION = "v77 · DIFFICULTY";
+        const GAME_VERSION = "v78 · ENDLESS OVERTIME";
 
         // Recent script errors for Pause → REPORT A BUG. Never saved.
         const recentErrors = [];
@@ -3845,14 +3845,24 @@
         let difficulty=1;
         function loadDifficulty(slot){try{const i=difficultyLevels.findIndex(d=>d.key===localStorage.getItem("ember-crypt-difficulty-"+slot));difficulty=i<0?1:i;}catch{difficulty=1;}}
         function difficultyLevel(){return difficultyLevels[endgameRun?.daily?1:difficulty];}
+        // Endless overtime: every wave past the wave-20 victory compounds enemy strength,
+        // so a long Endless run always ends. Rewards grow too.
+        function endlessOvertime(){
+          const w=hero?.endless&&runMode==="endless"?Math.max(0,wave-20):0;
+          return {waves:w,hp:Math.pow(1.1,w),damage:Math.pow(1.05,w),density:Math.min(2,1+.03*w),reward:1+.05*w,elite:1+.1*w};
+        }
         function endgameFactors(){
-          const level=difficultyLevel(),key=(endgameRun?.torment||0)+":"+(endgameRun?.daily?.modifier||"")+":"+level.key;
+          const level=difficultyLevel(),over=endlessOvertime(),key=(endgameRun?.torment||0)+":"+(endgameRun?.daily?.modifier||"")+":"+level.key+":"+over.waves;
           if(key!==endgameFactorKey||!endgameFactorCache){
             endgameFactorKey=key;const f=EmberEndgame.factors(endgameRun);
-            endgameFactorCache={...f,hp:f.hp*level.hp,damage:f.damage*level.damage,density:f.density*level.density,reward:f.reward*level.reward,elite:f.elite*level.elite};
+            endgameFactorCache={...f,hp:f.hp*level.hp*over.hp,damage:f.damage*level.damage*over.damage,density:f.density*level.density*over.density,
+              reward:f.reward*level.reward*over.reward,elite:f.elite*level.elite*over.elite};
+            if(over.waves>0&&over.waves%5===0&&over.waves!==endlessAnnounced){endlessAnnounced=over.waves;
+              showToast("THE CRYPT GROWS STRONGER · ENEMY HP ×"+over.hp.toFixed(1)+" · DAMAGE ×"+over.damage.toFixed(1));}
           }
           return endgameFactorCache;
         }
+        let endlessAnnounced=0;
         function gameRandom(){
           if(!endgameRun?.daily)return Math.random();
           endgameRun.rng=(Math.imul(endgameRun.rng,1664525)+1013904223)>>>0;
