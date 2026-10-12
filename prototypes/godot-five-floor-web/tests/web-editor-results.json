@@ -1,0 +1,302 @@
+{
+  "engine": "4.7.2.stable.official.ed1daf0bf",
+  "rows": [
+    {
+      "hero": "gravecaller",
+      "floor": 1,
+      "boss": "warden",
+      "normalHP": 100,
+      "normalDamage": 24
+    },
+    {
+      "hero": "gravecaller",
+      "floor": 2,
+      "boss": "tyrant",
+      "normalHP": 100,
+      "normalDamage": 24
+    },
+    {
+      "hero": "gravecaller",
+      "floor": 3,
+      "boss": "colossus",
+      "normalHP": 100,
+      "normalDamage": 24
+    },
+    {
+      "hero": "gravecaller",
+      "floor": 4,
+      "boss": "oracle",
+      "normalHP": 100,
+      "normalDamage": 24
+    },
+    {
+      "hero": "gravecaller",
+      "floor": 5,
+      "boss": "heart",
+      "normalHP": 100,
+      "normalDamage": 24
+    },
+    {
+      "hero": "ranger",
+      "floor": 1,
+      "boss": "warden",
+      "normalHP": 100,
+      "normalDamage": 30
+    },
+    {
+      "hero": "ranger",
+      "floor": 2,
+      "boss": "tyrant",
+      "normalHP": 100,
+      "normalDamage": 30
+    },
+    {
+      "hero": "ranger",
+      "floor": 3,
+      "boss": "colossus",
+      "normalHP": 100,
+      "normalDamage": 30
+    },
+    {
+      "hero": "ranger",
+      "floor": 4,
+      "boss": "oracle",
+      "normalHP": 100,
+      "normalDamage": 30
+    },
+    {
+      "hero": "ranger",
+      "floor": 5,
+      "boss": "heart",
+      "normalHP": 100,
+      "normalDamage": 30
+    },
+    {
+      "hero": "ember",
+      "floor": 1,
+      "boss": "warden",
+      "normalHP": 110,
+      "normalDamage": 25
+    },
+    {
+      "hero": "ember",
+      "floor": 2,
+      "boss": "tyrant",
+      "normalHP": 110,
+      "normalDamage": 25
+    },
+    {
+      "hero": "ember",
+      "floor": 3,
+      "boss": "colossus",
+      "normalHP": 110,
+      "normalDamage": 25
+    },
+    {
+      "hero": "ember",
+      "floor": 4,
+      "boss": "oracle",
+      "normalHP": 110,
+      "normalDamage": 25
+    },
+    {
+      "hero": "ember",
+      "floor": 5,
+      "boss": "heart",
+      "normalHP": 110,
+      "normalDamage": 25
+    },
+    {
+      "hero": "bloodknight",
+      "floor": 1,
+      "boss": "warden",
+      "normalHP": 140,
+      "normalDamage": 58
+    },
+    {
+      "hero": "bloodknight",
+      "floor": 2,
+      "boss": "tyrant",
+      "normalHP": 140,
+      "normalDamage": 58
+    },
+    {
+      "hero": "bloodknight",
+      "floor": 3,
+      "boss": "colossus",
+      "normalHP": 140,
+      "normalDamage": 58
+    },
+    {
+      "hero": "bloodknight",
+      "floor": 4,
+      "boss": "oracle",
+      "normalHP": 140,
+      "normalDamage": 58
+    },
+    {
+      "hero": "bloodknight",
+      "floor": 5,
+      "boss": "heart",
+      "normalHP": 140,
+      "normalDamage": 58
+    },
+    {
+      "hero": "sunwarden",
+      "floor": 1,
+      "boss": "warden",
+      "normalHP": 115,
+      "normalDamage": 18
+    },
+    {
+      "hero": "sunwarden",
+      "floor": 2,
+      "boss": "tyrant",
+      "normalHP": 115,
+      "normalDamage": 18
+    },
+    {
+      "hero": "sunwarden",
+      "floor": 3,
+      "boss": "colossus",
+      "normalHP": 115,
+      "normalDamage": 18
+    },
+    {
+      "hero": "sunwarden",
+      "floor": 4,
+      "boss": "oracle",
+      "normalHP": 115,
+      "normalDamage": 18
+    },
+    {
+      "hero": "sunwarden",
+      "floor": 5,
+      "boss": "heart",
+      "normalHP": 115,
+      "normalDamage": 18
+    },
+    {
+      "hero": "rogue",
+      "floor": 1,
+      "boss": "warden",
+      "normalHP": 90,
+      "normalDamage": 32
+    },
+    {
+      "hero": "rogue",
+      "floor": 2,
+      "boss": "tyrant",
+      "normalHP": 90,
+      "normalDamage": 32
+    },
+    {
+      "hero": "rogue",
+      "floor": 3,
+      "boss": "colossus",
+      "normalHP": 90,
+      "normalDamage": 32
+    },
+    {
+      "hero": "rogue",
+      "floor": 4,
+      "boss": "oracle",
+      "normalHP": 90,
+      "normalDamage": 32
+    },
+    {
+      "hero": "rogue",
+      "floor": 5,
+      "boss": "heart",
+      "normalHP": 90,
+      "normalDamage": 32
+    },
+    {
+      "hero": "frostwarden",
+      "floor": 1,
+      "boss": "warden",
+      "normalHP": 180,
+      "normalDamage": 66
+    },
+    {
+      "hero": "frostwarden",
+      "floor": 2,
+      "boss": "tyrant",
+      "normalHP": 180,
+      "normalDamage": 66
+    },
+    {
+      "hero": "frostwarden",
+      "floor": 3,
+      "boss": "colossus",
+      "normalHP": 180,
+      "normalDamage": 66
+    },
+    {
+      "hero": "frostwarden",
+      "floor": 4,
+      "boss": "oracle",
+      "normalHP": 180,
+      "normalDamage": 66
+    },
+    {
+      "hero": "frostwarden",
+      "floor": 5,
+      "boss": "heart",
+      "normalHP": 180,
+      "normalDamage": 66
+    }
+  ],
+  "controls": {
+    "movement": {
+      "before": {
+        "x": 400,
+        "y": 800,
+        "clock": 0.1
+      },
+      "after": {
+        "x": 414.6371103705616,
+        "y": 785.3628896294385,
+        "clock": 0.49999999999999994
+      }
+    },
+    "dash": 3.9000000000000004,
+    "ultimate": 0
+  },
+  "bounds": {
+    "canvas": {
+      "x": 0,
+      "y": 32.125,
+      "width": 1280,
+      "height": 720,
+      "top": 32.125,
+      "right": 1280,
+      "bottom": 752.125,
+      "left": 0
+    },
+    "frame": {
+      "x": 0,
+      "y": 32.125,
+      "width": 1280,
+      "height": 720,
+      "top": 32.125,
+      "right": 1280,
+      "bottom": 752.125,
+      "left": 0
+    },
+    "native": {
+      "hero": "bloodknight",
+      "floor": 1,
+      "pose": 18,
+      "frames": 625
+    }
+  },
+  "diagnostics": {
+    "mode": "play",
+    "hero": "bloodknight",
+    "floor": 1,
+    "errors": [],
+    "assets": 131,
+    "slot": 0
+  }
+}

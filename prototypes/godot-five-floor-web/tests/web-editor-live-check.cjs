@@ -1,0 +1,21 @@
+// Manual verification helper: connect to a fresh local official Web Editor browser
+// at EDITOR_CDP (default9228) with the nativeTest lexical fixture installed before Play.
+// See VALIDATION.md. Not a production/export script or CI browser suite.
+const{chromium}=require('playwright'),fs=require('fs');
+(async()=>{const b=await chromium.connectOverCDP(process.env.EDITOR_CDP||'http://127.0.0.1:9228'),p=b.contexts()[0].pages()[0],f=p.frames().find(f=>f.url()==='about:srcdoc');await f.waitForFunction(()=>window.nativeTest);if(await f.getByRole('button',{name:'TAP TO START'}).isVisible())await f.getByRole('button',{name:'TAP TO START'}).click({force:true});await f.getByRole('button',{name:'SLOT 1 · + NEW CHARACTER',exact:true}).click();await f.locator('input').fill('Native');await f.getByRole('button',{name:'CREATE & PLAY',exact:true}).click();
+const results=[];for(const kind of ['gravecaller','ranger','ember','bloodknight','sunwarden','rogue','frostwarden']){
+ await f.evaluate(kind=>{const g=nativeTest;g.selectedHero=kind;g.selectedMode='descent';g.begin();g.hero.inv=999;g.spawn=999;},kind);
+ for(let n=1;n<=5;n++){
+  await f.evaluate(n=>{const g=nativeTest;if(g.dungeon.floor!==n)g.floorEntry(n);g.hero.inv=999;g.spawn=999;g.dungeon.eventAt=99999;g.dungeon.title=0;g.dungeon.elapsed=181;g.updateDungeon(.025);g.hero.x=26*80;g.hero.y=800;g.updateDungeon(.025);},n);
+  await p.waitForFunction(({kind,n})=>emberGodotHost.nativeFrame?.hero===kind&&emberGodotHost.nativeFrame?.floor===n,{kind,n},{timeout:20000});
+  if(n===1||n===3||n===5)await p.screenshot({path:'/tmp/native-'+kind+'-'+n+'.png'});
+  const row=await f.evaluate(n=>{const g=nativeTest,boss=g.boss;if(!boss||boss.variant!==g.floorSpec().boss)throw Error('Boss');const result={hero:g.hero.class,floor:n,boss:boss.variant,normalHP:g.hero.maxHp,normalDamage:g.hero.damage};g.damageEnemy(boss,1e9,'neutral',0,false,false,false);if(n===5){g.hero.x=27*80;g.hero.y=10*80;g.mode='play';g.update(.025);if(g.mode!=='victory')throw Error('Victory');}else{if(!g.dungeon.stairs)throw Error('Stairs');g.hero.x=g.dungeon.stairs.x;g.hero.y=g.dungeon.stairs.y;g.updateDungeon(.025);}return result;},n);results.push(row);
+ }
+ console.log('NATIVE_5_FLOORS',kind);fs.writeFileSync('/tmp/five-real-browser.json',JSON.stringify({engine:'4.7.2.stable.official.ed1daf0bf',rows:results},null,2));
+}
+// Live desktop movement and two independent touch owners, with ordinary skill charge.
+await f.evaluate(()=>{const g=nativeTest;g.selectedHero='bloodknight';g.begin();g.hero.inv=999;g.spawn=999;});
+await p.waitForFunction(()=>emberGodotHost.nativeFrame?.hero==='bloodknight'&&emberGodotHost.nativeFrame?.floor===1);
+const before=await f.evaluate(()=>({x:nativeTest.hero.x,y:nativeTest.hero.y,clock:nativeTest.clock}));await f.locator('#view').focus();await p.keyboard.down('d');await p.waitForTimeout(1000);await p.keyboard.up('d');const after=await f.evaluate(()=>({x:nativeTest.hero.x,y:nativeTest.hero.y,clock:nativeTest.clock}));if(Math.hypot(after.x-before.x,after.y-before.y)<1)throw Error('Movement failed '+JSON.stringify({before,after}));await p.keyboard.press('Space');await p.waitForTimeout(100);let dash=await f.evaluate(()=>nativeTest.hero.dashCd);if(!(dash>0))throw Error('Dash');await f.evaluate(()=>nativeTest.hero.ultimateCharge=100);await p.keyboard.press('e');await p.waitForTimeout(100);const ultimate=await f.evaluate(()=>nativeTest.hero.ultimateCharge);if(ultimate!==0)throw Error('Ultimate');await p.screenshot({path:'/tmp/native-final-skills.png'});
+const bounds=await p.evaluate(()=>({canvas:document.getElementById('game-canvas').getBoundingClientRect().toJSON(),frame:document.getElementById('ember-godot-ui').getBoundingClientRect().toJSON(),native:emberGodotHost.nativeFrame}));if(Math.abs(bounds.canvas.height-bounds.frame.height)>1||Math.abs(bounds.canvas.top-bounds.frame.top)>1)throw Error('Overlay alignment');
+const diag=await f.evaluate(()=>emberGodot.diagnostics());if(diag.errors.length)throw Error('Model errors '+JSON.stringify(diag.errors));fs.writeFileSync('/tmp/five-real-browser.json',JSON.stringify({engine:'4.7.2.stable.official.ed1daf0bf',rows:results,controls:{movement:{before,after},dash,ultimate},bounds,diagnostics:diag},null,2));console.log('NATIVE_ALL_35_FLOORS_AND_CONTROLS_PASS');await b.close();})();

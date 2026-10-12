@@ -1,0 +1,24 @@
+{
+  "base": "ffa4c79f846a0e88218c549bea29e77afc8c35d8",
+  "indexSha256": "75d09adfd97a6f96e8fb7b401fa149c7e8111de104d7b7f6e598af4312cc85d6",
+  "modules": {
+    "assets/cinematic/hero-animation.js": "a162fb3fa48b4c6a6b6d883e702c7df967a121386141516293158468c31616c1",
+    "assets/cinematic/ash-environment.js": "519a435d001dcdfb2f634654658695ab16d06257f522a4c527f15357d2ffce8c",
+    "assets/cinematic/zone-environment.js": "9f69e8110ccaf4661dde507ba96d08ec6a0c98f515818524dc7dc7eb021df3ed",
+    "assets/cinematic/motion.js": "9a8f4161107c7412e4ab5f822e8765f8c9afb4db1158702707b8e4fb3f16895f",
+    "assets/cinematic/combat-feel.js": "d90313855b3bed9f7f7566e8d3235b63904e0d88f2234437c9b80ff12982deb7",
+    "assets/adventure/combat-loot.js": "3be5d397f3ef5503f4a595b8a1b747e1ffa754c22a2667047823d54385b1c678",
+    "assets/audio/combat-audio.js": "f6b6d439a5ccc0fe15f36065cd03e4cc187623269532876b2c38fbcd7a035235",
+    "assets/audio/music.js": "9b32e232a33e6c83b0bc8bee4551f90b77470b1aa834e569bbc5c16245a2c7f4",
+    "assets/endgame/endless-nights.js": "adf0f4ae088d7e962dbacf3eb06bfb7c21e9ba7f07ac3cde4a42b73f45aa5ed5",
+    "assets/heroes/mastery.js": "cde3eaac00a91b27ba9b24e126789fd5277831679adc37cdf7f7fdf69cfd89d2"
+  },
+  "changes": [
+    "native rendering replaces draw body",
+    "preview-only hero availability toggle",
+    "first-five-floor ceiling",
+    "isolated browser storage",
+    "snapshot export",
+    "Web preview version label"
+  ]
+}

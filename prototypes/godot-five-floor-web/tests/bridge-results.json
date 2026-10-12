@@ -1,0 +1,288 @@
+{
+  "heroes": [
+    {
+      "hero": "gravecaller",
+      "base": {
+        "hp": 100,
+        "damage": 24
+      },
+      "floors": [
+        {
+          "floor": 1,
+          "boss": "warden"
+        },
+        {
+          "floor": 2,
+          "boss": "tyrant"
+        },
+        {
+          "floor": 3,
+          "boss": "colossus"
+        },
+        {
+          "floor": 4,
+          "boss": "oracle"
+        },
+        {
+          "floor": 5,
+          "boss": "heart"
+        }
+      ],
+      "unlocks": {
+        "ranger": false,
+        "ember": false,
+        "bloodknight": false,
+        "sunwarden": false,
+        "rogue": false,
+        "frostwarden": false
+      },
+      "snapshotBytes": 12973
+    },
+    {
+      "hero": "ranger",
+      "base": {
+        "hp": 100,
+        "damage": 30
+      },
+      "floors": [
+        {
+          "floor": 1,
+          "boss": "warden"
+        },
+        {
+          "floor": 2,
+          "boss": "tyrant"
+        },
+        {
+          "floor": 3,
+          "boss": "colossus"
+        },
+        {
+          "floor": 4,
+          "boss": "oracle"
+        },
+        {
+          "floor": 5,
+          "boss": "heart"
+        }
+      ],
+      "unlocks": {
+        "ranger": true,
+        "ember": false,
+        "bloodknight": true,
+        "sunwarden": true,
+        "rogue": true,
+        "frostwarden": true
+      },
+      "snapshotBytes": 13223
+    },
+    {
+      "hero": "ember",
+      "base": {
+        "hp": 110,
+        "damage": 25
+      },
+      "floors": [
+        {
+          "floor": 1,
+          "boss": "warden"
+        },
+        {
+          "floor": 2,
+          "boss": "tyrant"
+        },
+        {
+          "floor": 3,
+          "boss": "colossus"
+        },
+        {
+          "floor": 4,
+          "boss": "oracle"
+        },
+        {
+          "floor": 5,
+          "boss": "heart"
+        }
+      ],
+      "unlocks": {
+        "ranger": true,
+        "ember": false,
+        "bloodknight": true,
+        "sunwarden": true,
+        "rogue": true,
+        "frostwarden": true
+      },
+      "snapshotBytes": 13082
+    },
+    {
+      "hero": "bloodknight",
+      "base": {
+        "hp": 140,
+        "damage": 58
+      },
+      "floors": [
+        {
+          "floor": 1,
+          "boss": "warden"
+        },
+        {
+          "floor": 2,
+          "boss": "tyrant"
+        },
+        {
+          "floor": 3,
+          "boss": "colossus"
+        },
+        {
+          "floor": 4,
+          "boss": "oracle"
+        },
+        {
+          "floor": 5,
+          "boss": "heart"
+        }
+      ],
+      "unlocks": {
+        "ranger": true,
+        "ember": false,
+        "bloodknight": true,
+        "sunwarden": true,
+        "rogue": true,
+        "frostwarden": true
+      },
+      "snapshotBytes": 13082
+    },
+    {
+      "hero": "sunwarden",
+      "base": {
+        "hp": 115,
+        "damage": 18
+      },
+      "floors": [
+        {
+          "floor": 1,
+          "boss": "warden"
+        },
+        {
+          "floor": 2,
+          "boss": "tyrant"
+        },
+        {
+          "floor": 3,
+          "boss": "colossus"
+        },
+        {
+          "floor": 4,
+          "boss": "oracle"
+        },
+        {
+          "floor": 5,
+          "boss": "heart"
+        }
+      ],
+      "unlocks": {
+        "ranger": true,
+        "ember": false,
+        "bloodknight": true,
+        "sunwarden": true,
+        "rogue": true,
+        "frostwarden": true
+      },
+      "snapshotBytes": 13213
+    },
+    {
+      "hero": "rogue",
+      "base": {
+        "hp": 90,
+        "damage": 32
+      },
+      "floors": [
+        {
+          "floor": 1,
+          "boss": "warden"
+        },
+        {
+          "floor": 2,
+          "boss": "tyrant"
+        },
+        {
+          "floor": 3,
+          "boss": "colossus"
+        },
+        {
+          "floor": 4,
+          "boss": "oracle"
+        },
+        {
+          "floor": 5,
+          "boss": "heart"
+        }
+      ],
+      "unlocks": {
+        "ranger": true,
+        "ember": true,
+        "bloodknight": true,
+        "sunwarden": true,
+        "rogue": true,
+        "frostwarden": true
+      },
+      "snapshotBytes": 13382
+    },
+    {
+      "hero": "frostwarden",
+      "base": {
+        "hp": 180,
+        "damage": 66
+      },
+      "floors": [
+        {
+          "floor": 1,
+          "boss": "warden"
+        },
+        {
+          "floor": 2,
+          "boss": "tyrant"
+        },
+        {
+          "floor": 3,
+          "boss": "colossus"
+        },
+        {
+          "floor": 4,
+          "boss": "oracle"
+        },
+        {
+          "floor": 5,
+          "boss": "heart"
+        }
+      ],
+      "unlocks": {
+        "ranger": true,
+        "ember": true,
+        "bloodknight": true,
+        "sunwarden": true,
+        "rogue": true,
+        "frostwarden": true
+      },
+      "snapshotBytes": 13511
+    }
+  ],
+  "saves": [
+    {
+      "run": 12,
+      "floor": 3,
+      "codePrefix": "EC1.",
+      "slots": "PASS",
+      "profile": 2
+    }
+  ],
+  "errors": [],
+  "migrations": {
+    "v9": "v12 / Endless / Gravecaller",
+    "deeperRun": "preserved; unsupported Continue blocked"
+  },
+  "isolation": {
+    "prefixed": 5,
+    "unprefixed": 0
+  }
+}

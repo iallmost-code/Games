@@ -1,0 +1,57 @@
+name: Godot seven-hero Web preview
+on:
+  pull_request:
+    paths: ['prototypes/godot-five-floor-web/**', '.github/workflows/godot-five-floor.yml']
+permissions:
+  contents: read
+jobs:
+  native:
+    name: Godot 4.7.2 seven heroes and five floors
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Get exact engine
+        run: |
+          curl --fail --location --retry 2 -o /tmp/godot.zip https://github.com/godotengine/godot-builds/releases/download/4.7.2-stable/Godot_v4.7.2-stable_linux.x86_64.zip
+          unzip -q /tmp/godot.zip -d /tmp/godot
+          chmod +x /tmp/godot/Godot_v4.7.2-stable_linux.x86_64
+      - name: Import and exercise native renderers
+        run: |
+          engine=/tmp/godot/Godot_v4.7.2-stable_linux.x86_64
+          project=prototypes/godot-five-floor-web
+          "$engine" --headless --path "$project" --editor --import --quit > /tmp/import.log 2>&1
+          "$engine" --headless --path "$project" --script res://tests/native-world.gd > /tmp/world.log 2>&1
+          "$engine" --headless --path "$project" --script res://tests/native-fx.gd > /tmp/fx.log 2>&1
+          cat /tmp/world.log /tmp/fx.log
+          grep 'PASS native world' /tmp/world.log
+          grep 'Native FX snapshot paint completed' /tmp/fx.log
+          if grep -E 'SCRIPT ERROR:|ERROR:' /tmp/import.log /tmp/world.log /tmp/fx.log; then exit 1; fi
+      - name: Rebuild model and reproducible ZIP
+        run: |
+          python3 prototypes/godot-five-floor-web/build-source.py
+          python3 prototypes/godot-five-floor-web/package.py
+          git diff --exit-code -- prototypes/godot-five-floor-web/source/ prototypes/godot-five-floor-web/downloads/
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ember-crypt-seven-heroes-five-floors
+          path: prototypes/godot-five-floor-web/downloads/
+  bridge:
+    name: Web preview progression and isolated saves
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install browser
+        run: |
+          npm install --no-save --no-package-lock --prefix .playwright playwright@1.56.1
+          .playwright/node_modules/.bin/playwright install --with-deps chromium
+      - name: Test seven-hero five-floor model, checkpoints, slots and EC1
+        env:
+          NODE_PATH: ${{ github.workspace }}/.playwright/node_modules
+        run: |
+          export BROWSER_PATH=$(node -e 'console.log(require("playwright").chromium.executablePath())')
+          node prototypes/godot-five-floor-web/tests/bridge.cjs
