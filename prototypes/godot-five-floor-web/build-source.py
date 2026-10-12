@@ -29,7 +29,7 @@ def inline(m):
  path=m.group(1);code=(root/path).read_text();modules[path]=hashlib.sha256(code.encode()).hexdigest()
  return '<script>'+code.replace('</script>','<\\/script>')+'</script>'
 html=re.sub(r'<script src="([^"]+)"></script>',inline,html)
-html=re.sub(r'<link rel="(?:manifest|apple-touch-icon)"[^>]*>', '',html)
+html=re.sub(r'^[ \t]*<link rel="(?:manifest|apple-touch-icon)"[^>]*>[ \t]*\n', '',html,flags=re.M)
 html=re.sub(r'    <script>\s*if \("serviceWorker"[\s\S]*?</script>', '',html)
 html=html.replace('<head>','<head><base href="https://ember-godot.invalid/">\n<script>'+ (project/'scripts/frame_bootstrap.js').read_text()+'</script>')
 html=html.replace('</head>','<style>html,body,#game.game{background:transparent!important}#view{opacity:0!important}body{margin:0}.game{width:100%!important;height:100dvh!important;max-width:none!important}</style></head>')
