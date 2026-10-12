@@ -1,0 +1,45 @@
+name: Godot Web Editor preview
+on:
+  pull_request:
+    paths: ['prototypes/godot-web/**', '.github/workflows/godot-preview.yml']
+  push:
+    branches: [main]
+    paths: ['prototypes/godot-web/**', '.github/workflows/godot-preview.yml']
+permissions:
+  contents: read
+jobs:
+  godot:
+    name: Godot 4.7.2 import, controls and ZIP layout
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Get exact preview engine
+        run: |
+          curl --fail --location --retry 2 -o /tmp/godot.zip https://github.com/godotengine/godot-builds/releases/download/4.7.2-stable/Godot_v4.7.2-stable_linux.x86_64.zip
+          unzip -q /tmp/godot.zip -d /tmp/godot-preview
+          chmod +x /tmp/godot-preview/Godot_v4.7.2-stable_linux.x86_64
+      - name: Import and exercise preview
+        run: |
+          engine=/tmp/godot-preview/Godot_v4.7.2-stable_linux.x86_64
+          project=prototypes/godot-web/EmberCryptWebEditor
+          "$engine" --headless --path "$project" --editor --import --quit > /tmp/import.log 2>&1
+          cat /tmp/import.log
+          if grep -E 'SCRIPT ERROR:|ERROR:' /tmp/import.log; then exit 1; fi
+          "$engine" --headless --path "$project" --script tests/smoke.gd > /tmp/smoke.log 2>&1
+          cat /tmp/smoke.log
+          grep 'PASS 37 GODOT INTEGRATION CHECKS' /tmp/smoke.log
+          if grep -E 'SCRIPT ERROR:|ERROR:' /tmp/smoke.log; then exit 1; fi
+          "$engine" --headless --path prototypes/godot-web/ImportTest --editor --import --quit > /tmp/tiny-import.log 2>&1
+          "$engine" --headless --path prototypes/godot-web/ImportTest --quit-after 5 > /tmp/tiny-run.log 2>&1
+          cat /tmp/tiny-run.log
+          grep EMBER_IMPORT_TEST_READY /tmp/tiny-run.log
+          if grep -E 'SCRIPT ERROR:|ERROR:' /tmp/tiny-import.log /tmp/tiny-run.log; then exit 1; fi
+      - name: Rebuild and verify ZIPs
+        run: |
+          python3 prototypes/godot-web/package.py
+          git diff --exit-code -- prototypes/godot-web/downloads/
+      - uses: actions/upload-artifact@v4
+        with:
+          name: godot-web-editor-packages
+          path: prototypes/godot-web/downloads/

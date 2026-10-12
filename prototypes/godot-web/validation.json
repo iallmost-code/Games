@@ -1,0 +1,18 @@
+{
+  "engine": "4.7.2.stable.official.ed1daf0bf",
+  "native_integration_checks": 37,
+  "native_result": "PASS",
+  "tiny_native_launch": "EMBER_IMPORT_TEST_READY",
+  "web_editor": "Official Godot 4.7.2 web editor, locally served in real Chromium with WebGL2",
+  "browser_verified": [
+    "ZIP preload installation with explicit directory entries",
+    "editor opening scene and assets",
+    "game startup EMBER_FROST_READY",
+    "visible authored Frost dungeon and hero",
+    "WASD movement",
+    "Space Dash with cooldown visible",
+    "E Earthsplitter with charge spent"
+  ],
+  "known_editor_logs": "Web editor TCP debug-server/HTTPS-proxy unavailable messages; no project parser/runtime errors observed",
+  "scope": "Standalone one-hero demo; not complete production port or physical-device FPS verification"
+}

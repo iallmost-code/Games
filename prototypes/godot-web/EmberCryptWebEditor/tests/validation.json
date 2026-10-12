@@ -1,0 +1,6 @@
+{
+  "checks": 37,
+  "engine": "4.7.2-stable (official)",
+  "result": "PASS",
+  "scope": "PC visual slice; not production balance/save compatibility or physical-device testing"
+}

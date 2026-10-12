@@ -1,0 +1,18 @@
+[
+  {
+    "file": "EmberCrypt-Import-Test.zip",
+    "bytes": 50278,
+    "entries": 4,
+    "crc": "PASS",
+    "root_project": true,
+    "sha256": "845e275625c572c3a441fef10625b03feaaeb1dece8ce4ce525144261ca2b22e"
+  },
+  {
+    "file": "EmberCrypt-Frost-Vault.zip",
+    "bytes": 3597803,
+    "entries": 49,
+    "crc": "PASS",
+    "root_project": true,
+    "sha256": "139d320c420d23d0ec2f9ef29f4594beb72b31b038001e5fccb4cba33c0169bd"
+  }
+]

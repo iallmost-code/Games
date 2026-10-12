@@ -1,0 +1,5 @@
+{
+  "source_repository": "https://github.com/iallmost-code/Games",
+  "source_commit": "4816438b0076b882d3687712ef9e7f6c1df81c0f",
+  "note": "Existing Ember Crypt assets; Frost atlas regions extracted for standalone Godot Web Editor prototype. No production game or save changes."
+}

@@ -1,0 +1,131 @@
+[gd_resource type="SpriteFrames" load_steps=32 format=3]
+
+[ext_resource type="Texture2D" path="res://assets/hero/bloodknight-frames.webp" id="1"]
+
+[sub_resource type="AtlasTexture" id="frame_0"]
+atlas = ExtResource("1")
+region = Rect2(0, 0, 224, 192)
+
+[sub_resource type="AtlasTexture" id="frame_1"]
+atlas = ExtResource("1")
+region = Rect2(224, 0, 224, 192)
+
+[sub_resource type="AtlasTexture" id="frame_2"]
+atlas = ExtResource("1")
+region = Rect2(448, 0, 224, 192)
+
+[sub_resource type="AtlasTexture" id="frame_3"]
+atlas = ExtResource("1")
+region = Rect2(672, 0, 224, 192)
+
+[sub_resource type="AtlasTexture" id="frame_4"]
+atlas = ExtResource("1")
+region = Rect2(896, 0, 224, 192)
+
+[sub_resource type="AtlasTexture" id="frame_5"]
+atlas = ExtResource("1")
+region = Rect2(1120, 0, 224, 192)
+
+[sub_resource type="AtlasTexture" id="frame_6"]
+atlas = ExtResource("1")
+region = Rect2(0, 192, 224, 192)
+
+[sub_resource type="AtlasTexture" id="frame_7"]
+atlas = ExtResource("1")
+region = Rect2(224, 192, 224, 192)
+
+[sub_resource type="AtlasTexture" id="frame_8"]
+atlas = ExtResource("1")
+region = Rect2(448, 192, 224, 192)
+
+[sub_resource type="AtlasTexture" id="frame_9"]
+atlas = ExtResource("1")
+region = Rect2(672, 192, 224, 192)
+
+[sub_resource type="AtlasTexture" id="frame_10"]
+atlas = ExtResource("1")
+region = Rect2(896, 192, 224, 192)
+
+[sub_resource type="AtlasTexture" id="frame_11"]
+atlas = ExtResource("1")
+region = Rect2(1120, 192, 224, 192)
+
+[sub_resource type="AtlasTexture" id="frame_12"]
+atlas = ExtResource("1")
+region = Rect2(0, 384, 224, 192)
+
+[sub_resource type="AtlasTexture" id="frame_13"]
+atlas = ExtResource("1")
+region = Rect2(224, 384, 224, 192)
+
+[sub_resource type="AtlasTexture" id="frame_14"]
+atlas = ExtResource("1")
+region = Rect2(448, 384, 224, 192)
+
+[sub_resource type="AtlasTexture" id="frame_15"]
+atlas = ExtResource("1")
+region = Rect2(672, 384, 224, 192)
+
+[sub_resource type="AtlasTexture" id="frame_16"]
+atlas = ExtResource("1")
+region = Rect2(896, 384, 224, 192)
+
+[sub_resource type="AtlasTexture" id="frame_17"]
+atlas = ExtResource("1")
+region = Rect2(1120, 384, 224, 192)
+
+[sub_resource type="AtlasTexture" id="frame_18"]
+atlas = ExtResource("1")
+region = Rect2(0, 576, 224, 192)
+
+[sub_resource type="AtlasTexture" id="frame_19"]
+atlas = ExtResource("1")
+region = Rect2(224, 576, 224, 192)
+
+[sub_resource type="AtlasTexture" id="frame_20"]
+atlas = ExtResource("1")
+region = Rect2(448, 576, 224, 192)
+
+[sub_resource type="AtlasTexture" id="frame_21"]
+atlas = ExtResource("1")
+region = Rect2(672, 576, 224, 192)
+
+[sub_resource type="AtlasTexture" id="frame_22"]
+atlas = ExtResource("1")
+region = Rect2(896, 576, 224, 192)
+
+[sub_resource type="AtlasTexture" id="frame_23"]
+atlas = ExtResource("1")
+region = Rect2(1120, 576, 224, 192)
+
+[sub_resource type="AtlasTexture" id="frame_24"]
+atlas = ExtResource("1")
+region = Rect2(0, 768, 224, 192)
+
+[sub_resource type="AtlasTexture" id="frame_25"]
+atlas = ExtResource("1")
+region = Rect2(224, 768, 224, 192)
+
+[sub_resource type="AtlasTexture" id="frame_26"]
+atlas = ExtResource("1")
+region = Rect2(448, 768, 224, 192)
+
+[sub_resource type="AtlasTexture" id="frame_27"]
+atlas = ExtResource("1")
+region = Rect2(672, 768, 224, 192)
+
+[sub_resource type="AtlasTexture" id="frame_28"]
+atlas = ExtResource("1")
+region = Rect2(896, 768, 224, 192)
+
+[sub_resource type="AtlasTexture" id="frame_29"]
+atlas = ExtResource("1")
+region = Rect2(1120, 768, 224, 192)
+
+[resource]
+animations = [{"frames": [{"duration": 1.0, "texture": SubResource("frame_0")}, {"duration": 1.0, "texture": SubResource("frame_1")}, {"duration": 1.0, "texture": SubResource("frame_2")}, {"duration": 1.0, "texture": SubResource("frame_3")}, {"duration": 1.0, "texture": SubResource("frame_4")}, {"duration": 1.0, "texture": SubResource("frame_5")}], "loop": true, "name": &"front", "speed": 10.0},
+{"frames": [{"duration": 1.0, "texture": SubResource("frame_6")}, {"duration": 1.0, "texture": SubResource("frame_7")}, {"duration": 1.0, "texture": SubResource("frame_8")}, {"duration": 1.0, "texture": SubResource("frame_9")}, {"duration": 1.0, "texture": SubResource("frame_10")}, {"duration": 1.0, "texture": SubResource("frame_11")}], "loop": true, "name": &"side", "speed": 10.0},
+{"frames": [{"duration": 1.0, "texture": SubResource("frame_12")}, {"duration": 1.0, "texture": SubResource("frame_13")}, {"duration": 1.0, "texture": SubResource("frame_14")}, {"duration": 1.0, "texture": SubResource("frame_15")}, {"duration": 1.0, "texture": SubResource("frame_16")}, {"duration": 1.0, "texture": SubResource("frame_17")}], "loop": true, "name": &"back", "speed": 10.0},
+{"frames": [{"duration": 1.0, "texture": SubResource("frame_18")}, {"duration": 1.0, "texture": SubResource("frame_19")}, {"duration": 1.0, "texture": SubResource("frame_20")}, {"duration": 1.0, "texture": SubResource("frame_21")}, {"duration": 1.0, "texture": SubResource("frame_22")}, {"duration": 1.0, "texture": SubResource("frame_23")}], "loop": false, "name": &"attack", "speed": 20.0},
+{"frames": [{"duration": 1.0, "texture": SubResource("frame_24")}, {"duration": 1.0, "texture": SubResource("frame_25")}, {"duration": 1.0, "texture": SubResource("frame_26")}], "loop": false, "name": &"hit", "speed": 18.0},
+{"frames": [{"duration": 1.0, "texture": SubResource("frame_27")}, {"duration": 1.0, "texture": SubResource("frame_28")}, {"duration": 1.0, "texture": SubResource("frame_29")}], "loop": false, "name": &"death", "speed": 7.0}]
