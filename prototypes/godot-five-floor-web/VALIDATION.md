@@ -12,3 +12,9 @@ Engine: official `4.7.2.stable.official.ed1daf0bf`. Production baseline: main `f
 Raw results are under `tests/*-results.json`. The manual live-editor check uses a transient source fixture exposing lexical test APIs, not included in the playable model or ZIP. It is not a GitHub Actions browser job: CI runs the isolated bridge/model suite. Source WebP extraction/compression provenance is in `native-art/verification.json`.
 
 This is a Web-only hybrid rendering prototype, not a complete native desktop/GDScript port. Actual world sprites/walls/effects are Godot-rendered; model/menus/audio/saves are original JS/DOM. Physical Android FPS and long-run survival balance have not been measured. Test invulnerability/damage only exist in the testing fixture, never in the playable project.
+
+## 2.5D graphics polish
+
+Native4.7.2 polish regression covers continuous floor UVs, hidden shared wall faces, hero contrast, themed scenery, the Low decorative cap and unchanged simulation snapshots. All seven hero classes rendered in the official4.7.2 Web Editor across Floors1–5, with the new masonry and hero silhouette shader active; no project/model/shader errors. Live keyboard movement, Dash and Ultimate passed again. This pass retains the exact original JavaScript model/source and all texture atlases; it changes native presentation only. Screenshots and browser results are under tests/.
+
+The expanded native matrix passes210 hero/floor/quality/view combinations,12,600 pose/flip cases and18/12/6 scenery-pool transitions, with actual native paint callbacks and source DTO purity. The hero-only outline masks samples to the selected authored frame so neighbouring poses cannot bleed into it. Final archive installed fresh in the official Web Editor and the corrected shader rendered front/attack poses for Gravecaller, Bloodknight and Sunwarden without shader errors.

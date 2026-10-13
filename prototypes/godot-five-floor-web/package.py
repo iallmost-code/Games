@@ -7,7 +7,7 @@ def included(p):
  return not any(n in ['.godot','downloads','tests','__pycache__'] for n in rel.parts) and p.suffix not in ['.import','.uid','.py'] and p.name!='verification.json'
 files=sorted(p for p in root.rglob('*') if p.is_file() and not p.is_symlink() and included(p))
 dirs=set(parent for f in files for parent in f.relative_to(root).parents if str(parent)!='.')
-target=out/'EmberCrypt-Seven-Heroes-Five-Floors.zip'
+target=out/'EmberCrypt-25D-Polish.zip'
 with ZipFile(target,'w',allowZip64=False) as z:
  for d in sorted(dirs,key=lambda p:(len(p.parts),str(p))):
   info=ZipInfo(d.as_posix()+'/',(2026,10,12,0,0,0));info.create_system=0;info.external_attr=0x10;info.compress_type=ZIP_STORED;z.writestr(info,b'')

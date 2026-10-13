@@ -1,0 +1,65 @@
+{
+  "rows": [
+    {
+      "hero": "gravecaller",
+      "floor": 1,
+      "hp": 100,
+      "damage": 24,
+      "errors": []
+    },
+    {
+      "hero": "ranger",
+      "floor": 2,
+      "hp": 100,
+      "damage": 30,
+      "errors": []
+    },
+    {
+      "hero": "ember",
+      "floor": 3,
+      "hp": 110,
+      "damage": 25,
+      "errors": []
+    },
+    {
+      "hero": "bloodknight",
+      "floor": 4,
+      "hp": 140,
+      "damage": 58,
+      "errors": []
+    },
+    {
+      "hero": "sunwarden",
+      "floor": 5,
+      "hp": 115,
+      "damage": 18,
+      "errors": []
+    },
+    {
+      "hero": "rogue",
+      "floor": 3,
+      "hp": 90,
+      "damage": 32,
+      "errors": []
+    },
+    {
+      "hero": "frostwarden",
+      "floor": 2,
+      "hp": 180,
+      "damage": 66,
+      "errors": []
+    }
+  ],
+  "controls": {
+    "before": {
+      "x": 400,
+      "y": 800
+    },
+    "after": {
+      "x": 414.6371103705616,
+      "y": 785.3628896294385
+    },
+    "dash": 3.95,
+    "ultimate": 0
+  }
+}
