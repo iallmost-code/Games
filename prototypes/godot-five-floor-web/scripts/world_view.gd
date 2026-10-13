@@ -17,6 +17,8 @@ var actors: Dictionary = {}
 var wall_nodes: Array = []
 var cells: Dictionary = {}
 var wall_cells: Array[Vector2i] = []
+var wall_occupancy: Dictionary = {}
+var masonry_cache: Dictionary = {}
 var layout_key := ""
 var lights: Array[PointLight2D] = []
 var light_texture: Texture2D
@@ -29,6 +31,7 @@ var viewport_size := Vector2(1280, 720)
 
 class Actor extends Node2D:
 	var sprite := Sprite2D.new()
+	var halo: Sprite2D
 	var radius := 18.0
 	var height := 80.0
 	var ring := Color.TRANSPARENT
@@ -70,23 +73,39 @@ class Wall extends Node2D:
 	var stone := Color("706455")
 	var texture: Texture2D
 	var lift := 42.0
+	var east_face := true
+	var south_face := true
+	var face_texture: Texture2D
+	var top_uv := PackedVector2Array([Vector2(0,0),Vector2(1,0),Vector2(1,1),Vector2(0,1)])
 	func _draw() -> void:
 		if corners.size() != 4:
 			return
 		var up := Vector2(0, -lift)
 		var top := PackedVector2Array([corners[0] + up, corners[1] + up, corners[2] + up, corners[3] + up])
-		draw_colored_polygon(PackedVector2Array([corners[1], corners[2], top[2], top[1]]), stone.darkened(0.58))
-		draw_colored_polygon(PackedVector2Array([corners[2], corners[3], top[3], top[2]]), stone.darkened(0.38))
+		var uv := PackedVector2Array([Vector2(0,0),Vector2(1,0),Vector2(1,1),Vector2(0,1)])
+		if east_face:
+			var side := PackedVector2Array([top[1],top[2],corners[2],corners[1]])
+			if face_texture:
+				draw_polygon(side,PackedColorArray([Color(0.52,0.52,0.55)]),uv,face_texture)
+			else:
+				draw_colored_polygon(side,stone.darkened(0.58))
+		if south_face:
+			var side := PackedVector2Array([top[2],top[3],corners[3],corners[2]])
+			if face_texture:
+				draw_polygon(side,PackedColorArray([Color(0.75,0.75,0.78)]),uv,face_texture)
+			else:
+				draw_colored_polygon(side,stone.darkened(0.38))
 		if texture:
-			draw_polygon(top, PackedColorArray([stone.lightened(0.18)]), PackedVector2Array([Vector2(0, 0), Vector2(1, 0), Vector2(1, 1), Vector2(0, 1)]), texture)
+			draw_polygon(top,PackedColorArray([Color(0.74,0.77,0.79)]),top_uv,texture)
 		else:
-			draw_colored_polygon(top, stone)
-		draw_polyline(PackedVector2Array([top[0], top[1], top[2], top[3], top[0]]), Color(0.025, 0.035, 0.045, 0.8), 1.5, true)
-		draw_line(top[0], top[1], stone.lightened(0.35), 1.2, true)
-		draw_line(top[1], top[2], stone.lightened(0.2), 1.2, true)
-		for row in [0.33, 0.66]:
-			draw_line(corners[1] + up * row, corners[2] + up * row, stone.darkened(0.7), 1, true)
-			draw_line(corners[2] + up * row, corners[3] + up * row, stone.darkened(0.7), 1, true)
+			draw_colored_polygon(top,stone)
+		# Show the exposed stone ledges, rather than outlining each block as a grid.
+		if east_face:
+			draw_line(top[1],top[2],Color(stone.lightened(0.16),0.6),1.2,true)
+			draw_line(corners[1],corners[2],Color(0.02,0.025,0.03,0.7),1.3,true)
+		if south_face:
+			draw_line(top[2],top[3],Color(stone.lightened(0.22),0.65),1.2,true)
+			draw_line(corners[2],corners[3],Color(0.02,0.025,0.03,0.7),1.3,true)
 
 func _ready() -> void:
 	load_art()
@@ -178,6 +197,7 @@ func set_snapshot(state: Dictionary) -> void:
 	for i in range(state.get("companions", []).size()):
 		update_companion(state.companions[i], i)
 	update_props(dungeon)
+	update_scenery(dungeon)
 	update_lights(dungeon)
 	queue_redraw()
 
@@ -207,6 +227,7 @@ func update_layout(dungeon: Dictionary) -> void:
 	if not bool(dungeon.get("open", false)):
 		for y in [9, 10]:
 			walls[Vector2i(24, y)] = true
+	wall_occupancy = walls
 	for cell in walls:
 		wall_cells.append(cell)
 
@@ -214,14 +235,47 @@ func floor_texture() -> Texture2D:
 	var floors: Array = manifest.get("floors", [])
 	return file_texture(str(floors[zone])) if floors.size() > zone else null
 
+func floor_uv(cell: Vector2i) -> PackedVector2Array:
+	# Four-by-four cells share a single image; adjacent edges are continuous.
+	var x := float(posmod(cell.x,4))/4
+	var y := float(posmod(cell.y,4))/4
+	return PackedVector2Array([Vector2(x,y),Vector2(x+0.25,y),Vector2(x+0.25,y+0.25),Vector2(x,y+0.25)])
+
+func masonry_texture() -> Texture2D:
+	if masonry_cache.has(zone):
+		return masonry_cache[zone]
+	var image := Image.create(192,96,false,Image.FORMAT_RGBA8)
+	var base: Color = [Color("63594d"),Color("536c76"),Color("4c5943")][zone]
+	# Once per zone, bake rough cut stone, mortar, chipped bevels and surface grain.
+	# It is a shared texture, not a per-frame filter or per-enemy effect.
+	for y in range(96):
+		var row := y/24
+		for x in range(192):
+			var bx := posmod(x+(24 if row%2 else 0),48)
+			var by := y%24
+			var hash_value: int = posmod((x*73856093)^(y*19349663)^((x/48+row*7)*83492791),65536)
+			var grain := float(hash_value)/65535
+			var color := base.lightened((grain-0.5)*0.12)
+			if bx<2 or by<2:
+				color=base.darkened(0.66)
+			elif bx<4 or by<4:
+				color=base.lightened(0.14+grain*0.04)
+			elif bx>44 or by>20:
+				color=base.darkened(0.22)
+			elif hash_value%317<3:
+				color=base.darkened(0.25)
+			image.set_pixel(x,y,color)
+	var texture := ImageTexture.create_from_image(image)
+	masonry_cache[zone]=texture
+	return texture
+
 func tile_polygon(cell: Vector2i) -> PackedVector2Array:
 	var origin := Vector2(cell) * CELL
 	return PackedVector2Array([screen(origin), screen(origin + Vector2(CELL, 0)), screen(origin + Vector2(CELL, CELL)), screen(origin + Vector2(0, CELL))])
 
 func _draw() -> void:
-	draw_rect(Rect2(Vector2.ZERO, viewport_size), Color("080b0d"))
+	draw_rect(Rect2(Vector2.ZERO, viewport_size), [Color("10090a"),Color("080e17"),Color("080e0b")][zone])
 	var tile := floor_texture()
-	var uv := PackedVector2Array([Vector2(0, 0), Vector2(1, 0), Vector2(1, 1), Vector2(0, 1)])
 	if cells.is_empty():
 		var center := Vector2i(floori(float(hero.get("x", 0)) / CELL), floori(float(hero.get("y", 0)) / CELL))
 		var extent := ceili(maxf(viewport_size.x, viewport_size.y) / (CELL * zoom * tilt)) + 2
@@ -229,12 +283,13 @@ func _draw() -> void:
 			for x in range(center.x - extent, center.x + extent):
 				var poly := tile_polygon(Vector2i(x, y))
 				if on_screen(poly[0], 100):
-					draw_floor(poly, tile, uv)
+					draw_floor(poly, tile, floor_uv(Vector2i(x,y)))
 	else:
 		for cell in cells:
 			var poly := tile_polygon(cell)
 			if on_screen(poly[0], 140):
-				draw_floor(poly, tile, uv)
+				draw_floor(poly, tile, floor_uv(cell))
+				draw_platform_edge(cell,poly)
 	var dungeon = snapshot.get("dungeon")
 	if dungeon is Dictionary:
 		var gate_point := screen(Vector2(24 * CELL, 9 * CELL))
@@ -287,7 +342,20 @@ func draw_floor(poly: PackedVector2Array, tile: Texture2D, uv: PackedVector2Arra
 		draw_polygon(poly, PackedColorArray([Color(0.72, 0.72, 0.76)]), uv, tile)
 	else:
 		draw_colored_polygon(poly, FLOOR_COLORS[zone])
-	draw_polyline(PackedVector2Array([poly[0], poly[1], poly[2], poly[3], poly[0]]), Color(0.05, 0.065, 0.08, 0.28), 1, true)
+	# Subdued joints keep floor art below combat in the visual hierarchy.
+	draw_line(poly[0],poly[1],Color(0.015,0.022,0.028,0.10),0.7,true)
+	draw_line(poly[0],poly[3],Color(0.015,0.022,0.028,0.10),0.7,true)
+
+func draw_platform_edge(cell: Vector2i, poly: PackedVector2Array) -> void:
+	var drop := Vector2(0,16*zoom)
+	for side in [1,2]:
+		var offset := Vector2i.RIGHT if side==1 else Vector2i.DOWN
+		if cells.has(cell+offset):
+			continue
+		var a: Vector2=poly[side]
+		var b: Vector2=poly[side+1]
+		draw_colored_polygon(PackedVector2Array([a,b,b+drop,a+drop]),STONE_COLORS[zone].darkened(0.72 if side==1 else 0.6))
+		draw_line(a,b,Color(0.38,0.42,0.40,0.30),1,true)
 
 func update_walls(_dungeon: Dictionary) -> void:
 	var used := 0
@@ -307,6 +375,10 @@ func update_walls(_dungeon: Dictionary) -> void:
 		wall.corners = PackedVector2Array([poly[0] - p, poly[1] - p, poly[2] - p, poly[3] - p])
 		wall.lift = 42 * zoom
 		wall.texture = floor_texture()
+		wall.top_uv = floor_uv(cell)
+		wall.face_texture = masonry_texture()
+		wall.east_face = not wall_occupancy.has(cell+Vector2i.RIGHT)
+		wall.south_face = not wall_occupancy.has(cell+Vector2i.DOWN)
 		wall.stone = STONE_COLORS[zone]
 		wall.z_index = depth(poly[2])
 		var relative := p - screen(Vector2(float(hero.get("x", 0)), float(hero.get("y", 0))))
@@ -329,6 +401,8 @@ func actor_for(key: String, world: Vector2) -> Actor:
 	actor.bar = -1
 	actor.label = ""
 	actor.draw_shadow = true
+	actor.sprite.modulate = Color.WHITE
+	actor.sprite.rotation = 0
 	actor.modulate = Color.WHITE
 	return actor
 
@@ -362,7 +436,7 @@ func update_hero() -> void:
 	var actor := actor_for("hero", Vector2(float(hero.get("x", 0)), float(hero.get("y", 0))))
 	var kind := str(hero.get("class", "gravecaller"))
 	var pose: Dictionary = snapshot.get("heroPose", {})
-	var height := float(pose.get("height", 90 if kind in ["bloodknight", "frostwarden"] else 80))
+	var height := float(pose.get("height", 90 if kind in ["bloodknight", "frostwarden"] else 80))*1.12
 	actor.radius = 20
 	actor.ring = HERO_COLORS.get(kind, Color("bb94ff"))
 	var variants: Array = manifest.get("heroes", {}).get(kind, [])
@@ -377,6 +451,33 @@ func update_hero() -> void:
 		actor.height = height
 	else:
 		ordinary_sprite(actor, facing_key(kind, hero), height, bool(pose.get("flip", false)))
+	actor.sprite.modulate=Color(1.24,1.22,1.20)
+	if bool(hero.get("moving",false)):
+		var phase := float(hero.get("stepPhase",0))
+		actor.sprite.position.y-=absf(sin(phase))*1.2
+		actor.sprite.rotation=sin(phase)*0.008
+	if actor.halo==null:
+		actor.halo=Sprite2D.new()
+		actor.halo.centered=false
+		var material := ShaderMaterial.new()
+		material.shader=load("res://scripts/hero_rim.gdshader")
+		actor.halo.material=material
+		actor.add_child(actor.halo)
+		actor.move_child(actor.halo,0)
+	actor.halo.texture=actor.sprite.texture
+	actor.halo.hframes=actor.sprite.hframes
+	actor.halo.vframes=actor.sprite.vframes
+	actor.halo.frame=actor.sprite.frame
+	actor.halo.flip_h=actor.sprite.flip_h
+	actor.halo.position=actor.sprite.position
+	actor.halo.scale=actor.sprite.scale
+	actor.halo.rotation=actor.sprite.rotation
+	var columns := float(actor.sprite.hframes)
+	var rows := float(actor.sprite.vframes)
+	var column := float(actor.sprite.frame%actor.sprite.hframes)
+	var row := float(actor.sprite.frame/actor.sprite.hframes)
+	actor.halo.material.set_shader_parameter("frame_rect",Vector4(column/columns,row/rows,(column+1)/columns,(row+1)/rows))
+	actor.halo.material.set_shader_parameter("rim_color",HERO_COLORS.get(kind,Color("bb94ff")))
 	if float(hero.get("inv", 0)) > 0 and int(float(hero.get("inv", 0)) * 16) % 2 == 1:
 		actor.modulate.a = 0.45
 	if kind == "rogue" and float(hero.get("veilUntil", 0)) > clock:
@@ -498,9 +599,44 @@ func update_arena_walls() -> void:
 		wall.corners = PackedVector2Array([screen(origin)-p, screen(origin+Vector2(size.x,0))-p, screen(origin+size)-p, screen(origin+Vector2(0,size.y))-p])
 		wall.visible = true
 		wall.texture = floor_texture()
+		wall.top_uv = floor_uv(Vector2i(floori(float(rect.x)/CELL),floori(float(rect.y)/CELL)))
+		wall.face_texture = masonry_texture()
+		wall.east_face = true
+		wall.south_face = true
 		wall.stone = STONE_COLORS[zone]
 		wall.lift = 42 * zoom
 		wall.z_index = depth(screen(origin+size))
 		var relative := p-screen(Vector2(float(hero.get("x",0)),float(hero.get("y",0))))
 		wall.modulate.a = 0.18 if absf(relative.x)<105*zoom and relative.y>-35*zoom and relative.y<140*zoom else 1.0
 		wall.queue_redraw()
+
+func update_scenery(dungeon) -> void:
+	var quality: Dictionary = snapshot.get("quality",{})
+	var atmosphere := int(quality.get("maxAtmosphere",32))
+	var cap := 18 if atmosphere>=32 else 12 if atmosphere>=16 else 6
+	var candidates: Array[Vector2]=[]
+	if dungeon is Dictionary:
+		for room in dungeon.get("rooms",[]):
+			if room is Array:
+				candidates.append(Vector2(float(room[0])-0.35,float(room[1])+0.5)*CELL)
+				candidates.append(Vector2(float(room[0])+float(room[2])+0.3,float(room[1])+float(room[3])-0.5)*CELL)
+	else:
+		for rect in snapshot.get("arenaWalls",[]):
+			if posmod(int(rect.x)+int(rect.y),7)==0:
+				candidates.append(Vector2(float(rect.x)+float(rect.w)*0.5,float(rect.y)+float(rect.h)*0.5))
+	var theme: String=["ash","frost","venom"][zone]
+	var used := 0
+	for i in range(candidates.size()):
+		var position: Vector2=candidates[i]
+		if used>=cap or not on_screen(screen(position),70):
+			continue
+		var kind: String=["column","statue","bones"][i%3]
+		var art_key := "prop-"+theme+"-"+kind
+		if not texture_for(art_key):
+			continue
+		var height := 114.0 if kind=="column" else 106.0 if kind=="statue" else 42.0
+		prop("scenery:%s"%used,position,art_key,66,height)
+		var actor: Actor=actors["scenery:%s"%used]
+		var relative := actor.position-screen(Vector2(float(hero.get("x",0)),float(hero.get("y",0))))
+		actor.modulate=Color(0.88,0.91,0.90,0.22 if absf(relative.x)<58*zoom and relative.y>0 and relative.y<height*zoom else 0.92)
+		used+=1

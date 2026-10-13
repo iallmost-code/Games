@@ -1,10 +1,14 @@
-# Seven heroes / five floors — Godot 4.7.2 Web Editor preview
+# 2.5D visual polish — seven heroes / five floors — Godot 4.7.2 Web Editor preview
 
-Download `downloads/EmberCrypt-Seven-Heroes-Five-Floors.zip`. Keep it zipped. In the Web Editor's Loader, select **Preload project ZIP**, click **Start Godot Editor**, and install under `/home/web_user/ember-seven` with **Create Folder** and **Edit Now** checked. Press **F5 / Play**. The editor scene can look empty before Play because the dungeon is assembled at runtime.
+Download `downloads/EmberCrypt-25D-Polish.zip`. Keep it zipped. In the Web Editor's Loader, select **Preload project ZIP**, click **Start Godot Editor**, and install under `/home/web_user/ember-seven` with **Create Folder** and **Edit Now** checked. Press **F5 / Play**. The editor scene can look empty before Play because the dungeon is assembled at runtime.
 
 Play contains the original seven heroes, first five Descent floors, enemies/bosses, cards/evolutions, relics, skills, loot, shrine, achievements, bestiary, Crypt Depths, Torment, random/Classic layouts, daily challenges, merchant, mastery and run history. Endless retains its existing rules. A menu-only **PLAYTEST ALL HEROES** toggle lets you try all seven without writing earned unlock flags. Earned progression still works. Floor 5 retains its victory/rewards and ends this preview; floors 6–10 are not playable here. Imported deeper saved runs remain preserved but cannot be continued in this preview.
 
 Movement: WASD/arrows or floating joystick. Space = Dash, E = Ultimate. Existing portrait/landscape menus and controls remain. No other gameplay buttons are added.
+
+## This graphics pass
+
+The same game now uses continuous floor textures spanning four cells, shared rough-stone wall textures with hidden internal faces, exposed platform ledges, a brighter/larger grounded hero and a single hero-only silhouette rim. Zone columns/statues/bones decorate room boundaries and fade when obscuring the hero. High/Medium/Low decorative caps are18/12/6. Scenery does not introduce collision or new navigation. No combat, progression, movement or saves changed.
 
 ## What this actually tests
 

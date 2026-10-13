@@ -23,10 +23,14 @@ jobs:
           "$engine" --headless --path "$project" --editor --import --quit > /tmp/import.log 2>&1
           "$engine" --headless --path "$project" --script res://tests/native-world.gd > /tmp/world.log 2>&1
           "$engine" --headless --path "$project" --script res://tests/native-fx.gd > /tmp/fx.log 2>&1
-          cat /tmp/world.log /tmp/fx.log
+          "$engine" --headless --path "$project" --script res://tests/native-polish.gd > /tmp/polish.log 2>&1
+          "$engine" --headless --path "$project" --script res://tests/native-polish-matrix.gd > /tmp/matrix.log 2>&1
+          cat /tmp/world.log /tmp/fx.log /tmp/polish.log /tmp/matrix.log
           grep 'PASS native world' /tmp/world.log
           grep 'Native FX snapshot paint completed' /tmp/fx.log
-          if grep -E 'SCRIPT ERROR:|ERROR:' /tmp/import.log /tmp/world.log /tmp/fx.log; then exit 1; fi
+          grep 'PASS native polish' /tmp/polish.log
+          grep 'PASS native polish matrix' /tmp/matrix.log
+          if grep -E 'SCRIPT ERROR:|ERROR:' /tmp/import.log /tmp/world.log /tmp/fx.log /tmp/polish.log /tmp/matrix.log; then exit 1; fi
       - name: Rebuild model and reproducible ZIP
         run: |
           python3 prototypes/godot-five-floor-web/build-source.py
