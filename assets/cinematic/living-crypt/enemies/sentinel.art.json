@@ -1,0 +1,879 @@
+{
+  "kind": "sentinel",
+  "authoring": "Original image-generated painted keyframes matched to existing monsters.png. Entire authored pose alpha-components extracted globally with antialias edge ownership; no source-edge truncation or still-sprite transform animation.",
+  "source": "exec-91be3f6d-df8b-49dd-aeb1-11547384054b.png",
+  "sourceSHA256": "41b3f80f6e52135b4f997defac9e1e344e972240d3c565e38162c4ee40afbd5a",
+  "sheet": {
+    "width": 864,
+    "height": 960,
+    "columns": 6,
+    "rows": [
+      "walk-down-6",
+      "walk-side-6",
+      "walk-up-6",
+      "attack-6",
+      "hit-2-plus-4-empty",
+      "death-6"
+    ],
+    "cellWidth": 144,
+    "cellHeight": 160,
+    "anchor": {
+      "x": 72,
+      "y": 156
+    }
+  },
+  "standingScale": {
+    "x": 0.6749058534087158,
+    "y": 0.7254901960784313
+  },
+  "frames": [
+    {
+      "index": 0,
+      "sourceCut": {
+        "left": 40,
+        "top": 16,
+        "width": 152,
+        "height": 200
+      },
+      "sourceBounds": {
+        "x": 1,
+        "y": 1,
+        "width": 150,
+        "height": 198
+      },
+      "sourceComponentPixels": 18174,
+      "bounds": {
+        "x": 17,
+        "y": 12,
+        "width": 101,
+        "height": 144
+      },
+      "foot": {
+        "x": 72,
+        "y": 156
+      }
+    },
+    {
+      "index": 1,
+      "sourceCut": {
+        "left": 249,
+        "top": 13,
+        "width": 154,
+        "height": 205
+      },
+      "sourceBounds": {
+        "x": 1,
+        "y": 1,
+        "width": 152,
+        "height": 203
+      },
+      "sourceComponentPixels": 17841,
+      "bounds": {
+        "x": 22,
+        "y": 9,
+        "width": 103,
+        "height": 147
+      },
+      "foot": {
+        "x": 72,
+        "y": 156
+      }
+    },
+    {
+      "index": 2,
+      "sourceCut": {
+        "left": 450,
+        "top": 13,
+        "width": 163,
+        "height": 203
+      },
+      "sourceBounds": {
+        "x": 1,
+        "y": 1,
+        "width": 161,
+        "height": 201
+      },
+      "sourceComponentPixels": 18099,
+      "bounds": {
+        "x": 14,
+        "y": 10,
+        "width": 109,
+        "height": 146
+      },
+      "foot": {
+        "x": 72,
+        "y": 156
+      }
+    },
+    {
+      "index": 3,
+      "sourceCut": {
+        "left": 660,
+        "top": 16,
+        "width": 173,
+        "height": 202
+      },
+      "sourceBounds": {
+        "x": 1,
+        "y": 1,
+        "width": 171,
+        "height": 200
+      },
+      "sourceComponentPixels": 18263,
+      "bounds": {
+        "x": 10,
+        "y": 11,
+        "width": 115,
+        "height": 145
+      },
+      "foot": {
+        "x": 72,
+        "y": 156
+      }
+    },
+    {
+      "index": 4,
+      "sourceCut": {
+        "left": 886,
+        "top": 16,
+        "width": 170,
+        "height": 203
+      },
+      "sourceBounds": {
+        "x": 1,
+        "y": 1,
+        "width": 168,
+        "height": 201
+      },
+      "sourceComponentPixels": 18427,
+      "bounds": {
+        "x": 29,
+        "y": 10,
+        "width": 113,
+        "height": 146
+      },
+      "foot": {
+        "x": 72,
+        "y": 156
+      }
+    },
+    {
+      "index": 5,
+      "sourceCut": {
+        "left": 1097,
+        "top": 16,
+        "width": 175,
+        "height": 203
+      },
+      "sourceBounds": {
+        "x": 1,
+        "y": 1,
+        "width": 173,
+        "height": 201
+      },
+      "sourceComponentPixels": 19008,
+      "bounds": {
+        "x": 5,
+        "y": 10,
+        "width": 117,
+        "height": 146
+      },
+      "foot": {
+        "x": 72,
+        "y": 156
+      }
+    },
+    {
+      "index": 6,
+      "sourceCut": {
+        "left": 25,
+        "top": 220,
+        "width": 167,
+        "height": 206
+      },
+      "sourceBounds": {
+        "x": 1,
+        "y": 1,
+        "width": 165,
+        "height": 204
+      },
+      "sourceComponentPixels": 18088,
+      "bounds": {
+        "x": 8,
+        "y": 8,
+        "width": 111,
+        "height": 148
+      },
+      "foot": {
+        "x": 72,
+        "y": 156
+      }
+    },
+    {
+      "index": 7,
+      "sourceCut": {
+        "left": 234,
+        "top": 221,
+        "width": 168,
+        "height": 203
+      },
+      "sourceBounds": {
+        "x": 1,
+        "y": 1,
+        "width": 166,
+        "height": 201
+      },
+      "sourceComponentPixels": 17824,
+      "bounds": {
+        "x": 8,
+        "y": 10,
+        "width": 112,
+        "height": 146
+      },
+      "foot": {
+        "x": 72,
+        "y": 156
+      }
+    },
+    {
+      "index": 8,
+      "sourceCut": {
+        "left": 450,
+        "top": 221,
+        "width": 175,
+        "height": 204
+      },
+      "sourceBounds": {
+        "x": 1,
+        "y": 1,
+        "width": 173,
+        "height": 202
+      },
+      "sourceComponentPixels": 18131,
+      "bounds": {
+        "x": 6,
+        "y": 9,
+        "width": 117,
+        "height": 147
+      },
+      "foot": {
+        "x": 72,
+        "y": 156
+      }
+    },
+    {
+      "index": 9,
+      "sourceCut": {
+        "left": 662,
+        "top": 222,
+        "width": 176,
+        "height": 199
+      },
+      "sourceBounds": {
+        "x": 1,
+        "y": 1,
+        "width": 174,
+        "height": 197
+      },
+      "sourceComponentPixels": 17612,
+      "bounds": {
+        "x": 9,
+        "y": 13,
+        "width": 117,
+        "height": 143
+      },
+      "foot": {
+        "x": 72,
+        "y": 156
+      }
+    },
+    {
+      "index": 10,
+      "sourceCut": {
+        "left": 874,
+        "top": 221,
+        "width": 175,
+        "height": 200
+      },
+      "sourceBounds": {
+        "x": 1,
+        "y": 1,
+        "width": 173,
+        "height": 198
+      },
+      "sourceComponentPixels": 17765,
+      "bounds": {
+        "x": 7,
+        "y": 12,
+        "width": 117,
+        "height": 144
+      },
+      "foot": {
+        "x": 72,
+        "y": 156
+      }
+    },
+    {
+      "index": 11,
+      "sourceCut": {
+        "left": 1094,
+        "top": 221,
+        "width": 176,
+        "height": 205
+      },
+      "sourceBounds": {
+        "x": 1,
+        "y": 1,
+        "width": 174,
+        "height": 203
+      },
+      "sourceComponentPixels": 17920,
+      "bounds": {
+        "x": 21,
+        "y": 9,
+        "width": 117,
+        "height": 147
+      },
+      "foot": {
+        "x": 72,
+        "y": 156
+      }
+    },
+    {
+      "index": 12,
+      "sourceCut": {
+        "left": 37,
+        "top": 430,
+        "width": 182,
+        "height": 203
+      },
+      "sourceBounds": {
+        "x": 1,
+        "y": 1,
+        "width": 180,
+        "height": 201
+      },
+      "sourceComponentPixels": 18465,
+      "bounds": {
+        "x": 20,
+        "y": 10,
+        "width": 121,
+        "height": 146
+      },
+      "foot": {
+        "x": 72,
+        "y": 156
+      }
+    },
+    {
+      "index": 13,
+      "sourceCut": {
+        "left": 259,
+        "top": 430,
+        "width": 160,
+        "height": 200
+      },
+      "sourceBounds": {
+        "x": 1,
+        "y": 1,
+        "width": 158,
+        "height": 198
+      },
+      "sourceComponentPixels": 16344,
+      "bounds": {
+        "x": 26,
+        "y": 12,
+        "width": 107,
+        "height": 144
+      },
+      "foot": {
+        "x": 72,
+        "y": 156
+      }
+    },
+    {
+      "index": 14,
+      "sourceCut": {
+        "left": 465,
+        "top": 429,
+        "width": 169,
+        "height": 205
+      },
+      "sourceBounds": {
+        "x": 1,
+        "y": 1,
+        "width": 167,
+        "height": 203
+      },
+      "sourceComponentPixels": 16847,
+      "bounds": {
+        "x": 27,
+        "y": 9,
+        "width": 113,
+        "height": 147
+      },
+      "foot": {
+        "x": 72,
+        "y": 156
+      }
+    },
+    {
+      "index": 15,
+      "sourceCut": {
+        "left": 681,
+        "top": 428,
+        "width": 175,
+        "height": 206
+      },
+      "sourceBounds": {
+        "x": 1,
+        "y": 1,
+        "width": 173,
+        "height": 204
+      },
+      "sourceComponentPixels": 17638,
+      "bounds": {
+        "x": 22,
+        "y": 8,
+        "width": 117,
+        "height": 148
+      },
+      "foot": {
+        "x": 72,
+        "y": 156
+      }
+    },
+    {
+      "index": 16,
+      "sourceCut": {
+        "left": 893,
+        "top": 428,
+        "width": 167,
+        "height": 206
+      },
+      "sourceBounds": {
+        "x": 1,
+        "y": 1,
+        "width": 165,
+        "height": 204
+      },
+      "sourceComponentPixels": 17145,
+      "bounds": {
+        "x": 23,
+        "y": 8,
+        "width": 111,
+        "height": 148
+      },
+      "foot": {
+        "x": 72,
+        "y": 156
+      }
+    },
+    {
+      "index": 17,
+      "sourceCut": {
+        "left": 1112,
+        "top": 428,
+        "width": 165,
+        "height": 202
+      },
+      "sourceBounds": {
+        "x": 1,
+        "y": 1,
+        "width": 163,
+        "height": 200
+      },
+      "sourceComponentPixels": 16347,
+      "bounds": {
+        "x": 20,
+        "y": 11,
+        "width": 110,
+        "height": 145
+      },
+      "foot": {
+        "x": 72,
+        "y": 156
+      }
+    },
+    {
+      "index": 18,
+      "sourceCut": {
+        "left": 35,
+        "top": 642,
+        "width": 171,
+        "height": 181
+      },
+      "sourceBounds": {
+        "x": 1,
+        "y": 1,
+        "width": 169,
+        "height": 179
+      },
+      "sourceComponentPixels": 17733,
+      "bounds": {
+        "x": 46,
+        "y": 26,
+        "width": 96,
+        "height": 130
+      },
+      "foot": {
+        "x": 72,
+        "y": 156
+      }
+    },
+    {
+      "index": 19,
+      "sourceCut": {
+        "left": 232,
+        "top": 638,
+        "width": 193,
+        "height": 182
+      },
+      "sourceBounds": {
+        "x": 1,
+        "y": 1,
+        "width": 191,
+        "height": 180
+      },
+      "sourceComponentPixels": 20116,
+      "bounds": {
+        "x": 42,
+        "y": 25,
+        "width": 100,
+        "height": 131
+      },
+      "foot": {
+        "x": 72,
+        "y": 156
+      }
+    },
+    {
+      "index": 20,
+      "sourceCut": {
+        "left": 443,
+        "top": 643,
+        "width": 226,
+        "height": 177
+      },
+      "sourceBounds": {
+        "x": 1,
+        "y": 1,
+        "width": 224,
+        "height": 175
+      },
+      "sourceComponentPixels": 20811,
+      "bounds": {
+        "x": 67,
+        "y": 29,
+        "width": 75,
+        "height": 127
+      },
+      "foot": {
+        "x": 72,
+        "y": 156
+      }
+    },
+    {
+      "index": 21,
+      "sourceCut": {
+        "left": 676,
+        "top": 639,
+        "width": 216,
+        "height": 181
+      },
+      "sourceBounds": {
+        "x": 1,
+        "y": 1,
+        "width": 214,
+        "height": 179
+      },
+      "sourceComponentPixels": 21269,
+      "bounds": {
+        "x": 16,
+        "y": 26,
+        "width": 126,
+        "height": 130
+      },
+      "foot": {
+        "x": 72,
+        "y": 156
+      }
+    },
+    {
+      "index": 22,
+      "sourceCut": {
+        "left": 912,
+        "top": 642,
+        "width": 166,
+        "height": 178
+      },
+      "sourceBounds": {
+        "x": 1,
+        "y": 1,
+        "width": 164,
+        "height": 176
+      },
+      "sourceComponentPixels": 18130,
+      "bounds": {
+        "x": 23,
+        "y": 28,
+        "width": 111,
+        "height": 128
+      },
+      "foot": {
+        "x": 72,
+        "y": 156
+      }
+    },
+    {
+      "index": 23,
+      "sourceCut": {
+        "left": 1094,
+        "top": 637,
+        "width": 177,
+        "height": 183
+      },
+      "sourceBounds": {
+        "x": 1,
+        "y": 1,
+        "width": 175,
+        "height": 181
+      },
+      "sourceComponentPixels": 18280,
+      "bounds": {
+        "x": 9,
+        "y": 25,
+        "width": 118,
+        "height": 131
+      },
+      "foot": {
+        "x": 72,
+        "y": 156
+      }
+    },
+    {
+      "index": 24,
+      "sourceCut": {
+        "left": 40,
+        "top": 829,
+        "width": 161,
+        "height": 176
+      },
+      "sourceBounds": {
+        "x": 1,
+        "y": 1,
+        "width": 159,
+        "height": 174
+      },
+      "sourceComponentPixels": 18204,
+      "bounds": {
+        "x": 19,
+        "y": 30,
+        "width": 107,
+        "height": 126
+      },
+      "foot": {
+        "x": 72,
+        "y": 156
+      }
+    },
+    {
+      "index": 25,
+      "sourceCut": {
+        "left": 226,
+        "top": 829,
+        "width": 185,
+        "height": 175
+      },
+      "sourceBounds": {
+        "x": 1,
+        "y": 1,
+        "width": 183,
+        "height": 173
+      },
+      "sourceComponentPixels": 17591,
+      "bounds": {
+        "x": 2,
+        "y": 30,
+        "width": 111,
+        "height": 126
+      },
+      "foot": {
+        "x": 72,
+        "y": 156
+      }
+    },
+    {
+      "index": 26,
+      "blank": true
+    },
+    {
+      "index": 27,
+      "blank": true
+    },
+    {
+      "index": 28,
+      "blank": true
+    },
+    {
+      "index": 29,
+      "blank": true
+    },
+    {
+      "index": 30,
+      "sourceCut": {
+        "left": 32,
+        "top": 1011,
+        "width": 176,
+        "height": 180
+      },
+      "sourceBounds": {
+        "x": 1,
+        "y": 1,
+        "width": 174,
+        "height": 178
+      },
+      "sourceComponentPixels": 17864,
+      "bounds": {
+        "x": 16,
+        "y": 27,
+        "width": 117,
+        "height": 129
+      },
+      "foot": {
+        "x": 72,
+        "y": 156
+      }
+    },
+    {
+      "index": 31,
+      "sourceCut": {
+        "left": 237,
+        "top": 1021,
+        "width": 188,
+        "height": 174
+      },
+      "sourceBounds": {
+        "x": 1,
+        "y": 1,
+        "width": 186,
+        "height": 172
+      },
+      "sourceComponentPixels": 18374,
+      "bounds": {
+        "x": 14,
+        "y": 31,
+        "width": 126,
+        "height": 125
+      },
+      "foot": {
+        "x": 72,
+        "y": 156
+      }
+    },
+    {
+      "index": 32,
+      "sourceCut": {
+        "left": 440,
+        "top": 1018,
+        "width": 185,
+        "height": 165
+      },
+      "sourceBounds": {
+        "x": 1,
+        "y": 1,
+        "width": 183,
+        "height": 163
+      },
+      "sourceComponentPixels": 17980,
+      "bounds": {
+        "x": 13,
+        "y": 38,
+        "width": 124,
+        "height": 118
+      },
+      "foot": {
+        "x": 72,
+        "y": 156
+      }
+    },
+    {
+      "index": 33,
+      "sourceCut": {
+        "left": 648,
+        "top": 1041,
+        "width": 208,
+        "height": 136
+      },
+      "sourceBounds": {
+        "x": 1,
+        "y": 1,
+        "width": 206,
+        "height": 134
+      },
+      "sourceComponentPixels": 18473,
+      "bounds": {
+        "x": 10,
+        "y": 59,
+        "width": 132,
+        "height": 97
+      },
+      "foot": {
+        "x": 72,
+        "y": 156
+      }
+    },
+    {
+      "index": 34,
+      "sourceCut": {
+        "left": 872,
+        "top": 1061,
+        "width": 214,
+        "height": 119
+      },
+      "sourceBounds": {
+        "x": 1,
+        "y": 1,
+        "width": 212,
+        "height": 117
+      },
+      "sourceComponentPixels": 15123,
+      "bounds": {
+        "x": 14,
+        "y": 71,
+        "width": 128,
+        "height": 85
+      },
+      "foot": {
+        "x": 72,
+        "y": 156
+      }
+    },
+    {
+      "index": 35,
+      "sourceCut": {
+        "left": 1089,
+        "top": 1075,
+        "width": 192,
+        "height": 103
+      },
+      "sourceBounds": {
+        "x": 1,
+        "y": 1,
+        "width": 190,
+        "height": 101
+      },
+      "sourceComponentPixels": 12863,
+      "bounds": {
+        "x": 2,
+        "y": 83,
+        "width": 123,
+        "height": 73
+      },
+      "foot": {
+        "x": 72,
+        "y": 156
+      }
+    }
+  ]
+}

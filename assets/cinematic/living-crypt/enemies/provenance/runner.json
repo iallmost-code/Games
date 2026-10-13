@@ -1,0 +1,644 @@
+{
+  "kind": "runner",
+  "format": 1,
+  "source": "OpenAI image generation; original authored poses referenced to Ember Crypt cinematic monsters",
+  "columns": 6,
+  "rows": 6,
+  "cell": {
+    "width": 144,
+    "height": 160,
+    "anchorX": 72,
+    "anchorY": 156
+  },
+  "activeFrames": 32,
+  "blankIndices": [
+    26,
+    27,
+    28,
+    29
+  ],
+  "rowLabels": [
+    "walk-down",
+    "walk-side",
+    "walk-up",
+    "attack",
+    "hit",
+    "death"
+  ],
+  "standingScale": {
+    "x": 0.6915887850467289,
+    "y": 0.6915887850467289
+  },
+  "webpBytes": 225436,
+  "pngBytes": 247692,
+  "frames": [
+    {
+      "index": 0,
+      "row": 0,
+      "col": 0,
+      "source": "exec-bef2fe6b-c75d-4736-911f-50a83fd21f43.png",
+      "cut": [
+        32,
+        22,
+        199,
+        222
+      ],
+      "alphaBounds": [
+        15,
+        18,
+        130,
+        156
+      ],
+      "fit": 1
+    },
+    {
+      "index": 1,
+      "row": 0,
+      "col": 1,
+      "source": "exec-bef2fe6b-c75d-4736-911f-50a83fd21f43.png",
+      "cut": [
+        249,
+        23,
+        418,
+        220
+      ],
+      "alphaBounds": [
+        14,
+        20,
+        131,
+        156
+      ],
+      "fit": 1
+    },
+    {
+      "index": 2,
+      "row": 0,
+      "col": 2,
+      "source": "exec-bef2fe6b-c75d-4736-911f-50a83fd21f43.png",
+      "cut": [
+        467,
+        21,
+        605,
+        218
+      ],
+      "alphaBounds": [
+        25,
+        20,
+        120,
+        156
+      ],
+      "fit": 1
+    },
+    {
+      "index": 3,
+      "row": 0,
+      "col": 3,
+      "source": "exec-bef2fe6b-c75d-4736-911f-50a83fd21f43.png",
+      "cut": [
+        659,
+        23,
+        807,
+        213
+      ],
+      "alphaBounds": [
+        21,
+        25,
+        123,
+        156
+      ],
+      "fit": 1
+    },
+    {
+      "index": 4,
+      "row": 0,
+      "col": 4,
+      "source": "exec-bef2fe6b-c75d-4736-911f-50a83fd21f43.png",
+      "cut": [
+        871,
+        24,
+        1042,
+        221
+      ],
+      "alphaBounds": [
+        13,
+        20,
+        131,
+        156
+      ],
+      "fit": 1
+    },
+    {
+      "index": 5,
+      "row": 0,
+      "col": 5,
+      "source": "exec-bef2fe6b-c75d-4736-911f-50a83fd21f43.png",
+      "cut": [
+        1087,
+        22,
+        1231,
+        217
+      ],
+      "alphaBounds": [
+        22,
+        21,
+        122,
+        156
+      ],
+      "fit": 1
+    },
+    {
+      "index": 6,
+      "row": 1,
+      "col": 0,
+      "source": "exec-bef2fe6b-c75d-4736-911f-50a83fd21f43.png",
+      "cut": [
+        33,
+        234,
+        227,
+        419
+      ],
+      "alphaBounds": [
+        5,
+        28,
+        139,
+        156
+      ],
+      "fit": 1
+    },
+    {
+      "index": 7,
+      "row": 1,
+      "col": 1,
+      "source": "exec-bef2fe6b-c75d-4736-911f-50a83fd21f43.png",
+      "cut": [
+        235,
+        232,
+        428,
+        421
+      ],
+      "alphaBounds": [
+        6,
+        25,
+        139,
+        156
+      ],
+      "fit": 1
+    },
+    {
+      "index": 8,
+      "row": 1,
+      "col": 2,
+      "source": "exec-bef2fe6b-c75d-4736-911f-50a83fd21f43.png",
+      "cut": [
+        442,
+        233,
+        623,
+        421
+      ],
+      "alphaBounds": [
+        10,
+        26,
+        135,
+        156
+      ],
+      "fit": 1
+    },
+    {
+      "index": 9,
+      "row": 1,
+      "col": 3,
+      "source": "exec-bef2fe6b-c75d-4736-911f-50a83fd21f43.png",
+      "cut": [
+        637,
+        234,
+        836,
+        418
+      ],
+      "alphaBounds": [
+        3,
+        29,
+        141,
+        156
+      ],
+      "fit": 1
+    },
+    {
+      "index": 10,
+      "row": 1,
+      "col": 4,
+      "source": "exec-bef2fe6b-c75d-4736-911f-50a83fd21f43.png",
+      "cut": [
+        864,
+        237,
+        1037,
+        420
+      ],
+      "alphaBounds": [
+        12,
+        29,
+        132,
+        156
+      ],
+      "fit": 1
+    },
+    {
+      "index": 11,
+      "row": 1,
+      "col": 5,
+      "source": "exec-bef2fe6b-c75d-4736-911f-50a83fd21f43.png",
+      "cut": [
+        1058,
+        235,
+        1242,
+        423
+      ],
+      "alphaBounds": [
+        9,
+        26,
+        136,
+        156
+      ],
+      "fit": 1
+    },
+    {
+      "index": 12,
+      "row": 2,
+      "col": 0,
+      "source": "exec-bef2fe6b-c75d-4736-911f-50a83fd21f43.png",
+      "cut": [
+        40,
+        442,
+        198,
+        649
+      ],
+      "alphaBounds": [
+        18,
+        13,
+        127,
+        156
+      ],
+      "fit": 1
+    },
+    {
+      "index": 13,
+      "row": 2,
+      "col": 1,
+      "source": "exec-bef2fe6b-c75d-4736-911f-50a83fd21f43.png",
+      "cut": [
+        244,
+        436,
+        401,
+        642
+      ],
+      "alphaBounds": [
+        18,
+        14,
+        127,
+        156
+      ],
+      "fit": 1
+    },
+    {
+      "index": 14,
+      "row": 2,
+      "col": 2,
+      "source": "exec-bef2fe6b-c75d-4736-911f-50a83fd21f43.png",
+      "cut": [
+        452,
+        434,
+        597,
+        639
+      ],
+      "alphaBounds": [
+        22,
+        14,
+        122,
+        156
+      ],
+      "fit": 1
+    },
+    {
+      "index": 15,
+      "row": 2,
+      "col": 3,
+      "source": "exec-bef2fe6b-c75d-4736-911f-50a83fd21f43.png",
+      "cut": [
+        656,
+        436,
+        803,
+        650
+      ],
+      "alphaBounds": [
+        21,
+        8,
+        123,
+        156
+      ],
+      "fit": 1
+    },
+    {
+      "index": 16,
+      "row": 2,
+      "col": 4,
+      "source": "exec-bef2fe6b-c75d-4736-911f-50a83fd21f43.png",
+      "cut": [
+        859,
+        438,
+        1030,
+        644
+      ],
+      "alphaBounds": [
+        13,
+        14,
+        131,
+        156
+      ],
+      "fit": 1
+    },
+    {
+      "index": 17,
+      "row": 2,
+      "col": 5,
+      "source": "exec-bef2fe6b-c75d-4736-911f-50a83fd21f43.png",
+      "cut": [
+        1070,
+        441,
+        1224,
+        646
+      ],
+      "alphaBounds": [
+        19,
+        14,
+        126,
+        156
+      ],
+      "fit": 1
+    },
+    {
+      "index": 18,
+      "row": 3,
+      "col": 0,
+      "source": "exec-9490e748-a432-4f0a-b933-f8ae9bce947e.png",
+      "cut": [
+        8,
+        198,
+        399,
+        660
+      ],
+      "alphaBounds": [
+        14,
+        18,
+        131,
+        156
+      ],
+      "fit": 1
+    },
+    {
+      "index": 19,
+      "row": 3,
+      "col": 1,
+      "source": "exec-9490e748-a432-4f0a-b933-f8ae9bce947e.png",
+      "cut": [
+        393,
+        137,
+        694,
+        660
+      ],
+      "alphaBounds": [
+        29,
+        4,
+        116,
+        156
+      ],
+      "fit": 0.96815
+    },
+    {
+      "index": 20,
+      "row": 3,
+      "col": 2,
+      "source": "exec-9490e748-a432-4f0a-b933-f8ae9bce947e.png",
+      "cut": [
+        693,
+        49,
+        1024,
+        660
+      ],
+      "alphaBounds": [
+        31,
+        4,
+        113,
+        156
+      ],
+      "fit": 0.8306
+    },
+    {
+      "index": 21,
+      "row": 3,
+      "col": 3,
+      "source": "exec-9490e748-a432-4f0a-b933-f8ae9bce947e.png",
+      "cut": [
+        1067,
+        191,
+        1451,
+        659
+      ],
+      "alphaBounds": [
+        15,
+        16,
+        130,
+        156
+      ],
+      "fit": 1
+    },
+    {
+      "index": 22,
+      "row": 3,
+      "col": 4,
+      "source": "exec-9490e748-a432-4f0a-b933-f8ae9bce947e.png",
+      "cut": [
+        1365,
+        187,
+        1836,
+        656
+      ],
+      "alphaBounds": [
+        2,
+        17,
+        142,
+        156
+      ],
+      "fit": 0.99291
+    },
+    {
+      "index": 23,
+      "row": 3,
+      "col": 5,
+      "source": "exec-9490e748-a432-4f0a-b933-f8ae9bce947e.png",
+      "cut": [
+        1826,
+        208,
+        2170,
+        659
+      ],
+      "alphaBounds": [
+        21,
+        21,
+        124,
+        156
+      ],
+      "fit": 1
+    },
+    {
+      "index": 24,
+      "row": 4,
+      "col": 0,
+      "source": "exec-bef2fe6b-c75d-4736-911f-50a83fd21f43.png",
+      "cut": [
+        26,
+        883,
+        219,
+        1053
+      ],
+      "alphaBounds": [
+        6,
+        38,
+        139,
+        156
+      ],
+      "fit": 1
+    },
+    {
+      "index": 25,
+      "row": 4,
+      "col": 1,
+      "source": "exec-bef2fe6b-c75d-4736-911f-50a83fd21f43.png",
+      "cut": [
+        244,
+        879,
+        414,
+        1053
+      ],
+      "alphaBounds": [
+        13,
+        36,
+        131,
+        156
+      ],
+      "fit": 1
+    },
+    {
+      "index": 30,
+      "row": 5,
+      "col": 0,
+      "source": "exec-bef2fe6b-c75d-4736-911f-50a83fd21f43.png",
+      "cut": [
+        43,
+        1066,
+        203,
+        1232
+      ],
+      "alphaBounds": [
+        17,
+        41,
+        128,
+        156
+      ],
+      "fit": 1
+    },
+    {
+      "index": 31,
+      "row": 5,
+      "col": 1,
+      "source": "exec-bef2fe6b-c75d-4736-911f-50a83fd21f43.png",
+      "cut": [
+        241,
+        1074,
+        419,
+        1235
+      ],
+      "alphaBounds": [
+        11,
+        45,
+        134,
+        156
+      ],
+      "fit": 1
+    },
+    {
+      "index": 32,
+      "row": 5,
+      "col": 2,
+      "source": "exec-bef2fe6b-c75d-4736-911f-50a83fd21f43.png",
+      "cut": [
+        428,
+        1094,
+        617,
+        1231
+      ],
+      "alphaBounds": [
+        7,
+        61,
+        138,
+        156
+      ],
+      "fit": 1
+    },
+    {
+      "index": 33,
+      "row": 5,
+      "col": 3,
+      "source": "exec-bef2fe6b-c75d-4736-911f-50a83fd21f43.png",
+      "cut": [
+        632,
+        1121,
+        829,
+        1229
+      ],
+      "alphaBounds": [
+        4,
+        81,
+        140,
+        156
+      ],
+      "fit": 1
+    },
+    {
+      "index": 34,
+      "row": 5,
+      "col": 4,
+      "source": "exec-bef2fe6b-c75d-4736-911f-50a83fd21f43.png",
+      "cut": [
+        840,
+        1134,
+        1030,
+        1225
+      ],
+      "alphaBounds": [
+        7,
+        93,
+        138,
+        156
+      ],
+      "fit": 1
+    },
+    {
+      "index": 35,
+      "row": 5,
+      "col": 5,
+      "source": "exec-bef2fe6b-c75d-4736-911f-50a83fd21f43.png",
+      "cut": [
+        1025,
+        1151,
+        1246,
+        1221
+      ],
+      "alphaBounds": [
+        2,
+        112,
+        142,
+        156
+      ],
+      "fit": 0.91503
+    }
+  ]
+}
