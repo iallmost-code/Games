@@ -2,11 +2,18 @@
 (() => {
   "use strict";
   const sheets = new Map(),
+    extensions = new Map(),
+    extensionPending = new Set(),
+    extensionFailed = new Set(),
+    turns = new WeakMap(),
     pending = new Set(),
     lastDraw = new Map(),
     deathStarted = new Map(),
     variants = new Map(),
     legacyColors = new WeakMap();
+  // Hero-select portraits keep using the legacy sheets. Retain extensions for
+  // only the two most recently used heroes, rather than all seven atlas sets.
+  const extensionLimit = 2;
   // Six columns / five rows; authored transparent gutters are not perfectly uniform.
   const authoredCuts = {
     rogue: {
@@ -33,6 +40,7 @@
     },
   };
   function cell(kind, index, width, height) {
+    if (index >= 30) return extensionCell(index - 30);
     const cuts = authoredCuts[kind],
       row = Math.floor(index / 6),
       col = index % 6;
@@ -190,7 +198,76 @@
     };
     image.src = "assets/cinematic/" + kind + "-animation.webp";
   }
-  function ensure() {
+  function extensionCell(index) {
+    return { sx: (index % 6) * 224, sy: Math.floor(index / 6) * 192, sw: 224, sh: 192 };
+  }
+  function touchExtension(kind) {
+    const frames = extensions.get(kind);
+    if (frames) {
+      extensions.delete(kind);
+      extensions.set(kind, frames);
+    }
+    return frames;
+  }
+  function evictExtension() {
+    const oldest = extensions.keys().next().value;
+    extensions.delete(oldest);
+    for (const key of variants.keys()) {
+      if (key.startsWith(oldest + ":")) variants.delete(key);
+    }
+    // Eviction is an ordinary cache miss; it must remain reloadable. Neither
+    // failures nor gameplay objects are written here.
+  }
+  function decodeExtension(kind, image) {
+    // Authored extensions already share the legacy frame's foot anchor. No
+    // per-frame trimming, re-scaling or physics coordinates are involved.
+    if (image.naturalWidth !== 1344 || image.naturalHeight !== 1344)
+      throw Error("Invalid hero extension dimensions");
+    const frames = Array(42).fill(null);
+    for (let row = 0; row < 7; row++) {
+      for (let col = 0; col < (row < 2 ? 6 : 4); col++) {
+        const index = row * 6 + col, r = extensionCell(index),
+          tile = document.createElement("canvas");
+        tile.width = 224;
+        tile.height = 192;
+        tile.getContext("2d").drawImage(image, r.sx, r.sy, r.sw, r.sh, 0, 0, 224, 192);
+        frames[index] = tile;
+      }
+    }
+    while (extensions.size >= extensionLimit) evictExtension();
+    extensions.set(kind, frames);
+  }
+  function loadExtension(kind) {
+    if (!kind || touchExtension(kind) || extensionPending.has(kind) || extensionFailed.has(kind)) return;
+    extensionPending.add(kind);
+    const image = new Image();
+    let fallback = false;
+    const fail = () => {
+      if (!fallback) {
+        fallback = true;
+        image.src = "assets/cinematic/living-crypt/heroes/" + kind + ".png";
+      } else {
+        extensionPending.delete(kind);
+        extensionFailed.add(kind);
+      }
+    };
+    image.onload = () => {
+      try {
+        decodeExtension(kind, image);
+        extensionPending.delete(kind);
+      } catch { fail(); }
+    };
+    image.onerror = fail;
+    image.src = "assets/cinematic/living-crypt/heroes/" + kind + ".webp";
+  }
+  // No argument preserves eager legacy readiness for portraits/tests. A hero
+  // argument additionally requests only that hero's optional, evictable atlas.
+  function ensure(kind) {
+    if (kind) {
+      load(kind);
+      loadExtension(kind);
+      return;
+    }
     for (const kind of [
       "gravecaller",
       "bloodknight",
@@ -201,6 +278,28 @@
       "frostwarden",
     ])
       load(kind);
+  }
+
+  function directions(dir = { x: 0, y: 1 }, isometric = true) {
+    const x = Number.isFinite(dir.x) ? dir.x : 0,
+      y = Number.isFinite(dir.y) ? dir.y : 1;
+    if (!isometric) {
+      const side = Math.abs(x) > Math.abs(y) * 0.72;
+      return { name: side ? "side" : y < -0.15 ? "up" : "down",
+        row: side ? 1 : y < -0.15 ? 2 : 0, flip: side && x < 0 };
+    }
+    const octant = Math.hypot(x, y) < 0.0001 ? 2 :
+      (Math.round(Math.atan2(y, x) / (Math.PI / 4)) + 8) % 8;
+    if (octant === 1 || octant === 3)
+      return { name: "down-diagonal", row: 5, flip: octant === 3 };
+    if (octant === 5 || octant === 7)
+      return { name: "up-diagonal", row: 6, flip: octant === 5 };
+    return { name: octant === 2 ? "down" : octant === 6 ? "up" : "side",
+      row: octant === 2 ? 0 : octant === 6 ? 2 : 1, flip: octant === 4 };
+  }
+  function reducedFrames(quality) {
+    return quality === "low" || quality === "Low" ||
+      (quality && (quality.maxAtmosphere ?? 32) < 16);
   }
 
   function choose(o) {
@@ -235,6 +334,23 @@
         ((((o.phase || 0) % (Math.PI * 2)) + Math.PI * 2) % (Math.PI * 2)) /
           ((Math.PI * 2) / 6),
       );
+    // Unmodified callers retain the original 30-pose selection contract.
+    // A failed/missing optional sheet also follows that exact fallback path.
+    if (o.isometric !== undefined && extensions.has(o.kind) &&
+        !o.dead && !(o.hit > 0) && !(o.cast > 0.025)) {
+      const facing = directions(dir, !!o.isometric);
+      flip = facing.flip;
+      if (!o.moving) {
+        const idleRow = facing.name === "down-diagonal" ? 5 :
+          facing.name === "up-diagonal" ? 6 : facing.row + 2;
+        const now = Number.isFinite(o.clock) ? o.clock : 0;
+        row = idleRow + 5;
+        col = Math.floor((((now % 1.8) + 1.8) % 1.8) / (1.8 / 4));
+      } else if (facing.name.endsWith("diagonal")) {
+        row = facing.name === "down-diagonal" ? 5 : 6;
+      } else row = facing.row;
+      if (o.moving && reducedFrames(o.quality)) col -= col % 2;
+    }
     return { index: row * 6 + col, row, col, flip };
   }
   function tint(image, variant) {
@@ -271,35 +387,72 @@
     }
   }
   function frame(kind, index = 0, variant = 0) {
-    const frames = sheets.get(kind);
-    if (!frames) return null;
-    if (!variant) return frames[index];
+    const original = index < 30 ? sheets.get(kind)?.[index] : touchExtension(kind)?.[index - 30];
+    if (!original) return null;
+    if (!variant) return original;
     const key = kind + ":" + variant;
     if (!variants.has(key)) {
-      const palette = variant === 1 ? [168, 197, 220] : [220, 166, 99];
-      const colored = frames.map((original) => {
-        const c = document.createElement("canvas");
-        c.width = original.width;
-        c.height = original.height;
-        const g = c.getContext("2d");
-        g.drawImage(original, 0, 0);
-        const image = g.getImageData(0, 0, c.width, c.height),
-          p = image.data;
-        for (let i = 0; i < p.length; i += 4) {
-          if (!p[i + 3]) continue;
-          const grey = p[i] * 0.2126 + p[i + 1] * 0.7152 + p[i + 2] * 0.0722;
-          for (let n = 0; n < 3; n++)
-            p[i + n] = p[i + n] * 0.4 + ((grey * palette[n]) / 190) * 0.6;
-        }
-        g.putImageData(image, 0, 0);
-        return c;
-      });
       if (variants.size >= 2) variants.delete(variants.keys().next().value);
-      variants.set(key, colored);
+      variants.set(key, new Map());
     }
-    return variants.get(key)[index];
+    const colored = variants.get(key);
+    if (!colored.has(index)) {
+      const palette = variant === 1 ? [168, 197, 220] : [220, 166, 99],
+        c = document.createElement("canvas");
+      c.width = original.width;
+      c.height = original.height;
+      const g = c.getContext("2d");
+      g.drawImage(original, 0, 0);
+      const image = g.getImageData(0, 0, c.width, c.height), p = image.data;
+      for (let i = 0; i < p.length; i += 4) {
+        if (!p[i + 3]) continue;
+        const grey = p[i] * 0.2126 + p[i + 1] * 0.7152 + p[i + 2] * 0.0722;
+        for (let n = 0; n < 3; n++)
+          p[i + n] = p[i + n] * 0.4 + ((grey * palette[n]) / 190) * 0.6;
+      }
+      g.putImageData(image, 0, 0);
+      colored.set(index, c);
+    }
+    return colored.get(index);
+  }
+  function turnPose(o, selected) {
+    const actor = o.actor;
+    if (!actor || (typeof actor !== "object" && typeof actor !== "function") ||
+        o.isometric === undefined || !extensions.has(o.kind)) return null;
+    const now = Number.isFinite(o.clock) ? o.clock : performance.now() / 1000,
+      facing = directions(o.direction, !!o.isometric),
+      key = o.kind + ":" + facing.name + ":" + facing.flip;
+    let state = turns.get(actor);
+    if (!state || now < state.lastClock) {
+      state = { key, selected, since: now, lastClock: now, from: null };
+      turns.set(actor, state);
+    } else if (key !== state.key) {
+      state.from = state.selected;
+      state.since = now;
+      state.key = key;
+    }
+    state.selected = selected;
+    state.lastClock = now;
+    if (o.dead || o.hit > 0 || o.cast > 0.025) state.from = null;
+    const progress = Math.min(1, Math.max(0, (now - state.since) / 0.1));
+    if (!state.from || progress >= 1) {
+      state.from = null;
+      return null;
+    }
+    return { from: state.from, alpha: progress * progress * (3 - 2 * progress) };
+  }
+  function drawPose(ctx, o, selected, alpha, size) {
+    const image = frame(o.kind, selected.index, o.variant || 0);
+    if (!image) return;
+    ctx.save();
+    ctx.globalAlpha *= alpha;
+    if (selected.flip) ctx.scale(-1, 1);
+    window.EmberPresence?.heroEdge(ctx, image, -112 * size, -188 * size, 224 * size, 192 * size);
+    ctx.drawImage(image, -112 * size, -188 * size, 224 * size, 192 * size);
+    ctx.restore();
   }
   function draw(ctx, o) {
+    if (o.isometric !== undefined) loadExtension(o.kind);
     const frames = sheets.get(o.kind);
     if (!frames) return false;
     if (o.dead) {
@@ -314,19 +467,13 @@
       };
     } else deathStarted.delete(o.kind);
     const selected = choose(o);
+    const blend = turnPose(o, selected);
     ctx.save();
     const recoil = window.EmberCombatFeel?.pose(o);
     if(recoil){ctx.translate(recoil.x,recoil.y);ctx.rotate(recoil.rotation);ctx.scale(recoil.scaleX,recoil.scaleY);}
-    if (selected.flip) ctx.scale(-1, 1);
     const size = o.height / 192;
-    window.EmberPresence?.heroEdge(ctx,frame(o.kind,selected.index,o.variant||0),-112*size,-188*size,224*size,192*size);
-    ctx.drawImage(
-      frame(o.kind, selected.index, o.variant || 0),
-      -112 * size,
-      -188 * size,
-      224 * size,
-      192 * size,
-    );
+    if (blend) drawPose(ctx, o, blend.from, 1 - blend.alpha, size);
+    drawPose(ctx, o, selected, blend ? blend.alpha : 1, size);
     ctx.restore();
     lastDraw.set(o.kind, selected);
     return true;
@@ -337,11 +484,21 @@
     choose,
     frame,
     cell,
+    extensionCell,
+    directions,
     tint,
     ready: (kind) => sheets.has(kind),
+    extensionReady: (kind) => extensions.has(kind),
     diagnostics: () => ({
       loaded: [...sheets.keys()],
       frames: [...sheets.values()].reduce((n, f) => n + f.length, 0),
+      extensions: [...extensions.keys()],
+      extensionLimit,
+      extensionFrames: [...extensions.values()].reduce((n, f) => n + f.filter(Boolean).length, 0),
+      extensionPending: [...extensionPending],
+      extensionFailed: [...extensionFailed],
+      variantSets: variants.size,
+      variantFrames: [...variants.values()].reduce((n, f) => n + f.size, 0),
       lastDraw: Object.fromEntries(lastDraw),
     }),
   };

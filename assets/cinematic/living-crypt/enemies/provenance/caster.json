@@ -1,0 +1,644 @@
+{
+  "kind": "caster",
+  "format": 1,
+  "source": "OpenAI image generation; original authored poses referenced to Ember Crypt cinematic monsters",
+  "columns": 6,
+  "rows": 6,
+  "cell": {
+    "width": 144,
+    "height": 160,
+    "anchorX": 72,
+    "anchorY": 156
+  },
+  "activeFrames": 32,
+  "blankIndices": [
+    26,
+    27,
+    28,
+    29
+  ],
+  "rowLabels": [
+    "walk-down",
+    "walk-side",
+    "walk-up",
+    "attack",
+    "hit",
+    "death"
+  ],
+  "standingScale": {
+    "x": 0.6981132075471698,
+    "y": 0.6981132075471698
+  },
+  "webpBytes": 273110,
+  "pngBytes": 272089,
+  "frames": [
+    {
+      "index": 0,
+      "row": 0,
+      "col": 0,
+      "source": "exec-3c3c07e8-4679-4010-9568-aac8de502499.png",
+      "cut": [
+        40,
+        8,
+        185,
+        208
+      ],
+      "alphaBounds": [
+        22,
+        16,
+        123,
+        156
+      ],
+      "fit": 1
+    },
+    {
+      "index": 1,
+      "row": 0,
+      "col": 1,
+      "source": "exec-3c3c07e8-4679-4010-9568-aac8de502499.png",
+      "cut": [
+        239,
+        9,
+        397,
+        207
+      ],
+      "alphaBounds": [
+        17,
+        18,
+        127,
+        156
+      ],
+      "fit": 1
+    },
+    {
+      "index": 2,
+      "row": 0,
+      "col": 2,
+      "source": "exec-3c3c07e8-4679-4010-9568-aac8de502499.png",
+      "cut": [
+        450,
+        10,
+        606,
+        207
+      ],
+      "alphaBounds": [
+        18,
+        18,
+        127,
+        156
+      ],
+      "fit": 1
+    },
+    {
+      "index": 3,
+      "row": 0,
+      "col": 3,
+      "source": "exec-3c3c07e8-4679-4010-9568-aac8de502499.png",
+      "cut": [
+        658,
+        18,
+        819,
+        207
+      ],
+      "alphaBounds": [
+        16,
+        24,
+        128,
+        156
+      ],
+      "fit": 1
+    },
+    {
+      "index": 4,
+      "row": 0,
+      "col": 4,
+      "source": "exec-3c3c07e8-4679-4010-9568-aac8de502499.png",
+      "cut": [
+        864,
+        14,
+        1029,
+        207
+      ],
+      "alphaBounds": [
+        15,
+        21,
+        130,
+        156
+      ],
+      "fit": 1
+    },
+    {
+      "index": 5,
+      "row": 0,
+      "col": 5,
+      "source": "exec-3c3c07e8-4679-4010-9568-aac8de502499.png",
+      "cut": [
+        1073,
+        10,
+        1232,
+        207
+      ],
+      "alphaBounds": [
+        17,
+        18,
+        128,
+        156
+      ],
+      "fit": 1
+    },
+    {
+      "index": 6,
+      "row": 1,
+      "col": 0,
+      "source": "exec-3c3c07e8-4679-4010-9568-aac8de502499.png",
+      "cut": [
+        29,
+        217,
+        192,
+        405
+      ],
+      "alphaBounds": [
+        15,
+        25,
+        129,
+        156
+      ],
+      "fit": 1
+    },
+    {
+      "index": 7,
+      "row": 1,
+      "col": 1,
+      "source": "exec-3c3c07e8-4679-4010-9568-aac8de502499.png",
+      "cut": [
+        241,
+        213,
+        390,
+        405
+      ],
+      "alphaBounds": [
+        20,
+        22,
+        124,
+        156
+      ],
+      "fit": 1
+    },
+    {
+      "index": 8,
+      "row": 1,
+      "col": 2,
+      "source": "exec-3c3c07e8-4679-4010-9568-aac8de502499.png",
+      "cut": [
+        442,
+        217,
+        606,
+        406
+      ],
+      "alphaBounds": [
+        15,
+        24,
+        129,
+        156
+      ],
+      "fit": 1
+    },
+    {
+      "index": 9,
+      "row": 1,
+      "col": 3,
+      "source": "exec-3c3c07e8-4679-4010-9568-aac8de502499.png",
+      "cut": [
+        655,
+        212,
+        818,
+        406
+      ],
+      "alphaBounds": [
+        15,
+        21,
+        129,
+        156
+      ],
+      "fit": 1
+    },
+    {
+      "index": 10,
+      "row": 1,
+      "col": 4,
+      "source": "exec-3c3c07e8-4679-4010-9568-aac8de502499.png",
+      "cut": [
+        859,
+        209,
+        1022,
+        406
+      ],
+      "alphaBounds": [
+        15,
+        18,
+        129,
+        156
+      ],
+      "fit": 1
+    },
+    {
+      "index": 11,
+      "row": 1,
+      "col": 5,
+      "source": "exec-3c3c07e8-4679-4010-9568-aac8de502499.png",
+      "cut": [
+        1072,
+        218,
+        1231,
+        406
+      ],
+      "alphaBounds": [
+        17,
+        25,
+        128,
+        156
+      ],
+      "fit": 1
+    },
+    {
+      "index": 12,
+      "row": 2,
+      "col": 0,
+      "source": "exec-3c3c07e8-4679-4010-9568-aac8de502499.png",
+      "cut": [
+        31,
+        417,
+        182,
+        624
+      ],
+      "alphaBounds": [
+        20,
+        11,
+        125,
+        156
+      ],
+      "fit": 1
+    },
+    {
+      "index": 13,
+      "row": 2,
+      "col": 1,
+      "source": "exec-3c3c07e8-4679-4010-9568-aac8de502499.png",
+      "cut": [
+        236,
+        411,
+        400,
+        623
+      ],
+      "alphaBounds": [
+        15,
+        8,
+        129,
+        156
+      ],
+      "fit": 1
+    },
+    {
+      "index": 14,
+      "row": 2,
+      "col": 2,
+      "source": "exec-3c3c07e8-4679-4010-9568-aac8de502499.png",
+      "cut": [
+        440,
+        413,
+        591,
+        624
+      ],
+      "alphaBounds": [
+        20,
+        9,
+        125,
+        156
+      ],
+      "fit": 1
+    },
+    {
+      "index": 15,
+      "row": 2,
+      "col": 3,
+      "source": "exec-3c3c07e8-4679-4010-9568-aac8de502499.png",
+      "cut": [
+        655,
+        413,
+        815,
+        623
+      ],
+      "alphaBounds": [
+        16,
+        9,
+        128,
+        156
+      ],
+      "fit": 1
+    },
+    {
+      "index": 16,
+      "row": 2,
+      "col": 4,
+      "source": "exec-3c3c07e8-4679-4010-9568-aac8de502499.png",
+      "cut": [
+        867,
+        412,
+        1027,
+        624
+      ],
+      "alphaBounds": [
+        16,
+        8,
+        128,
+        156
+      ],
+      "fit": 1
+    },
+    {
+      "index": 17,
+      "row": 2,
+      "col": 5,
+      "source": "exec-3c3c07e8-4679-4010-9568-aac8de502499.png",
+      "cut": [
+        1083,
+        419,
+        1216,
+        624
+      ],
+      "alphaBounds": [
+        26,
+        13,
+        119,
+        156
+      ],
+      "fit": 1
+    },
+    {
+      "index": 18,
+      "row": 3,
+      "col": 0,
+      "source": "exec-3c3c07e8-4679-4010-9568-aac8de502499.png",
+      "cut": [
+        29,
+        636,
+        188,
+        834
+      ],
+      "alphaBounds": [
+        17,
+        18,
+        128,
+        156
+      ],
+      "fit": 1
+    },
+    {
+      "index": 19,
+      "row": 3,
+      "col": 1,
+      "source": "exec-3c3c07e8-4679-4010-9568-aac8de502499.png",
+      "cut": [
+        232,
+        639,
+        396,
+        831
+      ],
+      "alphaBounds": [
+        15,
+        22,
+        129,
+        156
+      ],
+      "fit": 1
+    },
+    {
+      "index": 20,
+      "row": 3,
+      "col": 2,
+      "source": "exec-3c3c07e8-4679-4010-9568-aac8de502499.png",
+      "cut": [
+        435,
+        630,
+        617,
+        838
+      ],
+      "alphaBounds": [
+        9,
+        11,
+        136,
+        156
+      ],
+      "fit": 1
+    },
+    {
+      "index": 21,
+      "row": 3,
+      "col": 3,
+      "source": "exec-3c3c07e8-4679-4010-9568-aac8de502499.png",
+      "cut": [
+        634,
+        612,
+        820,
+        838
+      ],
+      "alphaBounds": [
+        10,
+        4,
+        135,
+        156
+      ],
+      "fit": 0.96203
+    },
+    {
+      "index": 22,
+      "row": 3,
+      "col": 4,
+      "source": "exec-3c3c07e8-4679-4010-9568-aac8de502499.png",
+      "cut": [
+        845,
+        629,
+        1041,
+        840
+      ],
+      "alphaBounds": [
+        4,
+        9,
+        141,
+        156
+      ],
+      "fit": 1
+    },
+    {
+      "index": 23,
+      "row": 3,
+      "col": 5,
+      "source": "exec-3c3c07e8-4679-4010-9568-aac8de502499.png",
+      "cut": [
+        1069,
+        629,
+        1221,
+        836
+      ],
+      "alphaBounds": [
+        19,
+        11,
+        125,
+        156
+      ],
+      "fit": 1
+    },
+    {
+      "index": 24,
+      "row": 4,
+      "col": 0,
+      "source": "exec-3c3c07e8-4679-4010-9568-aac8de502499.png",
+      "cut": [
+        14,
+        850,
+        207,
+        1029
+      ],
+      "alphaBounds": [
+        5,
+        31,
+        140,
+        156
+      ],
+      "fit": 1
+    },
+    {
+      "index": 25,
+      "row": 4,
+      "col": 1,
+      "source": "exec-3c3c07e8-4679-4010-9568-aac8de502499.png",
+      "cut": [
+        235,
+        874,
+        411,
+        1028
+      ],
+      "alphaBounds": [
+        11,
+        48,
+        134,
+        156
+      ],
+      "fit": 1
+    },
+    {
+      "index": 30,
+      "row": 5,
+      "col": 0,
+      "source": "exec-3c3c07e8-4679-4010-9568-aac8de502499.png",
+      "cut": [
+        25,
+        1037,
+        202,
+        1228
+      ],
+      "alphaBounds": [
+        10,
+        23,
+        134,
+        156
+      ],
+      "fit": 1
+    },
+    {
+      "index": 31,
+      "row": 5,
+      "col": 1,
+      "source": "exec-3c3c07e8-4679-4010-9568-aac8de502499.png",
+      "cut": [
+        218,
+        1056,
+        418,
+        1236
+      ],
+      "alphaBounds": [
+        2,
+        30,
+        142,
+        156
+      ],
+      "fit": 1
+    },
+    {
+      "index": 32,
+      "row": 5,
+      "col": 2,
+      "source": "exec-3c3c07e8-4679-4010-9568-aac8de502499.png",
+      "cut": [
+        420,
+        1070,
+        639,
+        1226
+      ],
+      "alphaBounds": [
+        2,
+        56,
+        142,
+        156
+      ],
+      "fit": 0.91503
+    },
+    {
+      "index": 33,
+      "row": 5,
+      "col": 3,
+      "source": "exec-3c3c07e8-4679-4010-9568-aac8de502499.png",
+      "cut": [
+        631,
+        1129,
+        839,
+        1232
+      ],
+      "alphaBounds": [
+        2,
+        86,
+        142,
+        156
+      ],
+      "fit": 0.96552
+    },
+    {
+      "index": 34,
+      "row": 5,
+      "col": 4,
+      "source": "exec-3c3c07e8-4679-4010-9568-aac8de502499.png",
+      "cut": [
+        841,
+        1129,
+        1037,
+        1234
+      ],
+      "alphaBounds": [
+        4,
+        83,
+        141,
+        156
+      ],
+      "fit": 1
+    },
+    {
+      "index": 35,
+      "row": 5,
+      "col": 5,
+      "source": "exec-3c3c07e8-4679-4010-9568-aac8de502499.png",
+      "cut": [
+        1041,
+        1149,
+        1252,
+        1232
+      ],
+      "alphaBounds": [
+        2,
+        101,
+        142,
+        156
+      ],
+      "fit": 0.95238
+    }
+  ]
+}

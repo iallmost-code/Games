@@ -1,0 +1,530 @@
+{
+  "kind": "champion",
+  "originalArt": true,
+  "source": "image_gen original painted poses, referenced current Ember Crypt monster costume",
+  "sourceSha256": "d86511923a2f4b12ed854bdb960d5bead2d0d7a575edd44ced8d5be610c8216d",
+  "columns": 6,
+  "rows": 6,
+  "cell": {
+    "width": 144,
+    "height": 160,
+    "footX": 72,
+    "footY": 156
+  },
+  "poses": {
+    "down": [
+      0,
+      6
+    ],
+    "side": [
+      6,
+      6
+    ],
+    "up": [
+      12,
+      6
+    ],
+    "attack": [
+      18,
+      6
+    ],
+    "hit": [
+      24,
+      2
+    ],
+    "death": [
+      30,
+      6
+    ]
+  },
+  "transparentIndices": [
+    26,
+    27,
+    28,
+    29
+  ],
+  "webpBytes": 289058,
+  "pngBytes": 1088730,
+  "frames": [
+    {
+      "index": 0,
+      "sourceBounds": [
+        12,
+        27,
+        205,
+        198
+      ],
+      "bounds": [
+        4,
+        8,
+        135,
+        148
+      ]
+    },
+    {
+      "index": 1,
+      "sourceBounds": [
+        235,
+        17,
+        186,
+        210
+      ],
+      "bounds": [
+        14,
+        8,
+        115,
+        148
+      ]
+    },
+    {
+      "index": 2,
+      "sourceBounds": [
+        423,
+        17,
+        205,
+        206
+      ],
+      "bounds": [
+        7,
+        8,
+        129,
+        148
+      ]
+    },
+    {
+      "index": 3,
+      "sourceBounds": [
+        637,
+        24,
+        190,
+        203
+      ],
+      "bounds": [
+        11,
+        8,
+        122,
+        148
+      ]
+    },
+    {
+      "index": 4,
+      "sourceBounds": [
+        836,
+        24,
+        203,
+        203
+      ],
+      "bounds": [
+        7,
+        8,
+        130,
+        148
+      ]
+    },
+    {
+      "index": 5,
+      "sourceBounds": [
+        1054,
+        23,
+        192,
+        204
+      ],
+      "bounds": [
+        11,
+        8,
+        122,
+        148
+      ]
+    },
+    {
+      "index": 6,
+      "sourceBounds": [
+        15,
+        234,
+        206,
+        194
+      ],
+      "bounds": [
+        3,
+        8,
+        138,
+        148
+      ]
+    },
+    {
+      "index": 7,
+      "sourceBounds": [
+        239,
+        234,
+        196,
+        194
+      ],
+      "bounds": [
+        6,
+        8,
+        131,
+        148
+      ]
+    },
+    {
+      "index": 8,
+      "sourceBounds": [
+        452,
+        231,
+        188,
+        195
+      ],
+      "bounds": [
+        9,
+        8,
+        125,
+        148
+      ]
+    },
+    {
+      "index": 9,
+      "sourceBounds": [
+        653,
+        237,
+        190,
+        190
+      ],
+      "bounds": [
+        7,
+        8,
+        130,
+        148
+      ]
+    },
+    {
+      "index": 10,
+      "sourceBounds": [
+        851,
+        233,
+        204,
+        195
+      ],
+      "bounds": [
+        4,
+        8,
+        136,
+        148
+      ]
+    },
+    {
+      "index": 11,
+      "sourceBounds": [
+        1066,
+        238,
+        179,
+        192
+      ],
+      "bounds": [
+        11,
+        8,
+        121,
+        148
+      ]
+    },
+    {
+      "index": 12,
+      "sourceBounds": [
+        18,
+        436,
+        207,
+        204
+      ],
+      "bounds": [
+        6,
+        8,
+        132,
+        148
+      ]
+    },
+    {
+      "index": 13,
+      "sourceBounds": [
+        237,
+        434,
+        186,
+        203
+      ],
+      "bounds": [
+        12,
+        8,
+        119,
+        148
+      ]
+    },
+    {
+      "index": 14,
+      "sourceBounds": [
+        436,
+        435,
+        199,
+        197
+      ],
+      "bounds": [
+        6,
+        8,
+        131,
+        148
+      ]
+    },
+    {
+      "index": 15,
+      "sourceBounds": [
+        644,
+        437,
+        203,
+        205
+      ],
+      "bounds": [
+        7,
+        8,
+        129,
+        148
+      ]
+    },
+    {
+      "index": 16,
+      "sourceBounds": [
+        860,
+        436,
+        191,
+        201
+      ],
+      "bounds": [
+        10,
+        8,
+        123,
+        148
+      ]
+    },
+    {
+      "index": 17,
+      "sourceBounds": [
+        1072,
+        436,
+        171,
+        201
+      ],
+      "bounds": [
+        16,
+        8,
+        111,
+        148
+      ]
+    },
+    {
+      "index": 18,
+      "sourceBounds": [
+        6,
+        670,
+        204,
+        183
+      ],
+      "bounds": [
+        3,
+        32,
+        138,
+        124
+      ]
+    },
+    {
+      "index": 19,
+      "sourceBounds": [
+        218,
+        614,
+        192,
+        238
+      ],
+      "bounds": [
+        11,
+        6,
+        121,
+        150
+      ]
+    },
+    {
+      "index": 20,
+      "sourceBounds": [
+        436,
+        626,
+        175,
+        228
+      ],
+      "bounds": [
+        14,
+        6,
+        115,
+        150
+      ]
+    },
+    {
+      "index": 21,
+      "sourceBounds": [
+        640,
+        658,
+        210,
+        194
+      ],
+      "bounds": [
+        3,
+        29,
+        138,
+        127
+      ]
+    },
+    {
+      "index": 22,
+      "sourceBounds": [
+        843,
+        676,
+        215,
+        176
+      ],
+      "bounds": [
+        3,
+        43,
+        138,
+        113
+      ]
+    },
+    {
+      "index": 23,
+      "sourceBounds": [
+        1058,
+        672,
+        183,
+        183
+      ],
+      "bounds": [
+        4,
+        21,
+        135,
+        135
+      ]
+    },
+    {
+      "index": 24,
+      "sourceBounds": [
+        9,
+        861,
+        201,
+        201
+      ],
+      "bounds": [
+        3,
+        18,
+        138,
+        138
+      ]
+    },
+    {
+      "index": 25,
+      "sourceBounds": [
+        240,
+        878,
+        171,
+        185
+      ],
+      "bounds": [
+        9,
+        20,
+        126,
+        136
+      ]
+    },
+    {
+      "index": 30,
+      "sourceBounds": [
+        9,
+        1059,
+        194,
+        180
+      ],
+      "bounds": [
+        3,
+        28,
+        138,
+        128
+      ]
+    },
+    {
+      "index": 31,
+      "sourceBounds": [
+        213,
+        1076,
+        184,
+        161
+      ],
+      "bounds": [
+        4,
+        37,
+        135,
+        119
+      ]
+    },
+    {
+      "index": 32,
+      "sourceBounds": [
+        409,
+        1096,
+        209,
+        144
+      ],
+      "bounds": [
+        3,
+        61,
+        138,
+        95
+      ]
+    },
+    {
+      "index": 33,
+      "sourceBounds": [
+        619,
+        1127,
+        198,
+        111
+      ],
+      "bounds": [
+        3,
+        79,
+        138,
+        77
+      ]
+    },
+    {
+      "index": 34,
+      "sourceBounds": [
+        822,
+        1125,
+        241,
+        116
+      ],
+      "bounds": [
+        3,
+        90,
+        138,
+        66
+      ]
+    },
+    {
+      "index": 35,
+      "sourceBounds": [
+        1037,
+        1128,
+        213,
+        113
+      ],
+      "bounds": [
+        3,
+        83,
+        138,
+        73
+      ]
+    }
+  ]
+}

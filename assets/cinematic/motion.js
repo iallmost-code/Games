@@ -61,13 +61,20 @@
       const t = progress(e, now),
         c = e.kind === "forge" ? "#ffd18b" : colors[e.zone ?? s.zone ?? 0];
       if (e.kind === "enemyDeath" && e.img) {
-        const tone = tint(e.img, c);
+        const frame = window.EmberEnemyAnimation?.deathFrame(e.enemyAnimation, t, s.quality),
+          tone = tint(frame || e.img, c);
         s.sceneItem(e.x, e.y, () =>
           s.billboard(e.x, e.y, () => {
             ctx.save();
             ctx.globalAlpha = (1 - t) * 0.6;
             const h = e.height || 55,
               w = e.width || 36;
+            if (frame) {
+              if(e.enemyAnimation.flip)ctx.scale(-1,1);
+              ctx.drawImage(tone,-w/2,-h*156/160,w,h);
+              ctx.restore();
+              return;
+            }
             for (let row = 0; row < 6; row++) {
               if (t > (row + 1) / 7) continue;
               ctx.drawImage(

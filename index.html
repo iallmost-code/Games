@@ -757,6 +757,7 @@
     </main>
     <canvas id="dungeonMap" width="144" height="94" hidden aria-label="Dungeon minimap"></canvas><div id="firstRunTip" hidden role="status"></div>
     <script src="assets/cinematic/hero-animation.js"></script>
+    <script src="assets/cinematic/enemy-animation.js"></script>
     <script src="assets/cinematic/ash-environment.js"></script>
     <script src="assets/cinematic/zone-environment.js"></script>
     <script src="assets/cinematic/motion.js"></script>
@@ -770,7 +771,7 @@
     <script>
       (() => {
         "use strict";
-        const GAME_VERSION = "v79 · WORLD & PRESENCE";
+        const GAME_VERSION = "v80 · LIVING CRYPT";
 
         // Recent script errors for Pause → REPORT A BUG. Never saved.
         const recentErrors = [];
@@ -959,7 +960,7 @@
           let cache=dangerOutlines.get(img);
           if(!cache){cache=new Map();dangerOutlines.set(img,cache);}
           if(!cache.has(color)){
-            let tile=surface(img.naturalWidth+12,img.naturalHeight+12),g=tile.getContext("2d");
+            let tile=surface((img.naturalWidth||img.width)+12,(img.naturalHeight||img.height)+12),g=tile.getContext("2d");
             for(let [dx,dy] of [[-4,0],[4,0],[0,-4],[0,4],[-3,-3],[3,-3],[-3,3],[3,3]])
               g.drawImage(img,6+dx,6+dy);
             g.globalCompositeOperation="source-in";g.fillStyle=color;g.fillRect(0,0,tile.width,tile.height);
@@ -7174,7 +7175,7 @@
           }
           walkFrames.set(img, frames);
         }
-        function drawGrounded(img, x, foot, w, h, phase, walking, flip, casting, faceX=0, hit=0, attackBeat=0, rise=0, feedback=null) {
+        function drawGrounded(img, x, foot, w, h, phase, walking, flip, casting, faceX=0, hit=0, attackBeat=0, rise=0, feedback=null, anchor=null) {
           ctx.save();
           let moving=walking&&!casting,sway=moving?Math.sin(phase||0):0;
           ctx.translate(x,foot);cancelProjection();
@@ -7194,7 +7195,7 @@
               w,
               h,
             );
-          else ctx.drawImage(img, -w / 2, -h, w, h);
+          else ctx.drawImage(img, -w * (anchor?.x??.5), -h * (anchor?.y??1), w, h);
           ctx.restore();
         }
         function drawArtEnemy(e) {
@@ -7214,7 +7215,11 @@
                     ? r * 2.3
                     : r * 3.25;
           if(rpgPreview)height*=e.type==="boss"?1.2:1.18;
-          if(img.cinematic){width=Math.min(height*1.4,height*img.naturalWidth/img.naturalHeight);}
+          const animated=window.EmberEnemyAnimation?.sample(e,{clock,quality:visualQuality,projectVector});
+          if(animated){img=animated.image;width=height*144/160;}
+          else if(img.cinematic){width=Math.min(height*1.4,height*img.naturalWidth/img.naturalHeight);}
+          const enemyFlip=animated?animated.flip:projectVector(e.faceX||0,e.faceY??1).x<-.25,
+            enemyWalk=animated?false:e.walking||0,enemyAnchor=animated?.anchor;
           groundShadow(x,actorFoot(y,r*.88),r+3,6);
           if (e.type === "burrower" && e.burrow > 0) {
             ctx.strokeStyle = "#9be96a";
@@ -7237,8 +7242,10 @@
           let hit=Math.min(1,(e.hitFlash||0)*10), feedback=window.EmberCombatFeel?.reaction(e,clock,projectVector);
           if(dangerColor){
             ctx.save();ctx.globalAlpha=(e.windup&&e.windup.time>0)? .96 : .68+Math.sin(clock*5)*.12;
-            drawGrounded(dangerOutline(img,dangerColor),x,actorFoot(y,r),width+8,height+8,
-              e.stepPhase||0,e.walking||0,projectVector(e.faceX||0,e.faceY??1).x<-.25,false,e.faceX||0,hit,0,0,feedback);
+            const outline= dangerOutline(img,dangerColor),margin=animated?height/160*12:8;
+            const outlineAnchor=animated?{x:.5,y:162/172}:null;
+            drawGrounded(outline,x,actorFoot(y,r),width+margin,height+margin,
+              e.stepPhase||0,enemyWalk,enemyFlip,false,e.faceX||0,hit,0,0,feedback,outlineAnchor);
             ctx.restore();
           }
           drawGrounded(
@@ -7248,16 +7255,16 @@
             width,
             height,
             e.stepPhase || 0,
-            e.walking || 0,
-            projectVector(e.faceX||0,e.faceY??1).x<-.25,
+            enemyWalk,
+            enemyFlip,
             false,
             e.faceX||0,
-            hit,0,0,feedback,
+            hit,0,0,feedback,enemyAnchor,
           );
           ctx.restore();
-          if(e.hitFlash>0&&spriteMasks.has(img)){
+          if(e.hitFlash>0&&(animated||spriteMasks.has(img))){
             ctx.save();ctx.globalAlpha=Math.min(.55,e.hitFlash*5);
-            drawGrounded(window.EmberMotion?.tint(img,["#ffe0c0","#d7f4ff","#ddf7b9"][currentZone()])||spriteMasks.get(img),x,actorFoot(y,r),width,height,e.stepPhase||0,e.walking||0,projectVector(e.faceX||0,e.faceY??1).x<-.25,false,e.faceX||0,hit,0,0,feedback);
+            drawGrounded(window.EmberMotion?.tint(img,["#ffe0c0","#d7f4ff","#ddf7b9"][currentZone()])||spriteMasks.get(img)||img,x,actorFoot(y,r),width,height,e.stepPhase||0,enemyWalk,enemyFlip,false,e.faceX||0,hit,0,0,feedback,enemyAnchor);
             ctx.restore();
           }
           if (e.frostTime > 0 || e.poisonTime > 0 || e.burnTime > 0 || e.bleedUntil > clock) {
@@ -7312,7 +7319,7 @@
           const attackVisual={kind:hero.class,height:h,direction:projectVector(fx,fy),cast:poseCast,hit:heroHit,dead:hero.hp<=0};
           if(window.EmberHeroAnimation?.ready(hero.class)){
             ctx.save();ctx.translate(x,actorFoot(y,19));cancelProjection();
-            heroPresencePose={kind:hero.class,variant:profile.mastery?.[hero.class]?.color||0,height:h,direction:projectVector(fx,fy),phase:hero.stepPhase,moving:hero.moving,cast:poseCast,hit:heroHit,dead:hero.hp<=0};
+            heroPresencePose={kind:hero.class,variant:profile.mastery?.[hero.class]?.color||0,height:h,direction:projectVector(fx,fy),phase:hero.stepPhase,moving:hero.moving,cast:poseCast,hit:heroHit,dead:hero.hp<=0,isometric:rpgPreview,clock,actor:hero,quality:visualQuality};
             authored=window.EmberHeroAnimation.draw(ctx,heroPresencePose);ctx.restore();
 
           }
@@ -7875,8 +7882,9 @@
           if(kind==="enemyDeath"){
             const key=o.type==="boss"?o.variant:o.type==="champion"?"brute":o.type==="charger"?"runner":o.type;
             const img=spriteReady(key)?facingArt(key,o.faceX||0,o.faceY??1,false):null;
+            data.enemyAnimation=window.EmberEnemyAnimation?.captureDeath(o,{clock,projectVector});
             data.img=img;data.height=o.r*(o.type==="boss"?3.36:o.type==="burrower"?2.3:3.835);
-            data.width=img?Math.min(data.height*1.4,data.height*(img.naturalWidth||img.width)/(img.naturalHeight||img.height)):o.r*2.7;
+            data.width=data.enemyAnimation?data.height*144/160:img?Math.min(data.height*1.4,data.height*(img.naturalWidth||img.width)/(img.naturalHeight||img.height)):o.r*2.7;
             sfx("enemy-"+key);
             if(o.type==="boss")window.EmberMotion?.emit("bossDeath",data,visualQuality);
           }else if(["chest","well","forge","door","stairs"].includes(kind))sfx(kind==="door"?"unlock":kind);
@@ -7892,6 +7900,7 @@
           ctx.fillStyle = "#171b1f";
           ctx.fillRect(0, 0, w, h);
           if (!hero) return;
+          for(const e of enemies)window.EmberEnemyAnimation?.observe(e,{clock,projectVector});
           ctx.save();
           if(rpgPreview){ctx.translate(w/2+Math.sin(clock*89)*(shakeEnabled?shake:0),cameraFocusY()+Math.cos(clock*71)*(shakeEnabled?shake:0)+(shakeEnabled?(window.EmberMotion?.cameraPush()||0):0));ctx.scale(1,cameraTilt);ctx.rotate(cameraAngle);ctx.translate(-hero.x,-hero.y);}else ctx.translate(w/2-hero.x+(Math.random()-.5)*(shakeEnabled?shake:0),h/2-hero.y+(Math.random()-.5)*(shakeEnabled?shake:0));
           queueScene=rpgPreview;sceneQueue=[];

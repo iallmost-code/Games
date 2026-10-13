@@ -1,0 +1,630 @@
+{
+  "version": 1,
+  "authoring": "Original image_gen painted diagonal footfalls and idle breathing key poses; no still-image perspective transforms. Alpha-isolated drawings fitted uncropped into grounded cells.",
+  "grid": {
+    "cols": 6,
+    "rows": 7,
+    "cellWidth": 224,
+    "cellHeight": 192,
+    "anchor": [
+      112,
+      188
+    ]
+  },
+  "rows": [
+    "downRightWalk",
+    "upRightWalk",
+    "downIdle",
+    "rightIdle",
+    "upIdle",
+    "downRightIdle",
+    "upRightIdle"
+  ],
+  "activeFrames": 32,
+  "webpBytes": 393716,
+  "frames": [
+    {
+      "row": 0,
+      "col": 0,
+      "bounds": [
+        16,
+        18,
+        171,
+        170
+      ],
+      "source": "exec-de648a92-ce73-4b0a-bedf-544298155063.png",
+      "cut": [
+        53,
+        7,
+        170,
+        169
+      ],
+      "footX": 95.05
+    },
+    {
+      "row": 0,
+      "col": 1,
+      "bounds": [
+        16,
+        18,
+        151,
+        170
+      ],
+      "source": "exec-de648a92-ce73-4b0a-bedf-544298155063.png",
+      "cut": [
+        244,
+        10,
+        157,
+        177
+      ],
+      "footX": 99.67
+    },
+    {
+      "row": 0,
+      "col": 2,
+      "bounds": [
+        10,
+        18,
+        156,
+        170
+      ],
+      "source": "exec-de648a92-ce73-4b0a-bedf-544298155063.png",
+      "cut": [
+        441,
+        7,
+        164,
+        179
+      ],
+      "footX": 107.56
+    },
+    {
+      "row": 0,
+      "col": 3,
+      "bounds": [
+        7,
+        18,
+        161,
+        170
+      ],
+      "source": "exec-de648a92-ce73-4b0a-bedf-544298155063.png",
+      "cut": [
+        651,
+        8,
+        168,
+        177
+      ],
+      "footX": 109.82
+    },
+    {
+      "row": 0,
+      "col": 4,
+      "bounds": [
+        3,
+        23,
+        162,
+        165
+      ],
+      "source": "exec-de648a92-ce73-4b0a-bedf-544298155063.png",
+      "cut": [
+        857,
+        7,
+        172,
+        176
+      ],
+      "footX": 116
+    },
+    {
+      "row": 0,
+      "col": 5,
+      "bounds": [
+        12,
+        18,
+        169,
+        170
+      ],
+      "source": "exec-de648a92-ce73-4b0a-bedf-544298155063.png",
+      "cut": [
+        1070,
+        8,
+        169,
+        170
+      ],
+      "footX": 99.52
+    },
+    {
+      "row": 1,
+      "col": 0,
+      "bounds": [
+        66,
+        18,
+        101,
+        170
+      ],
+      "source": "exec-08da12c3-8498-4580-9606-1df631cc3964.png",
+      "cut": [
+        3,
+        23,
+        266,
+        446
+      ],
+      "footX": 120.11
+    },
+    {
+      "row": 1,
+      "col": 1,
+      "bounds": [
+        65,
+        18,
+        100,
+        170
+      ],
+      "source": "exec-08da12c3-8498-4580-9606-1df631cc3964.png",
+      "cut": [
+        273,
+        27,
+        260,
+        442
+      ],
+      "footX": 122.19
+    },
+    {
+      "row": 1,
+      "col": 2,
+      "bounds": [
+        71,
+        18,
+        93,
+        170
+      ],
+      "source": "exec-08da12c3-8498-4580-9606-1df631cc3964.png",
+      "cut": [
+        540,
+        19,
+        241,
+        442
+      ],
+      "footX": 106.68
+    },
+    {
+      "row": 1,
+      "col": 3,
+      "bounds": [
+        60,
+        18,
+        99,
+        170
+      ],
+      "source": "exec-08da12c3-8498-4580-9606-1df631cc3964.png",
+      "cut": [
+        781,
+        28,
+        258,
+        441
+      ],
+      "footX": 135.84
+    },
+    {
+      "row": 1,
+      "col": 4,
+      "bounds": [
+        62,
+        18,
+        100,
+        170
+      ],
+      "source": "exec-08da12c3-8498-4580-9606-1df631cc3964.png",
+      "cut": [
+        1036,
+        16,
+        261,
+        442
+      ],
+      "footX": 129.18
+    },
+    {
+      "row": 1,
+      "col": 5,
+      "bounds": [
+        60,
+        18,
+        100,
+        170
+      ],
+      "source": "exec-08da12c3-8498-4580-9606-1df631cc3964.png",
+      "cut": [
+        907,
+        516,
+        266,
+        452
+      ],
+      "footX": 138.03
+    },
+    {
+      "row": 2,
+      "col": 0,
+      "bounds": [
+        33,
+        18,
+        153,
+        170
+      ],
+      "source": "exec-e779f14c-19c5-4f9d-8526-15a97194e90f.png",
+      "cut": [
+        34,
+        31,
+        297,
+        329
+      ],
+      "footX": 152.64
+    },
+    {
+      "row": 2,
+      "col": 1,
+      "bounds": [
+        43,
+        18,
+        149,
+        170
+      ],
+      "source": "exec-e779f14c-19c5-4f9d-8526-15a97194e90f.png",
+      "cut": [
+        410,
+        31,
+        289,
+        329
+      ],
+      "footX": 134.23
+    },
+    {
+      "row": 2,
+      "col": 2,
+      "bounds": [
+        40,
+        18,
+        157,
+        170
+      ],
+      "source": "exec-e779f14c-19c5-4f9d-8526-15a97194e90f.png",
+      "cut": [
+        760,
+        33,
+        302,
+        327
+      ],
+      "footX": 137.97
+    },
+    {
+      "row": 2,
+      "col": 3,
+      "bounds": [
+        44,
+        18,
+        152,
+        170
+      ],
+      "source": "exec-e779f14c-19c5-4f9d-8526-15a97194e90f.png",
+      "cut": [
+        1124,
+        34,
+        292,
+        326
+      ],
+      "footX": 130.57
+    },
+    {
+      "row": 3,
+      "col": 0,
+      "bounds": [
+        32,
+        18,
+        136,
+        170
+      ],
+      "source": "exec-e779f14c-19c5-4f9d-8526-15a97194e90f.png",
+      "cut": [
+        44,
+        381,
+        256,
+        319
+      ],
+      "footX": 150.05
+    },
+    {
+      "row": 3,
+      "col": 1,
+      "bounds": [
+        24,
+        18,
+        145,
+        170
+      ],
+      "source": "exec-e779f14c-19c5-4f9d-8526-15a97194e90f.png",
+      "cut": [
+        383,
+        380,
+        273,
+        320
+      ],
+      "footX": 166.44
+    },
+    {
+      "row": 3,
+      "col": 2,
+      "bounds": [
+        27,
+        18,
+        143,
+        170
+      ],
+      "source": "exec-e779f14c-19c5-4f9d-8526-15a97194e90f.png",
+      "cut": [
+        741,
+        378,
+        271,
+        322
+      ],
+      "footX": 160.13
+    },
+    {
+      "row": 3,
+      "col": 3,
+      "bounds": [
+        27,
+        18,
+        143,
+        170
+      ],
+      "source": "exec-e779f14c-19c5-4f9d-8526-15a97194e90f.png",
+      "cut": [
+        1104,
+        378,
+        271,
+        322
+      ],
+      "footX": 160.8
+    },
+    {
+      "row": 4,
+      "col": 0,
+      "bounds": [
+        36,
+        18,
+        152,
+        170
+      ],
+      "source": "exec-e779f14c-19c5-4f9d-8526-15a97194e90f.png",
+      "cut": [
+        26,
+        716,
+        304,
+        339
+      ],
+      "footX": 150.99
+    },
+    {
+      "row": 4,
+      "col": 1,
+      "bounds": [
+        31,
+        18,
+        155,
+        170
+      ],
+      "source": "exec-e779f14c-19c5-4f9d-8526-15a97194e90f.png",
+      "cut": [
+        381,
+        720,
+        306,
+        335
+      ],
+      "footX": 159.55
+    },
+    {
+      "row": 4,
+      "col": 2,
+      "bounds": [
+        28,
+        18,
+        154,
+        170
+      ],
+      "source": "exec-e779f14c-19c5-4f9d-8526-15a97194e90f.png",
+      "cut": [
+        737,
+        716,
+        307,
+        339
+      ],
+      "footX": 167.76
+    },
+    {
+      "row": 4,
+      "col": 3,
+      "bounds": [
+        32,
+        18,
+        157,
+        170
+      ],
+      "source": "exec-e779f14c-19c5-4f9d-8526-15a97194e90f.png",
+      "cut": [
+        1108,
+        716,
+        313,
+        338
+      ],
+      "footX": 159.88
+    },
+    {
+      "row": 5,
+      "col": 0,
+      "bounds": [
+        41,
+        18,
+        151,
+        170
+      ],
+      "source": "exec-de648a92-ce73-4b0a-bedf-544298155063.png",
+      "cut": [
+        56,
+        859,
+        159,
+        179
+      ],
+      "footX": 74.82
+    },
+    {
+      "row": 5,
+      "col": 1,
+      "bounds": [
+        41,
+        18,
+        161,
+        170
+      ],
+      "source": "exec-de648a92-ce73-4b0a-bedf-544298155063.png",
+      "cut": [
+        273,
+        859,
+        170,
+        179
+      ],
+      "footX": 74.61
+    },
+    {
+      "row": 5,
+      "col": 2,
+      "bounds": [
+        40,
+        18,
+        166,
+        170
+      ],
+      "source": "exec-de648a92-ce73-4b0a-bedf-544298155063.png",
+      "cut": [
+        472,
+        861,
+        173,
+        177
+      ],
+      "footX": 74.56
+    },
+    {
+      "row": 5,
+      "col": 3,
+      "bounds": [
+        37,
+        18,
+        163,
+        170
+      ],
+      "source": "exec-de648a92-ce73-4b0a-bedf-544298155063.png",
+      "cut": [
+        672,
+        861,
+        170,
+        177
+      ],
+      "footX": 78.08
+    },
+    {
+      "row": 6,
+      "col": 0,
+      "bounds": [
+        53,
+        18,
+        107,
+        170
+      ],
+      "source": "exec-08da12c3-8498-4580-9606-1df631cc3964.png",
+      "cut": [
+        16,
+        514,
+        286,
+        454
+      ],
+      "footX": 157.29
+    },
+    {
+      "row": 6,
+      "col": 1,
+      "bounds": [
+        54,
+        18,
+        107,
+        170
+      ],
+      "source": "exec-08da12c3-8498-4580-9606-1df631cc3964.png",
+      "cut": [
+        319,
+        511,
+        289,
+        458
+      ],
+      "footX": 156.46
+    },
+    {
+      "row": 6,
+      "col": 2,
+      "bounds": [
+        63,
+        18,
+        99,
+        170
+      ],
+      "source": "exec-08da12c3-8498-4580-9606-1df631cc3964.png",
+      "cut": [
+        630,
+        518,
+        261,
+        450
+      ],
+      "footX": 130
+    },
+    {
+      "row": 6,
+      "col": 3,
+      "bounds": [
+        60,
+        18,
+        100,
+        170
+      ],
+      "source": "exec-08da12c3-8498-4580-9606-1df631cc3964.png",
+      "cut": [
+        907,
+        516,
+        266,
+        452
+      ],
+      "footX": 138.03
+    }
+  ],
+  "sources": [
+    {
+      "source": "exec-de648a92-ce73-4b0a-bedf-544298155063.png",
+      "sha256": "b39fda06c8db7b18e1cbd9f2980ffb28f8595b5a3f4c91aa739113057e82131e",
+      "size": [
+        1254,
+        1254
+      ]
+    },
+    {
+      "source": "exec-08da12c3-8498-4580-9606-1df631cc3964.png",
+      "sha256": "7cf2a0f89b80acd988d44116acbcd28bf871c53ede4fcc2fb0c3c33437eca553",
+      "size": [
+        1536,
+        1024
+      ]
+    },
+    {
+      "source": "exec-e779f14c-19c5-4f9d-8526-15a97194e90f.png",
+      "sha256": "33fb0644ed350ab88cfc607dd0c3ba6e9f2c58b6eeff2ecac49ec50841c5f99c",
+      "size": [
+        1447,
+        1087
+      ]
+    }
+  ],
+  "authoringNote": "Rear walk loop closes with an independently drawn complete return stance; the edge-clipped draft drawing is excluded."
+}
