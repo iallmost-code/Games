@@ -761,6 +761,7 @@
     <script src="assets/cinematic/zone-environment.js"></script>
     <script src="assets/cinematic/motion.js"></script>
     <script src="assets/cinematic/combat-feel.js"></script>
+    <script src="assets/cinematic/world-presence.js"></script>
     <script src="assets/adventure/combat-loot.js"></script>
     <script src="assets/audio/combat-audio.js"></script>
     <script src="assets/audio/music.js"></script>
@@ -769,7 +770,7 @@
     <script>
       (() => {
         "use strict";
-        const GAME_VERSION = "v78 · ENDLESS OVERTIME";
+        const GAME_VERSION = "v79 · WORLD & PRESENCE";
 
         // Recent script errors for Pause → REPORT A BUG. Never saved.
         const recentErrors = [];
@@ -4787,8 +4788,8 @@
             }
         }
         function drawWalls(left, top) {
-          let zone = currentZone(),
-            cap = ["#5c4b3e", "#455e72", "#4d6348"][zone],
+          let zone = currentZone(), scenery={...visualScene(),projectVector};
+          let cap = ["#5c4b3e", "#455e72", "#4d6348"][zone],
             edge = ["#b17c50", "#92c7dc", "#83bc75"][zone],
             base = ["#27211f", "#1d2a35", "#202d22"][zone];
           for (let gx = Math.floor(left / chamberSize) * chamberSize; gx < left + worldW + 180; gx += chamberSize)
@@ -4810,6 +4811,7 @@
                       [gx + 252, gy + 263, 111, 98],
                     ];
               for (const [x, y, bw, bh] of blocks) {
+                if(window.EmberPresence?.drawObstacle(ctx,scenery,x,y,bw,bh))continue;
                 if(spriteReady("prop-tomb-"+zone)){
                   groundShadow(x+bw/2,y+bh*.78,bw*.55,bh*.32);
                   drawProp("prop-tomb-"+zone,x+bw/2,y+bh+9,bw+13,bh+47);
@@ -5265,7 +5267,7 @@
           for(const t of heroTraps){ctx.strokeStyle=hero.shockTrap?"#ffe783":"#a6e9ff";ctx.lineWidth=2;ctx.beginPath();ctx.ellipse(t.x,t.y,t.r,t.r*.5,0,0,7);ctx.stroke();ctx.beginPath();ctx.moveTo(t.x-9,t.y-7);ctx.lineTo(t.x+9,t.y+7);ctx.moveTo(t.x+9,t.y-7);ctx.lineTo(t.x-9,t.y+7);ctx.stroke();}
           if(hero.evolutions.includes("blizzard"))for(let i=1;i<heroTraps.length;i++){const a=heroTraps[i-1],b=heroTraps[i];if(Math.hypot(a.x-b.x,a.y-b.y)<700&&!segmentBlocked(a.x,a.y,b.x,b.y)){ctx.strokeStyle="#9ce9ff99";ctx.lineWidth=8;ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(b.x,b.y);ctx.stroke();}}
           if(hero.class==="sunwarden"){ctx.save();if(isDescent()){ctx.beginPath();for(const key of dungeon.cells){const [x,y]=key.split(",").map(Number);if(!dungeonSolid(x,y))ctx.rect(x*80,y*80,80,80);}ctx.clip();}
-          for(const b of beamEnds()){ctx.strokeStyle="#ffe9a333";ctx.lineWidth=beamWidth()*2;ctx.beginPath();ctx.moveTo(hero.x,hero.y);ctx.lineTo(b.x,b.y);ctx.stroke();ctx.strokeStyle="#fff2ccbb";ctx.lineWidth=3;ctx.stroke();drawGlow(b.x,b.y,16,elementColors.light);}
+          for(const b of beamEnds()){if(window.EmberPresence){window.EmberPresence.beam(ctx,{x:hero.x,y:hero.y,angle:b.angle,length:b.length},beamWidth());continue;}ctx.strokeStyle="#ffe9a333";ctx.lineWidth=beamWidth()*2;ctx.beginPath();ctx.moveTo(hero.x,hero.y);ctx.lineTo(b.x,b.y);ctx.stroke();ctx.strokeStyle="#fff2ccbb";ctx.lineWidth=3;ctx.stroke();drawGlow(b.x,b.y,16,elementColors.light);}
           ctx.restore();}
           for(const zone of heroZones){ctx.strokeStyle=zone.kind==="cyclone"?elementColors.wind:elementColors.light;ctx.lineWidth=2;ctx.fillStyle=zone.kind==="cyclone"?"#a6e4d71c":"#ffe5a11c";ctx.beginPath();ctx.ellipse(zone.x,zone.y,zone.r,zone.r*.7,0,0,7);ctx.fill();ctx.stroke();if(zone.kind==="pillar"){ctx.fillStyle="#fff0af80";ctx.fillRect(zone.x-8,zone.y-90,16,90);}if(zone.kind==="cyclone")for(let i=0;i<3;i++){ctx.beginPath();ctx.ellipse(zone.x+Math.sin(clock*4+i)*8,zone.y-i*12,zone.r*(.8-i*.15),12,0,clock*3+i,clock*3+i+4);ctx.stroke();}}
           for(let i=0;i<(hero.spiritWisps||0);i++){const a=clock*1.8+i*Math.PI*2/hero.spiritWisps,x=hero.x+Math.cos(a)*75,y=hero.y+Math.sin(a)*75;if(!segmentBlocked(hero.x,hero.y,x,y))drawGlow(x,y,10,"#c89cff");}
@@ -6026,9 +6028,9 @@
           if(!rpgPreview)return;
           let used=0;const light=(x,y,r,color,alpha)=>{if(used>=visualQuality.maxLights||!visiblePoint(x,y,r))return;used++;ctx.globalAlpha=alpha;drawGlow(x,y,r,color);};
           ctx.save();ctx.globalCompositeOperation="screen";
-          for(const m of meteors)light(m.x,m.y,m.r+35,"#ff833e",.16);
-          for(const p of pools){const color=p.kind==="frozen"?"#83d5ff":p.kind==="rift"?"#a17adb":["flame","cinder"].includes(p.kind)?"#f57b38":"#86ca67";light(p.x,p.y,p.r+25,color,.10);}
-          for(const arc of arcs)light((arc.x1+arc.x2)/2,(arc.y1+arc.y2)/2,70,arc.beam?"#ae83e1":"#afecff",Math.min(.22,arc.life));
+          for(const m of meteors)light(m.x,m.y,m.r+35,"#ff833e",.10);
+          for(const p of pools){const color=p.kind==="frozen"?"#83d5ff":p.kind==="rift"?"#a17adb":["flame","cinder"].includes(p.kind)?"#f57b38":"#86ca67";light(p.x,p.y,p.r+25,color,.06);}
+          for(const arc of arcs)light((arc.x1+arc.x2)/2,(arc.y1+arc.y2)/2,70,arc.beam?"#ae83e1":"#afecff",Math.min(.09,arc.life));
           ctx.restore();
           for(const p of pools){if(!visiblePoint(p.x,p.y,p.r+30))continue;ctx.save();ctx.globalAlpha=Math.min(.22,p.life*.12);
             if(p.kind==="rift"){ctx.strokeStyle="#13091d";ctx.lineWidth=7;ctx.beginPath();ctx.moveTo(p.x-p.r*.65,p.y);for(let i=1;i<=6;i++)ctx.lineTo(p.x-p.r*.65+i*p.r*.22,p.y+Math.sin(i*8)*9);ctx.stroke();}
@@ -6038,17 +6040,17 @@
         }
         function drawRpgLighting(){
           if(!rpgPreview)return;
-          ctx.save();ctx.globalCompositeOperation="screen";ctx.globalAlpha=.12;
-          drawGlow(hero.x,hero.y,150,"#c0a784");
+          ctx.save();ctx.globalCompositeOperation="screen";ctx.globalAlpha=.045;
+          drawGlow(hero.x,hero.y,95,"#9aa7b5");
           if(isDescent())for(const [x,y,rw,rh]of floorSpec().rooms)for(const p of [[(x+.6)*80,(y+rh-.6)*80],[(x+rw-.7)*80,(y+.7)*80]])if(visiblePoint(p[0],p[1],150)){
-            ctx.globalAlpha=.2+Math.sin(clock*7+x)*.015;drawGlow(p[0],p[1],145,["#e9934b","#82c6e1","#b6cf76"][currentZone()]);
+            ctx.globalAlpha=.09+Math.sin(clock*7+x)*.008;drawGlow(p[0],p[1],110,["#e9934b","#82c6e1","#b6cf76"][currentZone()]);
           }ctx.restore();
         }
         function drawRpgEffects(){
           if(!rpgPreview)return;
           for(const fx of rpgFx){
             const t=1-fx.life/fx.total,r=fx.r*(.35+.65*t),color=fx.color||{gravecaller:"#b895ff",ranger:"#a4e6ff",ember:"#ffab65",bloodknight:"#c99b61",sunwarden:"#fff0b0",rogue:"#b4ee82",frostwarden:"#a6e9ff"}[fx.kind];
-            ctx.save();ctx.globalAlpha=Math.sin((1-t)*Math.PI*.75)*.75;ctx.strokeStyle=color;ctx.lineWidth=fx.kind==="impact"?3:2;
+            ctx.save();ctx.globalAlpha=Math.sin((1-t)*Math.PI*.75)*(fx.kind==="impact"?.38:.75);ctx.strokeStyle=color;ctx.lineWidth=fx.kind==="impact"?3:2;
             ctx.beginPath();ctx.arc(fx.x,fx.y,r,0,Math.PI*2);ctx.stroke();
             if(fx.kind!=="impact"){
               ctx.beginPath();ctx.arc(fx.x,fx.y,r*.82,0,Math.PI*2);ctx.stroke();
@@ -7271,13 +7273,19 @@
           }
           return true;
         }
+        let heroPresencePose=null; // Presentation snapshot only; never part of a hero/save.
+        function drawHeroPresence(){
+          if(!window.EmberPresence||hero.hp<=0||!heroPresencePose||heroPresencePose.kind!==hero.class||!window.EmberPresence.occluded(hero,enemies,projectVector)||!window.EmberHeroAnimation?.ready(hero.class))return;
+          const alpha=(hero.class==="rogue"&&hero.veilUntil>clock?.5:hero.inv>0&&Math.floor(hero.inv*16)%2?.45:1)*.72;
+          billboard(hero.x,actorFoot(hero.y,19),()=>window.EmberPresence.rescue(ctx,{...heroPresencePose,alpha}));
+        }
         function drawArtHero() {
           let heroArt=spriteReady(hero.class)?hero.class:"gravecaller";
           if(!spriteReady(heroArt))return false;
           let x = hero.x,
             y = hero.y,
-            w = 55,
-            h = ["bloodknight","frostwarden"].includes(hero.class) ? 90 : 80,
+            w = 61,
+            h = ["bloodknight","frostwarden"].includes(hero.class) ? 100 : 89,
             fx = hero.class==="ranger"&&hero.cast>.025 ? (hero.aimX??hero.faceX??0) : hero.faceX || 0,
             fy = hero.class==="ranger"&&hero.cast>.025 ? (hero.aimY??hero.faceY??1) : hero.faceY === undefined ? 1 : hero.faceY,
             poseCast = hero.cast,
@@ -7304,7 +7312,8 @@
           const attackVisual={kind:hero.class,height:h,direction:projectVector(fx,fy),cast:poseCast,hit:heroHit,dead:hero.hp<=0};
           if(window.EmberHeroAnimation?.ready(hero.class)){
             ctx.save();ctx.translate(x,actorFoot(y,19));cancelProjection();
-            authored=window.EmberHeroAnimation.draw(ctx,{kind:hero.class,variant:profile.mastery?.[hero.class]?.color||0,height:h,direction:projectVector(fx,fy),phase:hero.stepPhase,moving:hero.moving,cast:poseCast,hit:heroHit,dead:hero.hp<=0});ctx.restore();
+            heroPresencePose={kind:hero.class,variant:profile.mastery?.[hero.class]?.color||0,height:h,direction:projectVector(fx,fy),phase:hero.stepPhase,moving:hero.moving,cast:poseCast,hit:heroHit,dead:hero.hp<=0};
+            authored=window.EmberHeroAnimation.draw(ctx,heroPresencePose);ctx.restore();
 
           }
           if(!authored)drawGrounded(img,x,actorFoot(y,19),w,h,hero.stepPhase||0,hero.moving,(side||hero.class==="ranger"&&casting)&&projectVector(fx,fy).x<0,casting,projectVector(fx,fy).x,heroHit,0,0,window.EmberCombatFeel?.pose(attackVisual));
@@ -7887,8 +7896,10 @@
           if(rpgPreview){ctx.translate(w/2+Math.sin(clock*89)*(shakeEnabled?shake:0),cameraFocusY()+Math.cos(clock*71)*(shakeEnabled?shake:0)+(shakeEnabled?(window.EmberMotion?.cameraPush()||0):0));ctx.scale(1,cameraTilt);ctx.rotate(cameraAngle);ctx.translate(-hero.x,-hero.y);}else ctx.translate(w/2-hero.x+(Math.random()-.5)*(shakeEnabled?shake:0),h/2-hero.y+(Math.random()-.5)*(shakeEnabled?shake:0));
           queueScene=rpgPreview;sceneQueue=[];
           const center=inputVector(0,h/2-cameraFocusY()),left=hero.x+center.x-worldW/2-70,top=hero.y+center.y-worldH/2-70;
+          window.EmberPresence?.begin();
           dungeonFloor(left, top);
-          const ashScene=visualScene();
+          const ashScene={...visualScene(),projectVector};
+          window.EmberPresence?.landmarks(ctx,ashScene);
           window.EmberAsh?.ground(ctx,ashScene);
           window.EmberAsh?.foreground(ctx,ashScene);
           window.EmberZones?.ground(ctx,ashScene);
@@ -7903,7 +7914,7 @@
           drawRpgEffects();
           drawSpellEffects(left, top);
           drawPrototypeGround();drawNewBlood();
-          ctx.save();ctx.globalAlpha=.10;
+          ctx.save();ctx.globalAlpha=.045;
           drawGlow(hero.x,hero.y,52,hero.class==="bloodknight"?"#d45768":hero.class==="ember"?"#ffb174":hero.class==="ranger"?"#99dfff":hero.class==="sunwarden"?"#ffe5a1":"#b9a0ef");ctx.restore();
           for (const e of enemies)
             if (e.type === "boss" && e.slam) {
@@ -8052,11 +8063,13 @@
           if(rpgPreview){sceneItem(hero.x,hero.y,drawHeroLayer);flushScene();}else {drawHeroLayer();window.EmberCombatFeel?.draw(ctx,{...ashScene,projectVector});}
           ctx.textAlign = "center";
           ctx.font = "bold 15px system-ui";
-          for (const f of floaters) {
+          drawHeroPresence();
+          for (const f of window.EmberPresence?.labels(floaters,visualQuality)||floaters) {
             ctx.globalAlpha = Math.min(1, f.life * 2);
             ctx.font = "bold " + Math.round(15 * (f.scale || 1)*(1+Math.max(0,(f.life-.6)/.2)*.32)) + "px system-ui";
             ctx.fillStyle = f.color;
-            if(rpgPreview)billboard(f.x,f.y,()=>ctx.fillText(f.text,0,0));else ctx.fillText(f.text,f.x,f.y);
+            ctx.strokeStyle="#11151ddd";ctx.lineWidth=3;
+            if(rpgPreview)billboard(f.x,f.y,()=>{ctx.strokeText(f.text,0,0);ctx.fillText(f.text,0,0);});else {ctx.strokeText(f.text,f.x,f.y);ctx.fillText(f.text,f.x,f.y);}
           }
           ctx.restore();
           ctx.globalAlpha = 1;

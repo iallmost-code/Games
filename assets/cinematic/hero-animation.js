@@ -319,6 +319,7 @@
     if(recoil){ctx.translate(recoil.x,recoil.y);ctx.rotate(recoil.rotation);ctx.scale(recoil.scaleX,recoil.scaleY);}
     if (selected.flip) ctx.scale(-1, 1);
     const size = o.height / 192;
+    window.EmberPresence?.heroEdge(ctx,frame(o.kind,selected.index,o.variant||0),-112*size,-188*size,224*size,192*size);
     ctx.drawImage(
       frame(o.kind, selected.index, o.variant || 0),
       -112 * size,
