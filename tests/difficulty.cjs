@@ -7,6 +7,7 @@ for(const m of source.matchAll(/<script>([\s\S]*?)<\/script>/g))new Function(m[1
 const marker='      })();\n    </script>';
 assert.equal(source.split(marker).length,2,'Test hook marker missing');
 const html=source.replaceAll('requestAnimationFrame(frame);','').replace('function sfx(kind) {','function sfx(kind) { return;')
+  .replace('function music(kind) {','function music(kind) { return;')
   .replace(marker,'        window.__test=(code)=>eval(code);\n'+marker);
 const server=http.createServer((req,res)=>{const name=decodeURIComponent(req.url.split('?')[0]);
   if(name==='/'||name==='/test'){res.writeHead(200,{'content-type':'text/html'});return res.end(html);}
